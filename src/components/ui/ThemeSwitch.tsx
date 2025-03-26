@@ -1,6 +1,7 @@
 
-import { useState, useEffect } from "react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useEffect } from "react";
+import "../ui/theme-switch.css";
 
 const ThemeSwitch = () => {
   const [isDarkMode, setIsDarkMode] = useLocalStorage<boolean>("dark-mode", false);

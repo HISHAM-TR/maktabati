@@ -4,6 +4,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import { Menu, X, Book, User, LogOut } from "lucide-react";
+import ThemeSwitch from "@/components/ui/ThemeSwitch";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -86,14 +87,19 @@ const Header = () => {
                   <span className="text-sm font-medium">{user.name}</span>
                 </div>
                 
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={handleLogout}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleLogout}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                  <div className="scale-75 origin-right">
+                    <ThemeSwitch />
+                  </div>
+                </div>
               </div>
             </>
           ) : (
@@ -104,6 +110,9 @@ const Header = () => {
               <NavLink to="/register">
                 <Button>إنشاء حساب</Button>
               </NavLink>
+              <div className="scale-75 origin-right">
+                <ThemeSwitch />
+              </div>
             </div>
           )}
         </nav>
@@ -167,15 +176,20 @@ const Header = () => {
                     <span className="text-sm font-medium">{user.name}</span>
                   </div>
                   
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={handleLogout}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <LogOut className="h-4 w-4 ml-2" />
-                    تسجيل الخروج
-                  </Button>
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={handleLogout}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <LogOut className="h-4 w-4 ml-2" />
+                      تسجيل الخروج
+                    </Button>
+                    <div className="scale-75">
+                      <ThemeSwitch />
+                    </div>
+                  </div>
                 </div>
               </>
             ) : (
@@ -186,6 +200,11 @@ const Header = () => {
                 <NavLink to="/register" className="w-full">
                   <Button className="w-full">إنشاء حساب</Button>
                 </NavLink>
+                <div className="flex justify-center mt-2">
+                  <div className="scale-75">
+                    <ThemeSwitch />
+                  </div>
+                </div>
               </div>
             )}
           </div>
