@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -31,7 +32,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
-import ThemeSwitch from "@/components/ui/ThemeSwitch";
+// إزالة استيراد ThemeSwitch
 
 const libraryData = {
   "1": {
@@ -308,7 +309,7 @@ const Library = () => {
                 {library.description}
               </p>
             </div>
-            <ThemeSwitch />
+            {/* تم حذف مكون ThemeSwitch من هنا */}
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
