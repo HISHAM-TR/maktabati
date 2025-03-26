@@ -85,7 +85,7 @@ const LibraryCard = ({
       </CardHeader>
       
       <CardContent>
-        <div className="text-sm text-muted-foreground flex flex-col gap-1 text-right">
+        <div className="text-sm text-muted-foreground flex flex-col gap-1">
           <div>{bookCount} {bookCount === 1 ? "كتاب" : "كتب"}</div>
           <div>{volumeCount} {volumeCount === 1 ? "مجلد" : "مجلدات"}</div>
         </div>

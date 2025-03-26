@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -31,7 +32,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
+// إزالة استيراد ThemeSwitch
 
+// تحديث نوع الكتاب بإضافة عدد المجلدات
 type ExtendedBookType = BookType & {
   volumes?: number;
 };
@@ -127,7 +130,7 @@ const initialBookCategories = [
   "فلسفة",
   "سيرة ذاتية",
   "تاريخ",
-  "تطوير ذ��تي",
+  "تطوير ذاتي",
   "غموض",
   "إثارة",
 ];
@@ -313,7 +316,7 @@ const Library = () => {
           <div className="mb-8 flex justify-between items-center">
             <div>
               <div className="flex items-center mb-2">
-                <Link to="/dashboard" className="text-muted-foreground hover:text-primary ms-4">
+                <Link to="/dashboard" className="text-muted-foreground hover:text-primary ml-4">
                   <ChevronRight className="h-5 w-5" />
                 </Link>
                 <h1 className="text-3xl font-bold">{library.name}</h1>
@@ -322,6 +325,7 @@ const Library = () => {
                 {library.description}
               </p>
             </div>
+            {/* تم حذف مكون ThemeSwitch من هنا */}
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -344,7 +348,7 @@ const Library = () => {
               }}
               className="text-lg py-6 px-8"
             >
-              <Plus className="h-5 w-5 ms-2" />
+              <Plus className="h-5 w-5 ml-2" />
               إضافة كتاب
             </Button>
           </div>
@@ -385,7 +389,7 @@ const Library = () => {
                 }}
                 className="text-lg py-6 px-8"
               >
-                <Plus className="h-5 w-5 ms-2" />
+                <Plus className="h-5 w-5 ml-2" />
                 إضافة كتاب
               </Button>
             </div>
@@ -482,7 +486,7 @@ const Library = () => {
                       onClick={() => setIsAddingCategory(true)}
                       className="text-lg"
                     >
-                      <Plus className="h-4 w-4 ms-1" />
+                      <Plus className="h-4 w-4 ml-1" />
                       تصنيف جديد
                     </Button>
                   </div>
@@ -521,11 +525,11 @@ const Library = () => {
               />
             </div>
           </div>
-          <DialogFooter className="flex-row sm:justify-end">
-            <Button onClick={handleAddBook} className="text-lg py-6 px-8">إضافة كتاب</Button>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="text-lg py-6 px-8 mr-2">
+          <DialogFooter className="flex-row-reverse sm:justify-end">
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
+            <Button onClick={handleAddBook} className="text-lg py-6 px-8">إضافة كتاب</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -615,7 +619,7 @@ const Library = () => {
                       onClick={() => setIsAddingCategory(true)}
                       className="text-lg"
                     >
-                      <Plus className="h-4 w-4 ms-1" />
+                      <Plus className="h-4 w-4 ml-1" />
                       تصنيف جديد
                     </Button>
                   </div>
@@ -653,11 +657,11 @@ const Library = () => {
               />
             </div>
           </div>
-          <DialogFooter className="flex-row sm:justify-end">
-            <Button onClick={handleEditBook} className="text-lg py-6 px-8">حفظ التغييرات</Button>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-lg py-6 px-8 mr-2">
+          <DialogFooter className="flex-row-reverse sm:justify-end">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
+            <Button onClick={handleEditBook} className="text-lg py-6 px-8">حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -667,45 +671,45 @@ const Library = () => {
           {activeBook && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl text-right">{activeBook.title}</DialogTitle>
+                <DialogTitle className="text-2xl">{activeBook.title}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="flex items-center">
-                  <User className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">المؤلف:</span>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">المؤلف:</span>
                   <span className="text-lg">{activeBook.author}</span>
                 </div>
-                <div className="flex items-center">
-                  <BookIcon className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">التصنيف:</span>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <BookIcon className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">التصنيف:</span>
                   <span className="text-lg">{activeBook.category}</span>
                 </div>
-                <div className="flex items-center">
-                  <BookIcon className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">عدد المجلدات:</span>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <BookIcon className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">عدد المجلدات:</span>
                   <span className="text-lg">{activeBook.volumes || 1}</span>
                 </div>
-                <div className="flex items-center">
-                  <Calendar className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">تمت الإضافة في:</span>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">تمت الإضافة في:</span>
                   <span className="text-lg">{new Date().toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div className="mt-4">
-                  <h4 className="text-lg font-medium mb-2 text-right">الوصف:</h4>
-                  <p className="text-muted-foreground text-lg text-right">
+                  <h4 className="text-lg font-medium mb-2">الوصف:</h4>
+                  <p className="text-muted-foreground text-lg">
                     {activeBook.description || "لا يوجد وصف متاح."}
                   </p>
                 </div>
               </div>
-              <DialogFooter className="flex-row sm:justify-end">
+              <DialogFooter className="flex-row-reverse sm:justify-end">
+                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="text-lg py-6 px-8">
+                  إغلاق
+                </Button>
                 <Button onClick={() => {
                   setIsViewDialogOpen(false);
                   handleEditDialogOpen(activeBook);
                 }} className="text-lg py-6 px-8">
                   تعديل الكتاب
-                </Button>
-                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="text-lg py-6 px-8 mr-2">
-                  إغلاق
                 </Button>
               </DialogFooter>
             </>
