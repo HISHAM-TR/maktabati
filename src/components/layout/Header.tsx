@@ -40,35 +40,38 @@ const Header = () => {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled ? "glass shadow-sm py-3" : "bg-transparent py-4"
     }`} dir="rtl">
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        <NavLink to="/" className="flex items-center space-x-reverse space-x-2">
-          <Book className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-xl">نظام إدارة المكتبات</span>
-        </NavLink>
-        
-        {/* قائمة سطح المكتب */}
-        <nav className="hidden md:flex items-center space-x-reverse space-x-8">
-          <NavLink 
-            to="/" 
-            className={({ isActive }) => 
-              `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
-            }
-          >
-            الرئيسية
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center">
+          {/* Logo على اليمين */}
+          <NavLink to="/" className="flex items-center space-x-reverse space-x-2">
+            <Book className="h-6 w-6 text-primary" />
+            <span className="font-semibold text-xl">نظام إدارة المكتبات</span>
           </NavLink>
-          
-          {user ? (
-            <>
+
+          {/* قائمة سطح المكتب في الوسط */}
+          <nav className="hidden md:flex items-center justify-center">
+            <div className="flex space-x-reverse space-x-8">
               <NavLink 
-                to="/dashboard" 
+                to="/" 
                 className={({ isActive }) => 
                   `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
                 }
               >
-                لوحة التحكم
+                الرئيسية
               </NavLink>
               
-              {user.role === "admin" && (
+              {user && (
+                <NavLink 
+                  to="/dashboard" 
+                  className={({ isActive }) => 
+                    `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
+                  }
+                >
+                  لوحة التحكم
+                </NavLink>
+              )}
+              
+              {user?.role === "admin" && (
                 <NavLink 
                   to="/admin" 
                   className={({ isActive }) => 
@@ -78,7 +81,12 @@ const Header = () => {
                   المشرف
                 </NavLink>
               )}
-              
+            </div>
+          </nav>
+          
+          {/* حساب المستخدم وأزرار تسجيل الدخول على اليسار */}
+          <div className="hidden md:flex items-center">
+            {user ? (
               <div className="flex items-center space-x-reverse space-x-4">
                 <div className="flex items-center space-x-reverse space-x-2">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -101,30 +109,30 @@ const Header = () => {
                   </div>
                 </div>
               </div>
-            </>
-          ) : (
-            <div className="flex items-center space-x-reverse space-x-4">
-              <NavLink to="/login">
-                <Button variant="ghost">تسجيل الدخول</Button>
-              </NavLink>
-              <NavLink to="/register">
-                <Button>إنشاء حساب</Button>
-              </NavLink>
-              <div className="scale-75 origin-right">
-                <ThemeSwitch />
+            ) : (
+              <div className="flex items-center space-x-reverse space-x-4">
+                <NavLink to="/login">
+                  <Button variant="ghost">تسجيل الدخول</Button>
+                </NavLink>
+                <NavLink to="/register">
+                  <Button>إنشاء حساب</Button>
+                </NavLink>
+                <div className="scale-75 origin-right">
+                  <ThemeSwitch />
+                </div>
               </div>
-            </div>
-          )}
-        </nav>
-        
-        {/* زر القائمة المتنقلة */}
-        <button 
-          className="md:hidden"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label={isMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+            )}
+          </div>
+          
+          {/* زر القائمة المتنقلة */}
+          <button 
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
       
       {/* القائمة المتنقلة */}
