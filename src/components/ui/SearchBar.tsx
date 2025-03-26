@@ -10,7 +10,7 @@ interface SearchBarProps {
 
 const SearchBar = ({ 
   onSearch, 
-  placeholder = "Search..." 
+  placeholder = "بحث..." 
 }: SearchBarProps) => {
   const [query, setQuery] = useState("");
 
@@ -23,21 +23,22 @@ const SearchBar = ({
     <form 
       onSubmit={handleSubmit}
       className="relative w-full max-w-md mx-auto"
+      dir="rtl"
     >
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="pl-10 pr-12 py-2 w-full bg-white"
+          className="pr-10 pl-12 py-2 w-full bg-white text-right"
         />
         <button
           type="submit"
-          className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1 rounded-md text-sm font-medium h-[34px]"
+          className="absolute left-1 top-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1 rounded-md text-sm font-medium h-[34px]"
         >
-          Search
+          بحث
         </button>
       </div>
     </form>

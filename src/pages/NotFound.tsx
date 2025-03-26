@@ -10,16 +10,16 @@ const NotFound = () => {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = "Page Not Found | Library Management System";
+    document.title = "الصفحة غير موجودة | نظام إدارة المكتبات";
     
     console.error(
-      "404 Error: User attempted to access non-existent route:",
+      "خطأ 404: حاول المستخدم الوصول إلى مسار غير موجود:",
       location.pathname
     );
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
       
       <main className="flex-1 flex items-center justify-center pt-24 pb-16">
@@ -29,15 +29,15 @@ const NotFound = () => {
           </div>
           
           <h1 className="text-4xl font-bold mb-4">404</h1>
-          <h2 className="text-2xl font-semibold mb-2">Page Not Found</h2>
+          <h2 className="text-2xl font-semibold mb-2">الصفحة غير موجودة</h2>
           <p className="text-muted-foreground mb-8">
-            The page you are looking for doesn't exist or has been moved.
+            الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
           </p>
           
           <Link to="/">
             <Button className="mx-auto">
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Return to Home
+              <ArrowLeft className="h-5 w-5 ml-2" />
+              العودة إلى الصفحة الرئيسية
             </Button>
           </Link>
         </div>

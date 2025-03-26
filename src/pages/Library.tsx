@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
-  ChevronLeft, 
+  ChevronRight, 
   Plus, 
   Book as BookIcon, 
   User,
@@ -33,96 +33,96 @@ import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
 
-// Mock library data
+// بيانات المكتبات الوهمية
 const libraryData = {
   "1": {
     id: "1",
-    name: "Fiction Collection",
-    description: "My collection of fiction books, including fantasy, sci-fi, and historical fiction.",
+    name: "مجموعة الروايات",
+    description: "مجموعتي من الروايات، بما في ذلك الخيال والخيال العلمي والتاريخي.",
   },
   "2": {
     id: "2",
-    name: "Tech Books",
-    description: "Programming and technology reference books.",
+    name: "كتب التقنية",
+    description: "كتب البرمجة والتكنولوجيا المرجعية.",
   },
   "3": {
     id: "3",
-    name: "Philosophy",
-    description: "Collection of classic and modern philosophy texts.",
+    name: "الفلسفة",
+    description: "مجموعة من نصوص الفلسفة الكلاسيكية والحديثة.",
   },
 };
 
-// Mock books data
+// بيانات الكتب الوهمية
 const initialBooksData = {
   "1": [
     {
       id: "1-1",
-      title: "The Lord of the Rings",
-      author: "J.R.R. Tolkien",
-      category: "Fantasy",
-      description: "An epic fantasy novel about a quest to destroy a powerful ring.",
+      title: "سيد الخواتم",
+      author: "ج.ر.ر. تولكين",
+      category: "خيال",
+      description: "رواية خيالية ملحمية عن مهمة لتدمير خاتم قوي.",
     },
     {
       id: "1-2",
-      title: "Dune",
-      author: "Frank Herbert",
-      category: "Science Fiction",
-      description: "A science fiction novel set in a distant future amidst a feudal interstellar society.",
+      title: "كثبان",
+      author: "فرانك هربرت",
+      category: "خيال علمي",
+      description: "رواية خيال علمي تدور في مستقبل بعيد وسط مجتمع إقطاعي بين النجوم.",
     },
     {
       id: "1-3",
-      title: "Pride and Prejudice",
-      author: "Jane Austen",
-      category: "Classic",
-      description: "A romantic novel following the emotional development of protagonist Elizabeth Bennet.",
+      title: "كبرياء وتحامل",
+      author: "جين أوستن",
+      category: "كلاسيكي",
+      description: "رواية رومانسية تتبع التطور العاطفي للبطلة إليزابيث بينيت.",
     },
   ],
   "2": [
     {
       id: "2-1",
-      title: "Clean Code",
-      author: "Robert C. Martin",
-      category: "Programming",
-      description: "A handbook of agile software craftsmanship.",
+      title: "كود نظيف",
+      author: "روبرت سي. مارتن",
+      category: "برمجة",
+      description: "دليل لحرفية البرمجيات الرشيقة.",
     },
     {
       id: "2-2",
-      title: "Design Patterns",
-      author: "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
-      category: "Programming",
-      description: "Elements of Reusable Object-Oriented Software.",
+      title: "أنماط التصميم",
+      author: "إريك جاما، ريتشارد هيلم، رالف جونسون، جون فليسيدس",
+      category: "برمجة",
+      description: "عناصر البرمجيات الموجهة للكائنات القابلة لإعادة الاستخدام.",
     },
   ],
   "3": [
     {
       id: "3-1",
-      title: "Republic",
-      author: "Plato",
-      category: "Philosophy",
-      description: "A Socratic dialogue concerning justice, the order and character of the just city-state, and the just man.",
+      title: "الجمهورية",
+      author: "أفلاطون",
+      category: "فلسفة",
+      description: "حوار سقراطي بخصوص العدالة، ونظام وطبيعة الدولة العادلة، والإنسان العادل.",
     },
     {
       id: "3-2",
-      title: "Beyond Good and Evil",
-      author: "Friedrich Nietzsche",
-      category: "Philosophy",
-      description: "Prelude to a Philosophy of the Future.",
+      title: "ما وراء الخير والشر",
+      author: "فريدريك نيتشه",
+      category: "فلسفة",
+      description: "مقدمة لفلسفة المستقبل.",
     },
   ],
 };
 
-// Book categories
+// تصنيفات الكتب
 const bookCategories = [
-  "Fantasy",
-  "Science Fiction",
-  "Classic",
-  "Programming",
-  "Philosophy",
-  "Biography",
-  "History",
-  "Self-Help",
-  "Mystery",
-  "Thriller",
+  "خيال",
+  "خيال علمي",
+  "كلاسيكي",
+  "برمجة",
+  "فلسفة",
+  "سيرة ذاتية",
+  "تاريخ",
+  "تطوير ذاتي",
+  "غموض",
+  "إثارة",
 ];
 
 const Library = () => {
@@ -143,14 +143,14 @@ const Library = () => {
     description: "",
   });
 
-  // Load library data on mount
+  // تحميل بيانات المكتبة عند التحميل
   useEffect(() => {
-    document.title = "Library | Library Management System";
+    document.title = "المكتبة | نظام إدارة المكتبات";
     
     if (id && libraryData[id as keyof typeof libraryData]) {
       setLibrary(libraryData[id as keyof typeof libraryData]);
       
-      // Load books for this library
+      // تحميل الكتب لهذه المكتبة
       if (initialBooksData[id as keyof typeof initialBooksData]) {
         setBooks(initialBooksData[id as keyof typeof initialBooksData]);
         setFilteredBooks(initialBooksData[id as keyof typeof initialBooksData]);
@@ -158,7 +158,7 @@ const Library = () => {
     }
   }, [id]);
 
-  // Handle search
+  // معالجة البحث
   const handleSearch = (query: string) => {
     if (!query.trim()) {
       setFilteredBooks(books);
@@ -176,10 +176,10 @@ const Library = () => {
     setFilteredBooks(results);
   };
 
-  // Add new book
+  // إضافة كتاب جديد
   const handleAddBook = () => {
     if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
-      toast.error("Title, author, and category are required");
+      toast.error("العنوان والمؤلف والتصنيف مطلوبين");
       return;
     }
 
@@ -197,14 +197,14 @@ const Library = () => {
       category: "",
       description: "",
     });
-    toast.success("Book added successfully");
+    toast.success("تمت إضافة الكتاب بنجاح");
   };
 
-  // Edit book
+  // تعديل كتاب
   const handleEditBook = () => {
     if (!activeBook) return;
     if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
-      toast.error("Title, author, and category are required");
+      toast.error("العنوان والمؤلف والتصنيف مطلوبين");
       return;
     }
 
@@ -224,23 +224,23 @@ const Library = () => {
       category: "",
       description: "",
     });
-    toast.success("Book updated successfully");
+    toast.success("تم تحديث الكتاب بنجاح");
   };
 
-  // Delete book
+  // حذف كتاب
   const handleDeleteBook = (id: string) => {
     const updatedBooks = books.filter((book) => book.id !== id);
     setBooks(updatedBooks);
     setFilteredBooks(updatedBooks);
   };
 
-  // View book details
+  // عرض تفاصيل الكتاب
   const handleViewBook = (book: BookType) => {
     setActiveBook(book);
     setIsViewDialogOpen(true);
   };
 
-  // Open edit dialog
+  // فتح مربع حوار التعديل
   const handleEditDialogOpen = (book: BookType) => {
     setActiveBook(book);
     setFormData({
@@ -254,21 +254,21 @@ const Library = () => {
 
   if (!library) {
     return (
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen" dir="rtl">
         <Header />
         <main className="flex-1 pt-24 pb-16">
           <div className="container mx-auto px-4 text-center">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <BookIcon className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold mb-4">Library Not Found</h1>
+            <h1 className="text-3xl font-bold mb-4">المكتبة غير موجودة</h1>
             <p className="text-xl text-muted-foreground mb-8">
-              The library you are looking for does not exist.
+              المكتبة التي تبحث عنها غير موجودة.
             </p>
             <Link to="/dashboard">
               <Button>
-                <ChevronLeft className="h-5 w-5 mr-2" />
-                Back to Dashboard
+                <ChevronRight className="h-5 w-5 ml-2" />
+                العودة إلى لوحة التحكم
               </Button>
             </Link>
           </div>
@@ -279,16 +279,16 @@ const Library = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Library Header */}
+          {/* رأس المكتبة */}
           <div className="mb-8">
             <div className="flex items-center mb-2">
-              <Link to="/dashboard" className="text-muted-foreground hover:text-primary mr-4">
-                <ChevronLeft className="h-5 w-5" />
+              <Link to="/dashboard" className="text-muted-foreground hover:text-primary ml-4">
+                <ChevronRight className="h-5 w-5" />
               </Link>
               <h1 className="text-3xl font-bold">{library.name}</h1>
             </div>
@@ -297,12 +297,12 @@ const Library = () => {
             </p>
           </div>
 
-          {/* Actions Bar */}
+          {/* شريط الإجراءات */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div className="mb-4 md:mb-0 md:w-1/2">
               <SearchBar
                 onSearch={handleSearch}
-                placeholder="Search books by title, author, or category..."
+                placeholder="ابحث عن الكتب حسب العنوان أو المؤلف أو التصنيف..."
               />
             </div>
             <Button
@@ -316,12 +316,12 @@ const Library = () => {
                 setIsAddDialogOpen(true);
               }}
             >
-              <Plus className="h-5 w-5 mr-2" />
-              Add Book
+              <Plus className="h-5 w-5 ml-2" />
+              إضافة كتاب
             </Button>
           </div>
 
-          {/* Books Grid */}
+          {/* شبكة الكتب */}
           {filteredBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredBooks.map((book) => (
@@ -339,11 +339,11 @@ const Library = () => {
               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <BookIcon className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">No books found</h3>
+              <h3 className="text-xl font-semibold mb-2">لم يتم العثور على كتب</h3>
               <p className="text-muted-foreground mb-6">
                 {books.length > 0
-                  ? "Try a different search term."
-                  : "Add your first book to this library."}
+                  ? "جرب مصطلح بحث مختلفًا."
+                  : "أضف أول كتاب إلى هذه المكتبة."}
               </p>
               <Button
                 onClick={() => {
@@ -356,8 +356,8 @@ const Library = () => {
                   setIsAddDialogOpen(true);
                 }}
               >
-                <Plus className="h-5 w-5 mr-2" />
-                Add Book
+                <Plus className="h-5 w-5 ml-2" />
+                إضافة كتاب
               </Button>
             </div>
           )}
@@ -366,19 +366,19 @@ const Library = () => {
 
       <Footer />
 
-      {/* Add Book Dialog */}
+      {/* مربع حوار إضافة كتاب */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent>
+        <DialogContent dir="rtl">
           <DialogHeader>
-            <DialogTitle>Add New Book</DialogTitle>
+            <DialogTitle>إضافة كتاب جديد</DialogTitle>
             <DialogDescription>
-              Add a new book to your library.
+              أضف كتابًا جديدًا إلى مكتبتك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right">
-                Title *
+              <Label htmlFor="title" className="text-left">
+                العنوان *
               </Label>
               <Input
                 id="title"
@@ -386,13 +386,13 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="col-span-3"
-                placeholder="Enter book title"
+                className="col-span-3 text-right"
+                placeholder="أدخل عنوان الكتاب"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="author" className="text-right">
-                Author *
+              <Label htmlFor="author" className="text-left">
+                المؤلف *
               </Label>
               <Input
                 id="author"
@@ -400,13 +400,13 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, author: e.target.value })
                 }
-                className="col-span-3"
-                placeholder="Enter author name"
+                className="col-span-3 text-right"
+                placeholder="أدخل اسم المؤلف"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
-                Category *
+              <Label htmlFor="category" className="text-left">
+                التصنيف *
               </Label>
               <Select
                 value={formData.category}
@@ -414,8 +414,8 @@ const Library = () => {
                   setFormData({ ...formData, category: value })
                 }
               >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select a category" />
+                <SelectTrigger className="col-span-3 text-right">
+                  <SelectValue placeholder="اختر تصنيفًا" />
                 </SelectTrigger>
                 <SelectContent>
                   {bookCategories.map((category) => (
@@ -427,8 +427,8 @@ const Library = () => {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
+              <Label htmlFor="description" className="text-left">
+                الوصف
               </Label>
               <Textarea
                 id="description"
@@ -436,34 +436,34 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="col-span-3"
-                placeholder="Enter book description"
+                className="col-span-3 text-right"
+                placeholder="أدخل وصف الكتاب"
                 rows={4}
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-row-reverse sm:justify-end">
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-              Cancel
+              إلغاء
             </Button>
-            <Button onClick={handleAddBook}>Add Book</Button>
+            <Button onClick={handleAddBook}>إضافة كتاب</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Book Dialog */}
+      {/* مربع حوار تعديل كتاب */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent dir="rtl">
           <DialogHeader>
-            <DialogTitle>Edit Book</DialogTitle>
+            <DialogTitle>تعديل كتاب</DialogTitle>
             <DialogDescription>
-              Update book information.
+              تحديث معلومات الكتاب.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-title" className="text-right">
-                Title *
+              <Label htmlFor="edit-title" className="text-left">
+                العنوان *
               </Label>
               <Input
                 id="edit-title"
@@ -471,12 +471,12 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-author" className="text-right">
-                Author *
+              <Label htmlFor="edit-author" className="text-left">
+                المؤلف *
               </Label>
               <Input
                 id="edit-author"
@@ -484,12 +484,12 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, author: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-category" className="text-right">
-                Category *
+              <Label htmlFor="edit-category" className="text-left">
+                التصنيف *
               </Label>
               <Select
                 value={formData.category}
@@ -497,7 +497,7 @@ const Library = () => {
                   setFormData({ ...formData, category: value })
                 }
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="col-span-3 text-right">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -510,8 +510,8 @@ const Library = () => {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-description" className="text-right">
-                Description
+              <Label htmlFor="edit-description" className="text-left">
+                الوصف
               </Label>
               <Textarea
                 id="edit-description"
@@ -519,60 +519,60 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right"
                 rows={4}
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-row-reverse sm:justify-end">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+              إلغاء
             </Button>
-            <Button onClick={handleEditBook}>Save Changes</Button>
+            <Button onClick={handleEditBook}>حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* View Book Dialog */}
+      {/* مربع حوار عرض الكتاب */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]">
+        <DialogContent className="sm:max-w-[525px]" dir="rtl">
           {activeBook && (
             <>
               <DialogHeader>
                 <DialogTitle className="text-2xl">{activeBook.title}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-reverse space-x-2">
                   <User className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">Author:</span>
+                  <span className="font-medium">المؤلف:</span>
                   <span>{activeBook.author}</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-reverse space-x-2">
                   <BookIcon className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">Category:</span>
+                  <span className="font-medium">التصنيف:</span>
                   <span>{activeBook.category}</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-reverse space-x-2">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">Added on:</span>
-                  <span>{new Date().toLocaleDateString()}</span>
+                  <span className="font-medium">تمت الإضافة في:</span>
+                  <span>{new Date().toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div className="mt-4">
-                  <h4 className="text-sm font-medium mb-2">Description:</h4>
+                  <h4 className="text-sm font-medium mb-2">الوصف:</h4>
                   <p className="text-muted-foreground">
-                    {activeBook.description || "No description available."}
+                    {activeBook.description || "لا يوجد وصف متاح."}
                   </p>
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="flex-row-reverse sm:justify-end">
                 <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
-                  Close
+                  إغلاق
                 </Button>
                 <Button onClick={() => {
                   setIsViewDialogOpen(false);
                   handleEditDialogOpen(activeBook);
                 }}>
-                  Edit Book
+                  تعديل الكتاب
                 </Button>
               </DialogFooter>
             </>
