@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -32,7 +31,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import ThemeSwitch from "@/components/ui/ThemeSwitch";
 
 const libraryData = {
   "1": {
@@ -110,7 +109,6 @@ const initialBooksData = {
   ],
 };
 
-// تعريف فئات الكتب الافتراضية
 const initialBookCategories = [
   "خيال",
   "خيال علمي",
@@ -135,7 +133,6 @@ const Library = () => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [activeBook, setActiveBook] = useState<BookType | null>(null);
   
-  // إضافة حالة لقائمة التصنيفات
   const [bookCategories, setBookCategories] = useState<string[]>(initialBookCategories);
   const [newCategory, setNewCategory] = useState<string>("");
   const [isAddingCategory, setIsAddingCategory] = useState(false);
@@ -249,7 +246,6 @@ const Library = () => {
     setIsEditDialogOpen(true);
   };
 
-  // دالة لإضافة تصنيف جديد
   const handleAddCategory = () => {
     if (!newCategory.trim()) {
       toast.error("يرجى إدخال اسم التصنيف");
@@ -312,7 +308,7 @@ const Library = () => {
                 {library.description}
               </p>
             </div>
-            <ThemeToggle />
+            <ThemeSwitch />
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
