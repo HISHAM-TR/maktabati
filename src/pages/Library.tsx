@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -32,9 +31,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
-// إزالة استيراد ThemeSwitch
 
-// تحديث نوع الكتاب بإضافة عدد المجلدات
 type ExtendedBookType = BookType & {
   volumes?: number;
 };
@@ -325,7 +322,6 @@ const Library = () => {
                 {library.description}
               </p>
             </div>
-            {/* تم حذف مكون ThemeSwitch من هنا */}
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -333,6 +329,7 @@ const Library = () => {
               <SearchBar
                 onSearch={handleSearch}
                 placeholder="ابحث عن الكتب حسب العنوان أو المؤلف أو التصنيف..."
+                label="البحث في المكتبة:"
               />
             </div>
             <Button

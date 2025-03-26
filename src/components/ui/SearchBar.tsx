@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input";
 interface SearchBarProps {
   onSearch: (query: string) => void;
   placeholder?: string;
+  label?: string;
 }
 
 const SearchBar = ({ 
   onSearch, 
-  placeholder = "بحث..." 
+  placeholder = "بحث...",
+  label = "البحث:"
 }: SearchBarProps) => {
   const [query, setQuery] = useState("");
 
@@ -25,6 +27,11 @@ const SearchBar = ({
       className="relative w-full max-w-md mx-auto"
       dir="rtl"
     >
+      {label && (
+        <label className="block text-foreground font-medium mb-2 text-right text-lg">
+          {label}
+        </label>
+      )}
       <div className="relative">
         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
