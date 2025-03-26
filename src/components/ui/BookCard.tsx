@@ -60,14 +60,14 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
       onClick={handleView}
     >
       <CardHeader className="pb-2 relative">
-        <div className="absolute right-2 top-2">
+        <div className="absolute left-2 top-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
                 <MoreHorizontal className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={(e) => {
                 e.stopPropagation();
                 onView(book);
