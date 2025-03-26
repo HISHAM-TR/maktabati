@@ -39,7 +39,7 @@ const LibraryCard = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const handleDelete = () => {
-    toast.success("Library deleted successfully");
+    toast.success("تم حذف المكتبة بنجاح");
     onDelete(id);
   };
 
@@ -61,15 +61,15 @@ const LibraryCard = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(id)}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
+                <Edit className="h-4 w-4 ml-2" />
+                تعديل
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDelete}
                 className="text-destructive focus:text-destructive"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                <Trash2 className="h-4 w-4 ml-2" />
+                حذف
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -84,14 +84,14 @@ const LibraryCard = ({
       
       <CardContent>
         <div className="text-sm text-muted-foreground">
-          {bookCount} {bookCount === 1 ? "book" : "books"}
+          {bookCount} {bookCount === 1 ? "كتاب" : "كتب"}
         </div>
       </CardContent>
       
       <CardFooter>
         <Link to={`/library/${id}`} className="w-full">
           <Button variant="outline" className="w-full">
-            View Library
+            عرض المكتبة
           </Button>
         </Link>
       </CardFooter>
