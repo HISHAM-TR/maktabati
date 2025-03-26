@@ -1,36 +1,18 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { 
-  ChevronRight, 
-  Plus, 
-  Book as BookIcon, 
-  User,
-  Calendar
-} from "lucide-react";
+import { BookIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
+import LibraryHeader from "@/components/library/LibraryHeader";
+import NoBooks from "@/components/library/NoBooks";
+import AddBookDialog, { BookFormData } from "@/components/library/AddBookDialog";
+import EditBookDialog from "@/components/library/EditBookDialog";
+import ViewBookDialog from "@/components/library/ViewBookDialog";
 
 type ExtendedBookType = BookType & {
   volumes?: number;
@@ -127,7 +109,7 @@ const initialBookCategories = [
   "فلسفة",
   "سيرة ذاتية",
   "تاريخ",
-  "تطوير ذ��تي",
+  "تطوير ذاتي",
   "غموض",
   "إثارة",
 ];
@@ -144,16 +126,6 @@ const Library = () => {
   const [activeBook, setActiveBook] = useState<ExtendedBookType | null>(null);
   
   const [bookCategories, setBookCategories] = useState<string[]>(initialBookCategories);
-  const [newCategory, setNewCategory] = useState<string>("");
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    category: "",
-    description: "",
-    volumes: 1,
-  });
 
   useEffect(() => {
     document.title = "المكتبة | نظام إدارة المكتبات";
@@ -185,40 +157,49 @@ const Library = () => {
     setFilteredBooks(results);
   };
 
-  const handleAddBook = () => {
-    if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
-      toast.error("العنوان والمؤلف والتصنيف مطلوبين");
+  const handleAddBook = (formData: BookFormData) => {
+    // Check if this is a new category addition
+    if (formData.title === "_NEW_CATEGORY_") {
+      setBookCategories([...bookCategories, formData.category]);
+      toast.success("تمت إضافة التصنيف الجديد");
       return;
     }
 
     const newBook = {
       id: `${id}-${Date.now()}`,
-      ...formData,
+      title: formData.title,
+      author: formData.author,
+      category: formData.category,
+      description: formData.description,
+      volumes: formData.volumes,
     };
 
     setBooks([newBook, ...books]);
     setFilteredBooks([newBook, ...books]);
     setIsAddDialogOpen(false);
-    setFormData({
-      title: "",
-      author: "",
-      category: "",
-      description: "",
-      volumes: 1,
-    });
     toast.success("تمت إضافة الكتاب بنجاح");
   };
 
-  const handleEditBook = () => {
+  const handleEditBook = (formData: BookFormData) => {
     if (!activeBook) return;
-    if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
-      toast.error("العنوان والمؤلف والتصنيف مطلوبين");
+
+    // Check if this is a new category addition
+    if (formData.title === "_NEW_CATEGORY_") {
+      setBookCategories([...bookCategories, formData.category]);
+      toast.success("تمت إضافة التصنيف الجديد");
       return;
     }
 
     const updatedBooks = books.map((book) =>
       book.id === activeBook.id
-        ? { ...book, ...formData }
+        ? { 
+            ...book, 
+            title: formData.title,
+            author: formData.author,
+            category: formData.category,
+            description: formData.description,
+            volumes: formData.volumes,
+          }
         : book
     );
 
@@ -226,13 +207,6 @@ const Library = () => {
     setFilteredBooks(updatedBooks);
     setIsEditDialogOpen(false);
     setActiveBook(null);
-    setFormData({
-      title: "",
-      author: "",
-      category: "",
-      description: "",
-      volumes: 1,
-    });
     toast.success("تم تحديث الكتاب بنجاح");
   };
 
@@ -250,32 +224,12 @@ const Library = () => {
 
   const handleEditDialogOpen = (book: ExtendedBookType) => {
     setActiveBook(book);
-    setFormData({
-      title: book.title,
-      author: book.author,
-      category: book.category,
-      description: book.description,
-      volumes: book.volumes || 1,
-    });
     setIsEditDialogOpen(true);
   };
 
-  const handleAddCategory = () => {
-    if (!newCategory.trim()) {
-      toast.error("يرجى إدخال اسم التصنيف");
-      return;
-    }
-
-    if (bookCategories.includes(newCategory)) {
-      toast.error("هذا التصنيف موجود بالفعل");
-      return;
-    }
-
-    setBookCategories([...bookCategories, newCategory]);
-    setFormData({ ...formData, category: newCategory });
-    setNewCategory("");
-    setIsAddingCategory(false);
-    toast.success("تمت إضافة التصنيف الجديد");
+  const handleViewToEditTransition = () => {
+    setIsViewDialogOpen(false);
+    setIsEditDialogOpen(true);
   };
 
   if (!library) {
@@ -293,7 +247,6 @@ const Library = () => {
             </p>
             <Link to="/dashboard">
               <Button className="text-lg py-6 px-8">
-                <ChevronRight className="h-5 w-5 ml-2" />
                 العودة إلى لوحة التحكم
               </Button>
             </Link>
@@ -310,19 +263,12 @@ const Library = () => {
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          <div className="mb-8 flex justify-between items-center">
-            <div>
-              <div className="flex items-center mb-2">
-                <Link to="/dashboard" className="text-muted-foreground hover:text-primary ms-4">
-                  <ChevronRight className="h-5 w-5" />
-                </Link>
-                <h1 className="text-3xl font-bold">{library.name}</h1>
-              </div>
-              <p className="text-muted-foreground max-w-2xl text-lg">
-                {library.description}
-              </p>
-            </div>
-          </div>
+          <LibraryHeader 
+            id={library.id}
+            name={library.name}
+            description={library.description}
+            onAddBookClick={() => setIsAddDialogOpen(true)}
+          />
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div className="mb-4 md:mb-0 md:w-1/2">
@@ -332,19 +278,9 @@ const Library = () => {
               />
             </div>
             <Button
-              onClick={() => {
-                setFormData({
-                  title: "",
-                  author: "",
-                  category: "",
-                  description: "",
-                  volumes: 1,
-                });
-                setIsAddDialogOpen(true);
-              }}
+              onClick={() => setIsAddDialogOpen(true)}
               className="text-lg py-6 px-8"
             >
-              <Plus className="h-5 w-5 ms-2" />
               إضافة كتاب
             </Button>
           </div>
@@ -362,356 +298,37 @@ const Library = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <BookIcon className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">لم يتم العثور على كتب</h3>
-              <p className="text-muted-foreground mb-6 text-lg">
-                {books.length > 0
-                  ? "جرب مصطلح بحث مختلفًا."
-                  : "أضف أول كتاب إلى هذه المكتبة."}
-              </p>
-              <Button
-                onClick={() => {
-                  setFormData({
-                    title: "",
-                    author: "",
-                    category: "",
-                    description: "",
-                    volumes: 1,
-                  });
-                  setIsAddDialogOpen(true);
-                }}
-                className="text-lg py-6 px-8"
-              >
-                <Plus className="h-5 w-5 ms-2" />
-                إضافة كتاب
-              </Button>
-            </div>
+            <NoBooks 
+              hasBooks={books.length > 0}
+              onAddBookClick={() => setIsAddDialogOpen(true)}
+            />
           )}
         </div>
       </main>
 
       <Footer />
 
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="font-cairo">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">إضافة كتاب جديد</DialogTitle>
-            <DialogDescription className="text-lg">
-              أضف كتابًا جديدًا إلى مكتبتك.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-right text-lg">
-                العنوان *
-              </Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className="col-span-3 text-right py-6 text-lg"
-                placeholder="أدخل عنوان الكتاب"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="author" className="text-right text-lg">
-                المؤلف *
-              </Label>
-              <Input
-                id="author"
-                value={formData.author}
-                onChange={(e) =>
-                  setFormData({ ...formData, author: e.target.value })
-                }
-                className="col-span-3 text-right py-6 text-lg"
-                placeholder="أدخل اسم المؤلف"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="category" className="text-right text-lg pt-3">
-                التصنيف *
-              </Label>
-              <div className="col-span-3">
-                {isAddingCategory ? (
-                  <div className="flex flex-col space-y-2">
-                    <Input
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                      className="text-right py-6 text-lg"
-                      placeholder="أدخل اسم التصنيف الجديد"
-                    />
-                    <div className="flex gap-2 justify-end">
-                      <Button onClick={handleAddCategory} className="text-lg">
-                        إضافة
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddingCategory(false)}
-                        className="text-lg"
-                      >
-                        إلغاء
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, category: value })
-                      }
-                    >
-                      <SelectTrigger className="text-right py-6 text-lg">
-                        <SelectValue placeholder="اختر تصنيفًا" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bookCategories.map((category) => (
-                          <SelectItem key={category} value={category} className="text-lg">
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsAddingCategory(true)}
-                      className="text-lg"
-                    >
-                      <Plus className="h-4 w-4 ms-1" />
-                      تصنيف جديد
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="volumes" className="text-right text-lg">
-                عدد المجلدات
-              </Label>
-              <Input
-                id="volumes"
-                type="number"
-                min="1"
-                value={formData.volumes}
-                onChange={(e) =>
-                  setFormData({ ...formData, volumes: parseInt(e.target.value) || 1 })
-                }
-                className="col-span-3 text-right py-6 text-lg"
-                placeholder="أدخل عدد المجلدات"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right text-lg">
-                الوصف
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className="col-span-3 text-right py-4 text-lg"
-                placeholder="أدخل وصف الكتاب"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex-row sm:justify-end">
-            <Button onClick={handleAddBook} className="text-lg py-6 px-8">إضافة كتاب</Button>
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="text-lg py-6 px-8 mr-2">
-              إلغاء
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AddBookDialog 
+        isOpen={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        onAddBook={handleAddBook}
+        bookCategories={bookCategories}
+      />
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="font-cairo">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">تعديل كتاب</DialogTitle>
-            <DialogDescription className="text-lg">
-              تحديث معلومات الكتاب.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-title" className="text-right text-lg">
-                العنوان *
-              </Label>
-              <Input
-                id="edit-title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className="col-span-3 text-right py-6 text-lg"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-author" className="text-right text-lg">
-                المؤلف *
-              </Label>
-              <Input
-                id="edit-author"
-                value={formData.author}
-                onChange={(e) =>
-                  setFormData({ ...formData, author: e.target.value })
-                }
-                className="col-span-3 text-right py-6 text-lg"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="edit-category" className="text-right text-lg pt-3">
-                التصنيف *
-              </Label>
-              <div className="col-span-3">
-                {isAddingCategory ? (
-                  <div className="flex flex-col space-y-2">
-                    <Input
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                      className="text-right py-6 text-lg"
-                      placeholder="أدخل اسم التصنيف الجديد"
-                    />
-                    <div className="flex gap-2 justify-end">
-                      <Button onClick={handleAddCategory} className="text-lg">
-                        إضافة
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsAddingCategory(false)}
-                        className="text-lg"
-                      >
-                        إلغاء
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, category: value })
-                      }
-                    >
-                      <SelectTrigger className="text-right py-6 text-lg">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bookCategories.map((category) => (
-                          <SelectItem key={category} value={category} className="text-lg">
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsAddingCategory(true)}
-                      className="text-lg"
-                    >
-                      <Plus className="h-4 w-4 ms-1" />
-                      تصنيف جديد
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-volumes" className="text-right text-lg">
-                عدد المجلدات
-              </Label>
-              <Input
-                id="edit-volumes"
-                type="number"
-                min="1"
-                value={formData.volumes}
-                onChange={(e) =>
-                  setFormData({ ...formData, volumes: parseInt(e.target.value) || 1 })
-                }
-                className="col-span-3 text-right py-6 text-lg"
-                placeholder="أدخل عدد المجلدات"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-description" className="text-right text-lg">
-                الوصف
-              </Label>
-              <Textarea
-                id="edit-description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className="col-span-3 text-right py-4 text-lg"
-                rows={4}
-              />
-            </div>
-          </div>
-          <DialogFooter className="flex-row sm:justify-end">
-            <Button onClick={handleEditBook} className="text-lg py-6 px-8">حفظ التغييرات</Button>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-lg py-6 px-8 mr-2">
-              إلغاء
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditBookDialog 
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onEditBook={handleEditBook}
+        bookCategories={bookCategories}
+        activeBook={activeBook}
+      />
 
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="font-cairo sm:max-w-[525px]">
-          {activeBook && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl text-right">{activeBook.title}</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="flex items-center">
-                  <User className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">المؤلف:</span>
-                  <span className="text-lg">{activeBook.author}</span>
-                </div>
-                <div className="flex items-center">
-                  <BookIcon className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">التصنيف:</span>
-                  <span className="text-lg">{activeBook.category}</span>
-                </div>
-                <div className="flex items-center">
-                  <BookIcon className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">عدد المجلدات:</span>
-                  <span className="text-lg">{activeBook.volumes || 1}</span>
-                </div>
-                <div className="flex items-center">
-                  <Calendar className="h-5 w-5 text-muted-foreground ml-2" />
-                  <span className="font-medium text-lg ml-2">تمت الإضافة في:</span>
-                  <span className="text-lg">{new Date().toLocaleDateString('ar-EG')}</span>
-                </div>
-                <div className="mt-4">
-                  <h4 className="text-lg font-medium mb-2 text-right">الوصف:</h4>
-                  <p className="text-muted-foreground text-lg text-right">
-                    {activeBook.description || "لا يوجد وصف متاح."}
-                  </p>
-                </div>
-              </div>
-              <DialogFooter className="flex-row sm:justify-end">
-                <Button onClick={() => {
-                  setIsViewDialogOpen(false);
-                  handleEditDialogOpen(activeBook);
-                }} className="text-lg py-6 px-8">
-                  تعديل الكتاب
-                </Button>
-                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="text-lg py-6 px-8 mr-2">
-                  إغلاق
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ViewBookDialog 
+        isOpen={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        onEditClick={handleViewToEditTransition}
+        activeBook={activeBook}
+      />
     </div>
   );
 };
