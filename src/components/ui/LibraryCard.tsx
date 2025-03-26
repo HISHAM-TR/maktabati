@@ -24,6 +24,7 @@ interface LibraryCardProps {
   name: string;
   description: string;
   bookCount: number;
+  volumeCount?: number; // إضافة عدد المجلدات
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
 }
@@ -33,6 +34,7 @@ const LibraryCard = ({
   name, 
   description, 
   bookCount, 
+  volumeCount = 0, // قيمة افتراضية لعدد المجلدات 
   onDelete, 
   onEdit 
 }: LibraryCardProps) => {
@@ -52,14 +54,14 @@ const LibraryCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardHeader className="pb-2 relative">
-        <div className="absolute left-2 top-2">
+        <div className="absolute right-2 top-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MoreHorizontal className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(id)}>
                 <Edit className="h-4 w-4 ml-2" />
                 تعديل
@@ -83,8 +85,9 @@ const LibraryCard = ({
       </CardHeader>
       
       <CardContent>
-        <div className="text-sm text-muted-foreground">
-          {bookCount} {bookCount === 1 ? "كتاب" : "كتب"}
+        <div className="text-sm text-muted-foreground flex flex-col gap-1">
+          <div>{bookCount} {bookCount === 1 ? "كتاب" : "كتب"}</div>
+          <div>{volumeCount} {volumeCount === 1 ? "مجلد" : "مجلدات"}</div>
         </div>
       </CardContent>
       

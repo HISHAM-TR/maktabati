@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -31,6 +32,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 const libraryData = {
   "1": {
@@ -108,7 +110,8 @@ const initialBooksData = {
   ],
 };
 
-const bookCategories = [
+// تعريف فئات الكتب الافتراضية
+const initialBookCategories = [
   "خيال",
   "خيال علمي",
   "كلاسيكي",
@@ -131,6 +134,11 @@ const Library = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [activeBook, setActiveBook] = useState<BookType | null>(null);
+  
+  // إضافة حالة لقائمة التصنيفات
+  const [bookCategories, setBookCategories] = useState<string[]>(initialBookCategories);
+  const [newCategory, setNewCategory] = useState<string>("");
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -241,6 +249,25 @@ const Library = () => {
     setIsEditDialogOpen(true);
   };
 
+  // دالة لإضافة تصنيف جديد
+  const handleAddCategory = () => {
+    if (!newCategory.trim()) {
+      toast.error("يرجى إدخال اسم التصنيف");
+      return;
+    }
+
+    if (bookCategories.includes(newCategory)) {
+      toast.error("هذا التصنيف موجود بالفعل");
+      return;
+    }
+
+    setBookCategories([...bookCategories, newCategory]);
+    setFormData({ ...formData, category: newCategory });
+    setNewCategory("");
+    setIsAddingCategory(false);
+    toast.success("تمت إضافة التصنيف الجديد");
+  };
+
   if (!library) {
     return (
       <div className="flex flex-col min-h-screen font-cairo" dir="rtl">
@@ -273,16 +300,19 @@ const Library = () => {
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <div className="flex items-center mb-2">
-              <Link to="/dashboard" className="text-muted-foreground hover:text-primary ml-4">
-                <ChevronRight className="h-5 w-5" />
-              </Link>
-              <h1 className="text-3xl font-bold">{library.name}</h1>
+          <div className="mb-8 flex justify-between items-center">
+            <div>
+              <div className="flex items-center mb-2">
+                <Link to="/dashboard" className="text-muted-foreground hover:text-primary ml-4">
+                  <ChevronRight className="h-5 w-5" />
+                </Link>
+                <h1 className="text-3xl font-bold">{library.name}</h1>
+              </div>
+              <p className="text-muted-foreground max-w-2xl text-lg">
+                {library.description}
+              </p>
             </div>
-            <p className="text-muted-foreground max-w-2xl text-lg">
-              {library.description}
-            </p>
+            <ThemeToggle />
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -355,7 +385,7 @@ const Library = () => {
       <Footer />
 
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent dir="rtl" className="font-cairo">
+        <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-2xl">إضافة كتاب جديد</DialogTitle>
             <DialogDescription className="text-lg">
@@ -391,27 +421,62 @@ const Library = () => {
                 placeholder="أدخل اسم المؤلف"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right text-lg">
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="category" className="text-right text-lg pt-3">
                 التصنيف *
               </Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, category: value })
-                }
-              >
-                <SelectTrigger className="col-span-3 text-right py-6 text-lg">
-                  <SelectValue placeholder="اختر تصنيفًا" />
-                </SelectTrigger>
-                <SelectContent>
-                  {bookCategories.map((category) => (
-                    <SelectItem key={category} value={category} className="text-lg">
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="col-span-3">
+                {isAddingCategory ? (
+                  <div className="flex flex-col space-y-2">
+                    <Input
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      className="text-right py-6 text-lg"
+                      placeholder="أدخل اسم التصنيف الجديد"
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <Button onClick={handleAddCategory} className="text-lg">
+                        إضافة
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsAddingCategory(false)}
+                        className="text-lg"
+                      >
+                        إلغاء
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, category: value })
+                      }
+                    >
+                      <SelectTrigger className="text-right py-6 text-lg">
+                        <SelectValue placeholder="اختر تصنيفًا" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bookCategories.map((category) => (
+                          <SelectItem key={category} value={category} className="text-lg">
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsAddingCategory(true)}
+                      className="text-lg"
+                    >
+                      <Plus className="h-4 w-4 ml-1" />
+                      تصنيف جديد
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="description" className="text-right text-lg">
@@ -439,7 +504,7 @@ const Library = () => {
       </Dialog>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent dir="rtl" className="font-cairo">
+        <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-2xl">تعديل كتاب</DialogTitle>
             <DialogDescription className="text-lg">
@@ -473,27 +538,62 @@ const Library = () => {
                 className="col-span-3 text-right py-6 text-lg"
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-category" className="text-right text-lg">
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="edit-category" className="text-right text-lg pt-3">
                 التصنيف *
               </Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, category: value })
-                }
-              >
-                <SelectTrigger className="col-span-3 text-right py-6 text-lg">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {bookCategories.map((category) => (
-                    <SelectItem key={category} value={category} className="text-lg">
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="col-span-3">
+                {isAddingCategory ? (
+                  <div className="flex flex-col space-y-2">
+                    <Input
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      className="text-right py-6 text-lg"
+                      placeholder="أدخل اسم التصنيف الجديد"
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <Button onClick={handleAddCategory} className="text-lg">
+                        إضافة
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsAddingCategory(false)}
+                        className="text-lg"
+                      >
+                        إلغاء
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, category: value })
+                      }
+                    >
+                      <SelectTrigger className="text-right py-6 text-lg">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {bookCategories.map((category) => (
+                          <SelectItem key={category} value={category} className="text-lg">
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsAddingCategory(true)}
+                      className="text-lg"
+                    >
+                      <Plus className="h-4 w-4 ml-1" />
+                      تصنيف جديد
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-description" className="text-right text-lg">
@@ -520,7 +620,7 @@ const Library = () => {
       </Dialog>
 
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent dir="rtl" className="font-cairo sm:max-w-[525px]">
+        <DialogContent className="font-cairo sm:max-w-[525px]">
           {activeBook && (
             <>
               <DialogHeader>
