@@ -19,7 +19,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen font-cairo" dir="rtl">
       <Header />
       
       <main className="flex-1 flex items-center justify-center pt-24 pb-16">
@@ -28,14 +28,14 @@ const NotFound = () => {
             <AlertCircle className="h-12 w-12 text-primary" />
           </div>
           
-          <h1 className="text-4xl font-bold mb-4">404</h1>
-          <h2 className="text-2xl font-semibold mb-2">الصفحة غير موجودة</h2>
-          <p className="text-muted-foreground mb-8">
+          <h1 className="text-5xl font-bold mb-4">404</h1>
+          <h2 className="text-3xl font-semibold mb-2">الصفحة غير موجودة</h2>
+          <p className="text-muted-foreground mb-8 text-xl">
             الصفحة التي تبحث عنها غير موجودة أو تم نقلها.
           </p>
           
           <Link to="/">
-            <Button className="mx-auto">
+            <Button className="mx-auto text-lg py-6 px-8">
               <ArrowLeft className="h-5 w-5 ml-2" />
               العودة إلى الصفحة الرئيسية
             </Button>

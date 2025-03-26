@@ -232,6 +232,7 @@ const Library = () => {
     const updatedBooks = books.filter((book) => book.id !== id);
     setBooks(updatedBooks);
     setFilteredBooks(updatedBooks);
+    toast.success("تم حذف الكتاب بنجاح");
   };
 
   // عرض تفاصيل الكتاب
@@ -254,7 +255,7 @@ const Library = () => {
 
   if (!library) {
     return (
-      <div className="flex flex-col min-h-screen" dir="rtl">
+      <div className="flex flex-col min-h-screen font-cairo" dir="rtl">
         <Header />
         <main className="flex-1 pt-24 pb-16">
           <div className="container mx-auto px-4 text-center">
@@ -266,7 +267,7 @@ const Library = () => {
               المكتبة التي تبحث عنها غير موجودة.
             </p>
             <Link to="/dashboard">
-              <Button>
+              <Button className="text-lg py-6 px-8">
                 <ChevronRight className="h-5 w-5 ml-2" />
                 العودة إلى لوحة التحكم
               </Button>
@@ -279,7 +280,7 @@ const Library = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen font-cairo" dir="rtl">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
@@ -292,7 +293,7 @@ const Library = () => {
               </Link>
               <h1 className="text-3xl font-bold">{library.name}</h1>
             </div>
-            <p className="text-muted-foreground max-w-2xl">
+            <p className="text-muted-foreground max-w-2xl text-lg">
               {library.description}
             </p>
           </div>
@@ -315,6 +316,7 @@ const Library = () => {
                 });
                 setIsAddDialogOpen(true);
               }}
+              className="text-lg py-6 px-8"
             >
               <Plus className="h-5 w-5 ml-2" />
               إضافة كتاب
@@ -340,7 +342,7 @@ const Library = () => {
                 <BookIcon className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">لم يتم العثور على كتب</h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6 text-lg">
                 {books.length > 0
                   ? "جرب مصطلح بحث مختلفًا."
                   : "أضف أول كتاب إلى هذه المكتبة."}
@@ -355,6 +357,7 @@ const Library = () => {
                   });
                   setIsAddDialogOpen(true);
                 }}
+                className="text-lg py-6 px-8"
               >
                 <Plus className="h-5 w-5 ml-2" />
                 إضافة كتاب
@@ -368,16 +371,16 @@ const Library = () => {
 
       {/* مربع حوار إضافة كتاب */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent dir="rtl">
+        <DialogContent dir="rtl" className="font-cairo">
           <DialogHeader>
-            <DialogTitle>إضافة كتاب جديد</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-2xl">إضافة كتاب جديد</DialogTitle>
+            <DialogDescription className="text-lg">
               أضف كتابًا جديدًا إلى مكتبتك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="title" className="text-left">
+              <Label htmlFor="title" className="text-right text-lg">
                 العنوان *
               </Label>
               <Input
@@ -386,12 +389,12 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="col-span-3 text-right"
+                className="col-span-3 text-right py-6 text-lg"
                 placeholder="أدخل عنوان الكتاب"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="author" className="text-left">
+              <Label htmlFor="author" className="text-right text-lg">
                 المؤلف *
               </Label>
               <Input
@@ -400,12 +403,12 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, author: e.target.value })
                 }
-                className="col-span-3 text-right"
+                className="col-span-3 text-right py-6 text-lg"
                 placeholder="أدخل اسم المؤلف"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-left">
+              <Label htmlFor="category" className="text-right text-lg">
                 التصنيف *
               </Label>
               <Select
@@ -414,12 +417,12 @@ const Library = () => {
                   setFormData({ ...formData, category: value })
                 }
               >
-                <SelectTrigger className="col-span-3 text-right">
+                <SelectTrigger className="col-span-3 text-right py-6 text-lg">
                   <SelectValue placeholder="اختر تصنيفًا" />
                 </SelectTrigger>
                 <SelectContent>
                   {bookCategories.map((category) => (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem key={category} value={category} className="text-lg">
                       {category}
                     </SelectItem>
                   ))}
@@ -427,7 +430,7 @@ const Library = () => {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-left">
+              <Label htmlFor="description" className="text-right text-lg">
                 الوصف
               </Label>
               <Textarea
@@ -436,33 +439,33 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="col-span-3 text-right"
+                className="col-span-3 text-right py-4 text-lg"
                 placeholder="أدخل وصف الكتاب"
                 rows={4}
               />
             </div>
           </div>
           <DialogFooter className="flex-row-reverse sm:justify-end">
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
-            <Button onClick={handleAddBook}>إضافة كتاب</Button>
+            <Button onClick={handleAddBook} className="text-lg py-6 px-8">إضافة كتاب</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* مربع حوار تعديل كتاب */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent dir="rtl">
+        <DialogContent dir="rtl" className="font-cairo">
           <DialogHeader>
-            <DialogTitle>تعديل كتاب</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-2xl">تعديل كتاب</DialogTitle>
+            <DialogDescription className="text-lg">
               تحديث معلومات الكتاب.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-title" className="text-left">
+              <Label htmlFor="edit-title" className="text-right text-lg">
                 العنوان *
               </Label>
               <Input
@@ -471,11 +474,11 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="col-span-3 text-right"
+                className="col-span-3 text-right py-6 text-lg"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-author" className="text-left">
+              <Label htmlFor="edit-author" className="text-right text-lg">
                 المؤلف *
               </Label>
               <Input
@@ -484,11 +487,11 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, author: e.target.value })
                 }
-                className="col-span-3 text-right"
+                className="col-span-3 text-right py-6 text-lg"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-category" className="text-left">
+              <Label htmlFor="edit-category" className="text-right text-lg">
                 التصنيف *
               </Label>
               <Select
@@ -497,12 +500,12 @@ const Library = () => {
                   setFormData({ ...formData, category: value })
                 }
               >
-                <SelectTrigger className="col-span-3 text-right">
+                <SelectTrigger className="col-span-3 text-right py-6 text-lg">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {bookCategories.map((category) => (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem key={category} value={category} className="text-lg">
                       {category}
                     </SelectItem>
                   ))}
@@ -510,7 +513,7 @@ const Library = () => {
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-description" className="text-left">
+              <Label htmlFor="edit-description" className="text-right text-lg">
                 الوصف
               </Label>
               <Textarea
@@ -519,23 +522,23 @@ const Library = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="col-span-3 text-right"
+                className="col-span-3 text-right py-4 text-lg"
                 rows={4}
               />
             </div>
           </div>
           <DialogFooter className="flex-row-reverse sm:justify-end">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
-            <Button onClick={handleEditBook}>حفظ التغييرات</Button>
+            <Button onClick={handleEditBook} className="text-lg py-6 px-8">حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* مربع حوار عرض الكتاب */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]" dir="rtl">
+        <DialogContent className="sm:max-w-[525px]" dir="rtl" className="font-cairo">
           {activeBook && (
             <>
               <DialogHeader>
@@ -544,34 +547,34 @@ const Library = () => {
               <div className="grid gap-4 py-4">
                 <div className="flex items-center space-x-reverse space-x-2">
                   <User className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">المؤلف:</span>
-                  <span>{activeBook.author}</span>
+                  <span className="font-medium text-lg">المؤلف:</span>
+                  <span className="text-lg">{activeBook.author}</span>
                 </div>
                 <div className="flex items-center space-x-reverse space-x-2">
                   <BookIcon className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">التصنيف:</span>
-                  <span>{activeBook.category}</span>
+                  <span className="font-medium text-lg">التصنيف:</span>
+                  <span className="text-lg">{activeBook.category}</span>
                 </div>
                 <div className="flex items-center space-x-reverse space-x-2">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">تمت الإضافة في:</span>
-                  <span>{new Date().toLocaleDateString('ar-EG')}</span>
+                  <span className="font-medium text-lg">تمت الإضافة في:</span>
+                  <span className="text-lg">{new Date().toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div className="mt-4">
-                  <h4 className="text-sm font-medium mb-2">الوصف:</h4>
-                  <p className="text-muted-foreground">
+                  <h4 className="text-lg font-medium mb-2">الوصف:</h4>
+                  <p className="text-muted-foreground text-lg">
                     {activeBook.description || "لا يوجد وصف متاح."}
                   </p>
                 </div>
               </div>
               <DialogFooter className="flex-row-reverse sm:justify-end">
-                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="text-lg py-6 px-8">
                   إغلاق
                 </Button>
                 <Button onClick={() => {
                   setIsViewDialogOpen(false);
                   handleEditDialogOpen(activeBook);
-                }}>
+                }} className="text-lg py-6 px-8">
                   تعديل الكتاب
                 </Button>
               </DialogFooter>

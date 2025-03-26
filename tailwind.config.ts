@@ -21,9 +21,10 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: [
-					"'Noto Kufi Arabic'", "'Cairo'", "'Rubik'", "'Tajawal'", "-apple-system", "BlinkMacSystemFont", 
+					"'Cairo'", "'Noto Kufi Arabic'", "'Tajawal'", "-apple-system", "BlinkMacSystemFont", 
 					"Segoe UI", "Roboto", "Helvetica Neue", "sans-serif"
 				],
+				cairo: ['Cairo', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
