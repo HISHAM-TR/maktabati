@@ -21,24 +21,24 @@ import LibraryCard from "@/components/ui/LibraryCard";
 import SearchBar from "@/components/ui/SearchBar";
 import { useAuth } from "@/App";
 
-// Mock data for libraries
+// بيانات وهمية للمكتبات
 const initialLibraries = [
   {
     id: "1",
-    name: "Fiction Collection",
-    description: "My collection of fiction books, including fantasy, sci-fi, and historical fiction.",
+    name: "مجموعة الروايات",
+    description: "مجموعتي من الروايات تتضمن الفانتازيا والخيال العلمي والروايات التاريخية.",
     bookCount: 42,
   },
   {
     id: "2",
-    name: "Tech Books",
-    description: "Programming and technology reference books.",
+    name: "كتب التقنية",
+    description: "كتب البرمجة ومراجع التكنولوجيا.",
     bookCount: 17,
   },
   {
     id: "3",
-    name: "Philosophy",
-    description: "Collection of classic and modern philosophy texts.",
+    name: "الفلسفة",
+    description: "مجموعة من نصوص الفلسفة الكلاسيكية والحديثة.",
     bookCount: 8,
   },
 ];
@@ -60,12 +60,12 @@ const Dashboard = () => {
     description: "",
   });
 
-  // Set title on mount
+  // تعيين العنوان عند التحميل
   useEffect(() => {
-    document.title = "Dashboard | Library Management System";
+    document.title = "لوحة التحكم | نظام إدارة المكتبات";
   }, []);
 
-  // Handle search
+  // معالجة البحث
   const handleSearch = (query: string) => {
     if (!query.trim()) {
       setFilteredLibraries(libraries);
@@ -81,10 +81,10 @@ const Dashboard = () => {
     setFilteredLibraries(results);
   };
 
-  // Create new library
+  // إنشاء مكتبة جديدة
   const handleCreateLibrary = () => {
     if (!formData.name.trim()) {
-      toast.error("Library name is required");
+      toast.error("اسم المكتبة مطلوب");
       return;
     }
 
@@ -99,14 +99,14 @@ const Dashboard = () => {
     setFilteredLibraries([newLibrary, ...libraries]);
     setIsCreateDialogOpen(false);
     setFormData({ name: "", description: "" });
-    toast.success("Library created successfully");
+    toast.success("تم إنشاء المكتبة بنجاح");
   };
 
-  // Edit library
+  // تعديل المكتبة
   const handleEditLibrary = () => {
     if (!activeLibrary) return;
     if (!formData.name.trim()) {
-      toast.error("Library name is required");
+      toast.error("اسم المكتبة مطلوب");
       return;
     }
 
@@ -121,17 +121,17 @@ const Dashboard = () => {
     setIsEditDialogOpen(false);
     setActiveLibrary(null);
     setFormData({ name: "", description: "" });
-    toast.success("Library updated successfully");
+    toast.success("تم تحديث المكتبة بنجاح");
   };
 
-  // Delete library
+  // حذف المكتبة
   const handleDeleteLibrary = (id: string) => {
     const updatedLibraries = libraries.filter((lib) => lib.id !== id);
     setLibraries(updatedLibraries);
     setFilteredLibraries(updatedLibraries);
   };
 
-  // Open edit dialog
+  // فتح حوار التعديل
   const openEditDialog = (id: string) => {
     const libraryToEdit = libraries.find((lib) => lib.id === id);
     if (libraryToEdit) {
@@ -145,17 +145,17 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* Dashboard Header */}
+          {/* رأس لوحة التحكم */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold mb-2">My Libraries</h1>
+              <h1 className="text-3xl font-bold mb-2">مكتباتي</h1>
               <p className="text-muted-foreground">
-                Manage your book collections by library
+                إدارة مجموعات الكتب الخاصة بك حسب المكتبة
               </p>
             </div>
             <Button
@@ -165,20 +165,20 @@ const Dashboard = () => {
               }}
               className="mt-4 md:mt-0"
             >
-              <Plus className="h-5 w-5 mr-2" />
-              Create Library
+              <Plus className="h-5 w-5 ml-2" />
+              إنشاء مكتبة
             </Button>
           </div>
 
-          {/* Search Bar */}
+          {/* شريط البحث */}
           <div className="mb-8">
             <SearchBar
               onSearch={handleSearch}
-              placeholder="Search libraries by name or description..."
+              placeholder="ابحث عن المكتبات حسب الاسم أو الوصف..."
             />
           </div>
 
-          {/* Libraries Grid */}
+          {/* شبكة المكتبات */}
           {filteredLibraries.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredLibraries.map((library) => (
@@ -198,11 +198,11 @@ const Dashboard = () => {
               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Library className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">No libraries found</h3>
+              <h3 className="text-xl font-semibold mb-2">لم يتم العثور على مكتبات</h3>
               <p className="text-muted-foreground mb-6">
                 {libraries.length > 0
-                  ? "Try a different search term."
-                  : "Create your first library to get started."}
+                  ? "جرب مصطلح بحث مختلف."
+                  : "قم بإنشاء مكتبتك الأولى للبدء."}
               </p>
               <Button
                 onClick={() => {
@@ -210,8 +210,8 @@ const Dashboard = () => {
                   setIsCreateDialogOpen(true);
                 }}
               >
-                <Plus className="h-5 w-5 mr-2" />
-                Create Library
+                <Plus className="h-5 w-5 ml-2" />
+                إنشاء مكتبة
               </Button>
             </div>
           )}
@@ -220,19 +220,19 @@ const Dashboard = () => {
 
       <Footer />
 
-      {/* Create Library Dialog */}
+      {/* حوار إنشاء مكتبة */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create New Library</DialogTitle>
+            <DialogTitle>إنشاء مكتبة جديدة</DialogTitle>
             <DialogDescription>
-              Create a new library to organize your books.
+              قم بإنشاء مكتبة جديدة لتنظيم كتبك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
+                الاسم
               </Label>
               <Input
                 id="name"
@@ -241,12 +241,12 @@ const Dashboard = () => {
                   setFormData({ ...formData, name: e.target.value })
                 }
                 className="col-span-3"
-                placeholder="Enter library name"
+                placeholder="أدخل اسم المكتبة"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="description" className="text-right">
-                Description
+                الوصف
               </Label>
               <Textarea
                 id="description"
@@ -255,7 +255,7 @@ const Dashboard = () => {
                   setFormData({ ...formData, description: e.target.value })
                 }
                 className="col-span-3"
-                placeholder="Describe your library"
+                placeholder="وصف المكتبة الخاصة بك"
                 rows={4}
               />
             </div>
@@ -265,26 +265,26 @@ const Dashboard = () => {
               variant="outline"
               onClick={() => setIsCreateDialogOpen(false)}
             >
-              Cancel
+              إلغاء
             </Button>
-            <Button onClick={handleCreateLibrary}>Create Library</Button>
+            <Button onClick={handleCreateLibrary}>إنشاء مكتبة</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Library Dialog */}
+      {/* حوار تعديل المكتبة */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Library</DialogTitle>
+            <DialogTitle>تعديل المكتبة</DialogTitle>
             <DialogDescription>
-              Update your library information.
+              تحديث معلومات المكتبة الخاصة بك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-name" className="text-right">
-                Name
+                الاسم
               </Label>
               <Input
                 id="edit-name"
@@ -297,7 +297,7 @@ const Dashboard = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-description" className="text-right">
-                Description
+                الوصف
               </Label>
               <Textarea
                 id="edit-description"
@@ -312,9 +312,9 @@ const Dashboard = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+              إلغاء
             </Button>
-            <Button onClick={handleEditLibrary}>Save Changes</Button>
+            <Button onClick={handleEditLibrary}>حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

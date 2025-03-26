@@ -40,12 +40,12 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import SearchBar from "@/components/ui/SearchBar";
 
-// Mock data for users
+// بيانات وهمية للمستخدمين
 const initialUsers = [
   {
     id: "1",
-    name: "John Doe",
-    email: "john@example.com",
+    name: "أحمد محمد",
+    email: "ahmed@example.com",
     status: "active",
     registrationDate: "2023-01-15",
     lastLogin: "2023-06-20",
@@ -53,8 +53,8 @@ const initialUsers = [
   },
   {
     id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
+    name: "سارة علي",
+    email: "sara@example.com",
     status: "active",
     registrationDate: "2023-02-10",
     lastLogin: "2023-06-18",
@@ -62,8 +62,8 @@ const initialUsers = [
   },
   {
     id: "3",
-    name: "Bob Johnson",
-    email: "bob@example.com",
+    name: "عمر خالد",
+    email: "omar@example.com",
     status: "inactive",
     registrationDate: "2023-03-05",
     lastLogin: "2023-05-12",
@@ -71,8 +71,8 @@ const initialUsers = [
   },
   {
     id: "4",
-    name: "Sarah Williams",
-    email: "sarah@example.com",
+    name: "نورا سالم",
+    email: "noura@example.com",
     status: "active",
     registrationDate: "2023-04-20",
     lastLogin: "2023-06-21",
@@ -80,8 +80,8 @@ const initialUsers = [
   },
   {
     id: "5",
-    name: "Michael Brown",
-    email: "michael@example.com",
+    name: "فهد محمد",
+    email: "fahad@example.com",
     status: "pending",
     registrationDate: "2023-06-15",
     lastLogin: "-",
@@ -89,85 +89,85 @@ const initialUsers = [
   },
 ];
 
-// Mock data for libraries
+// بيانات وهمية للمكتبات
 const initialLibrariesData = [
   {
     id: "1",
-    name: "Fiction Collection",
-    owner: "John Doe",
-    ownerEmail: "john@example.com",
+    name: "مجموعة الروايات",
+    owner: "أحمد محمد",
+    ownerEmail: "ahmed@example.com",
     bookCount: 42,
     creationDate: "2023-02-10",
   },
   {
     id: "2",
-    name: "Tech Books",
-    owner: "John Doe",
-    ownerEmail: "john@example.com",
+    name: "كتب التقنية",
+    owner: "أحمد محمد",
+    ownerEmail: "ahmed@example.com",
     bookCount: 17,
     creationDate: "2023-03-15",
   },
   {
     id: "3",
-    name: "Philosophy",
-    owner: "John Doe",
-    ownerEmail: "john@example.com",
+    name: "الفلسفة",
+    owner: "أحمد محمد",
+    ownerEmail: "ahmed@example.com",
     bookCount: 8,
     creationDate: "2023-04-20",
   },
   {
     id: "4",
-    name: "Classic Literature",
-    owner: "Jane Smith",
-    ownerEmail: "jane@example.com",
+    name: "الأدب الكلاسيكي",
+    owner: "سارة علي",
+    ownerEmail: "sara@example.com",
     bookCount: 25,
     creationDate: "2023-02-28",
   },
   {
     id: "5",
-    name: "Science",
-    owner: "Jane Smith",
-    ownerEmail: "jane@example.com",
+    name: "العلوم",
+    owner: "سارة علي",
+    ownerEmail: "sara@example.com",
     bookCount: 13,
     creationDate: "2023-05-05",
   },
   {
     id: "6",
-    name: "History Books",
-    owner: "Bob Johnson",
-    ownerEmail: "bob@example.com",
+    name: "كتب التاريخ",
+    owner: "عمر خالد",
+    ownerEmail: "omar@example.com",
     bookCount: 9,
     creationDate: "2023-04-12",
   },
   {
     id: "7",
-    name: "Cooking Recipes",
-    owner: "Sarah Williams",
-    ownerEmail: "sarah@example.com",
+    name: "وصفات الطبخ",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
     bookCount: 16,
     creationDate: "2023-03-10",
   },
   {
     id: "8",
-    name: "Travel Guides",
-    owner: "Sarah Williams",
-    ownerEmail: "sarah@example.com",
+    name: "أدلة السفر",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
     bookCount: 11,
     creationDate: "2023-04-05",
   },
   {
     id: "9",
-    name: "Poetry Collection",
-    owner: "Sarah Williams",
-    ownerEmail: "sarah@example.com",
+    name: "مجموعة الشعر",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
     bookCount: 22,
     creationDate: "2023-05-15",
   },
   {
     id: "10",
-    name: "Art Books",
-    owner: "Sarah Williams",
-    ownerEmail: "sarah@example.com",
+    name: "كتب الفن",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
     bookCount: 7,
     creationDate: "2023-06-01",
   },
@@ -187,18 +187,18 @@ const Admin = () => {
     status: "",
   });
 
-  // Set title on mount
+  // تعيين العنوان عند التحميل
   useEffect(() => {
-    document.title = "Admin Panel | Library Management System";
+    document.title = "لوحة المشرف | نظام إدارة المكتبات";
   }, []);
 
-  // Calculate stats
+  // حساب الإحصائيات
   const totalUsers = users.length;
   const activeUsers = users.filter((user) => user.status === "active").length;
   const totalLibraries = libraries.length;
   const totalBooks = libraries.reduce((sum, lib) => sum + lib.bookCount, 0);
 
-  // Handle user search
+  // معالجة بحث المستخدمين
   const handleUserSearch = (query: string) => {
     if (!query.trim()) {
       setFilteredUsers(users);
@@ -214,7 +214,7 @@ const Admin = () => {
     setFilteredUsers(results);
   };
 
-  // Handle library search
+  // معالجة بحث المكتبات
   const handleLibrarySearch = (query: string) => {
     if (!query.trim()) {
       setFilteredLibraries(libraries);
@@ -231,7 +231,7 @@ const Admin = () => {
     setFilteredLibraries(results);
   };
 
-  // Edit user
+  // تعديل المستخدم
   const openEditUserDialog = (user: any) => {
     setActiveUser(user);
     setUserFormData({
@@ -245,7 +245,7 @@ const Admin = () => {
   const handleEditUser = () => {
     if (!activeUser) return;
     if (!userFormData.name.trim() || !userFormData.email.trim()) {
-      toast.error("Name and email are required");
+      toast.error("الاسم والبريد الإلكتروني مطلوبان");
       return;
     }
 
@@ -259,10 +259,10 @@ const Admin = () => {
     setFilteredUsers(updatedUsers);
     setIsEditUserDialogOpen(false);
     setActiveUser(null);
-    toast.success("User updated successfully");
+    toast.success("تم تحديث المستخدم بنجاح");
   };
 
-  // Toggle user status
+  // تبديل حالة المستخدم
   const toggleUserStatus = (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     
@@ -272,38 +272,38 @@ const Admin = () => {
 
     setUsers(updatedUsers);
     setFilteredUsers(updatedUsers);
-    toast.success(`User status changed to ${newStatus}`);
+    toast.success(`تم تغيير حالة المستخدم إلى ${newStatus === "active" ? "نشط" : "غير نشط"}`);
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">Admin Panel</h1>
+          <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="libraries">Libraries</TabsTrigger>
+              <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
+              <TabsTrigger value="users">المستخدمون</TabsTrigger>
+              <TabsTrigger value="libraries">المكتبات</TabsTrigger>
             </TabsList>
 
-            {/* Dashboard Tab */}
+            {/* علامة تبويب لوحة المعلومات */}
             <TabsContent value="dashboard" className="animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Users
+                      إجمالي المستخدمين
                     </CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{totalUsers}</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {activeUsers} active users
+                      {activeUsers} مستخدم نشط
                     </p>
                   </CardContent>
                 </Card>
@@ -311,14 +311,14 @@ const Admin = () => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Libraries
+                      إجمالي المكتبات
                     </CardTitle>
                     <Library className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{totalLibraries}</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Across {activeUsers} users
+                      عبر {activeUsers} مستخدم
                     </p>
                   </CardContent>
                 </Card>
@@ -326,14 +326,14 @@ const Admin = () => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Books
+                      إجمالي الكتب
                     </CardTitle>
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{totalBooks}</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Avg. {(totalBooks / totalLibraries).toFixed(1)} per library
+                      متوسط {(totalBooks / totalLibraries).toFixed(1)} لكل مكتبة
                     </p>
                   </CardContent>
                 </Card>
@@ -341,14 +341,14 @@ const Admin = () => {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-sm font-medium">
-                      User Growth
+                      نمو المستخدمين
                     </CardTitle>
                     <BarChart className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">+{totalUsers}</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      In the last 30 days
+                      في آخر 30 يوم
                     </p>
                   </CardContent>
                 </Card>
@@ -357,15 +357,15 @@ const Admin = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Recent Users</CardTitle>
+                    <CardTitle>المستخدمون الجدد</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Registration</TableHead>
+                          <TableHead>الاسم</TableHead>
+                          <TableHead>الحالة</TableHead>
+                          <TableHead>تاريخ التسجيل</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -384,7 +384,8 @@ const Admin = () => {
                                     : "outline"
                                 }
                               >
-                                {user.status}
+                                {user.status === "active" ? "نشط" : 
+                                 user.status === "inactive" ? "غير نشط" : "معلق"}
                               </Badge>
                             </TableCell>
                             <TableCell>{user.registrationDate}</TableCell>
@@ -397,15 +398,15 @@ const Admin = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Recent Libraries</CardTitle>
+                    <CardTitle>المكتبات الحديثة</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Owner</TableHead>
-                          <TableHead>Books</TableHead>
+                          <TableHead>الاسم</TableHead>
+                          <TableHead>المالك</TableHead>
+                          <TableHead>الكتب</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -425,35 +426,35 @@ const Admin = () => {
               </div>
             </TabsContent>
 
-            {/* Users Tab */}
+            {/* علامة تبويب المستخدمين */}
             <TabsContent value="users" className="animate-fade-in">
               <div className="mb-6">
                 <SearchBar
                   onSearch={handleUserSearch}
-                  placeholder="Search users by name or email..."
+                  placeholder="ابحث عن المستخدمين بالاسم أو البريد الإلكتروني..."
                 />
               </div>
 
               <Card>
                 <CardContent className="p-0">
                   <Table>
-                    <TableCaption>List of all registered users</TableCaption>
+                    <TableCaption>قائمة جميع المستخدمين المسجلين</TableCaption>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Registration Date</TableHead>
-                        <TableHead>Last Login</TableHead>
-                        <TableHead>Libraries</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead>الاسم</TableHead>
+                        <TableHead>البريد الإلكتروني</TableHead>
+                        <TableHead>الحالة</TableHead>
+                        <TableHead>تاريخ التسجيل</TableHead>
+                        <TableHead>آخر تسجيل دخول</TableHead>
+                        <TableHead>المكتبات</TableHead>
+                        <TableHead>الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((user) => (
                         <TableRow key={user.id}>
                           <TableCell className="font-medium">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-reverse space-x-2">
                               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                                 <User className="h-4 w-4 text-primary" />
                               </div>
@@ -471,11 +472,12 @@ const Admin = () => {
                                   : "outline"
                               }
                             >
-                              {user.status}
+                              {user.status === "active" ? "نشط" : 
+                               user.status === "inactive" ? "غير نشط" : "معلق"}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-reverse space-x-2">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span>{user.registrationDate}</span>
                             </div>
@@ -483,13 +485,13 @@ const Admin = () => {
                           <TableCell>{user.lastLogin}</TableCell>
                           <TableCell>{user.libraryCount}</TableCell>
                           <TableCell>
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-reverse space-x-2">
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => openEditUserDialog(user)}
                               >
-                                Edit
+                                تعديل
                               </Button>
                               <Button
                                 variant={
@@ -504,13 +506,13 @@ const Admin = () => {
                               >
                                 {user.status === "active" ? (
                                   <>
-                                    <X className="h-4 w-4 mr-1" />
-                                    Disable
+                                    <X className="h-4 w-4 ml-1" />
+                                    تعطيل
                                   </>
                                 ) : (
                                   <>
-                                    <Check className="h-4 w-4 mr-1" />
-                                    Enable
+                                    <Check className="h-4 w-4 ml-1" />
+                                    تفعيل
                                   </>
                                 )}
                               </Button>
@@ -524,33 +526,33 @@ const Admin = () => {
               </Card>
             </TabsContent>
 
-            {/* Libraries Tab */}
+            {/* علامة تبويب المكتبات */}
             <TabsContent value="libraries" className="animate-fade-in">
               <div className="mb-6">
                 <SearchBar
                   onSearch={handleLibrarySearch}
-                  placeholder="Search libraries by name or owner..."
+                  placeholder="ابحث عن المكتبات بالاسم أو المالك..."
                 />
               </div>
 
               <Card>
                 <CardContent className="p-0">
                   <Table>
-                    <TableCaption>List of all libraries</TableCaption>
+                    <TableCaption>قائمة جميع المكتبات</TableCaption>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Owner</TableHead>
-                        <TableHead>Books</TableHead>
-                        <TableHead>Creation Date</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead>الاسم</TableHead>
+                        <TableHead>المالك</TableHead>
+                        <TableHead>الكتب</TableHead>
+                        <TableHead>تاريخ الإنشاء</TableHead>
+                        <TableHead>الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredLibraries.map((library) => (
                         <TableRow key={library.id}>
                           <TableCell className="font-medium">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-reverse space-x-2">
                               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                                 <Library className="h-4 w-4 text-primary" />
                               </div>
@@ -558,7 +560,7 @@ const Admin = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-reverse space-x-2">
                               <User className="h-4 w-4 text-muted-foreground" />
                               <span>{library.owner}</span>
                             </div>
@@ -568,14 +570,14 @@ const Admin = () => {
                           </TableCell>
                           <TableCell>{library.bookCount}</TableCell>
                           <TableCell>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-reverse space-x-2">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span>{library.creationDate}</span>
                             </div>
                           </TableCell>
                           <TableCell>
                             <Button variant="ghost" size="sm">
-                              View
+                              عرض
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -591,22 +593,22 @@ const Admin = () => {
 
       <Footer />
 
-      {/* Edit User Dialog */}
+      {/* حوار تعديل المستخدم */}
       <Dialog
         open={isEditUserDialogOpen}
         onOpenChange={setIsEditUserDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>تعديل المستخدم</DialogTitle>
             <DialogDescription>
-              Update user information. Click save when you're done.
+              تحديث معلومات المستخدم. انقر على حفظ عند الانتهاء.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
+                الاسم
               </Label>
               <Input
                 id="name"
@@ -619,9 +621,9 @@ const Admin = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
-                Email
+                البريد الإلكتروني
               </Label>
-              <div className="col-span-3 flex items-center space-x-2">
+              <div className="col-span-3 flex items-center space-x-reverse space-x-2">
                 <Input
                   id="email"
                   value={userFormData.email}
@@ -634,9 +636,9 @@ const Admin = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => {
-                    toast.success("Verification email sent");
+                    toast.success("تم إرسال بريد التحقق");
                   }}
-                  title="Send verification email"
+                  title="إرسال بريد التحقق"
                 >
                   <Mail className="h-4 w-4" />
                 </Button>
@@ -644,9 +646,9 @@ const Admin = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="status" className="text-right">
-                Status
+                الحالة
               </Label>
-              <div className="col-span-3 flex items-center space-x-2">
+              <div className="col-span-3 flex items-center space-x-reverse space-x-2">
                 <Badge
                   variant={
                     userFormData.status === "active"
@@ -657,7 +659,8 @@ const Admin = () => {
                   }
                   className="py-1 px-2"
                 >
-                  {userFormData.status}
+                  {userFormData.status === "active" ? "نشط" : 
+                   userFormData.status === "inactive" ? "غير نشط" : "معلق"}
                 </Badge>
                 <Button
                   variant="outline"
@@ -670,7 +673,7 @@ const Admin = () => {
                     setUserFormData({ ...userFormData, status: newStatus });
                   }}
                 >
-                  Toggle Status
+                  تبديل الحالة
                 </Button>
                 {userFormData.status === "pending" && (
                   <Button
@@ -678,28 +681,28 @@ const Admin = () => {
                     size="sm"
                     onClick={() => {
                       setUserFormData({ ...userFormData, status: "active" });
-                      toast.success("User activation email sent");
+                      toast.success("تم إرسال بريد تفعيل المستخدم");
                     }}
                   >
-                    <Check className="h-4 w-4 mr-2" />
-                    Approve
+                    <Check className="h-4 w-4 ml-2" />
+                    موافقة
                   </Button>
                 )}
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <div className="text-right">
-                <AlertCircle className="h-4 w-4 text-destructive inline mr-2" />
+                <AlertCircle className="h-4 w-4 text-destructive inline ml-2" />
               </div>
               <div className="col-span-3">
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => {
-                    toast.success("Password reset email sent to user");
+                    toast.success("تم إرسال بريد إعادة تعيين كلمة المرور للمستخدم");
                   }}
                 >
-                  Send Password Reset
+                  إرسال إعادة تعيين كلمة المرور
                 </Button>
               </div>
             </div>
@@ -709,9 +712,9 @@ const Admin = () => {
               variant="outline"
               onClick={() => setIsEditUserDialogOpen(false)}
             >
-              Cancel
+              إلغاء
             </Button>
-            <Button onClick={handleEditUser}>Save Changes</Button>
+            <Button onClick={handleEditUser}>حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
