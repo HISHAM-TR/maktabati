@@ -17,7 +17,7 @@ type StatCardProps = {
 const StatCard = ({ title, value, icon, color }: StatCardProps) => {
   return (
     <div className={`p-6 rounded-lg shadow-sm border border-border flex items-center ${color}`}>
-      <div className="p-3 rounded-full bg-white/20 mr-4">
+      <div className="p-3 rounded-full bg-white/20 ml-4">
         {icon}
       </div>
       <div>
@@ -37,7 +37,7 @@ type LibraryStatsProps = {
 
 const LibraryStats = ({ totalLibraries, totalBooks, totalCategories, totalVolumes }: LibraryStatsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10" dir="rtl">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
       <StatCard 
         title="إجمالي المكتبات" 
         value={totalLibraries} 

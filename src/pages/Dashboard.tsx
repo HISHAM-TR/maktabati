@@ -29,18 +29,21 @@ const initialLibraries = [
     name: "مجموعة الروايات",
     description: "مجموعتي من الروايات تتضمن الفانتازيا والخيال العلمي والروايات التاريخية.",
     bookCount: 42,
+    volumeCount: 45,
   },
   {
     id: "2",
     name: "كتب التقنية",
     description: "كتب البرمجة ومراجع التكنولوجيا.",
     bookCount: 17,
+    volumeCount: 17,
   },
   {
     id: "3",
     name: "الفلسفة",
     description: "مجموعة من نصوص الفلسفة الكلاسيكية والحديثة.",
     bookCount: 8,
+    volumeCount: 23,
   },
 ];
 
@@ -102,6 +105,7 @@ const Dashboard = () => {
       name: formData.name,
       description: formData.description,
       bookCount: 0,
+      volumeCount: 0,
     };
 
     setLibraries([newLibrary, ...libraries]);
@@ -154,7 +158,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
@@ -211,6 +215,7 @@ const Dashboard = () => {
                   name={library.name}
                   description={library.description}
                   bookCount={library.bookCount}
+                  volumeCount={library.volumeCount}
                   onDelete={handleDeleteLibrary}
                   onEdit={openEditDialog}
                 />
@@ -248,8 +253,8 @@ const Dashboard = () => {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="font-cairo">
           <DialogHeader>
-            <DialogTitle className="text-xl tracking-wide">إنشاء مكتبة جديدة</DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogTitle className="text-xl tracking-wide text-right">إنشاء مكتبة جديدة</DialogTitle>
+            <DialogDescription className="text-base text-right">
               قم بإنشاء مكتبة جديدة لتنظيم كتبك.
             </DialogDescription>
           </DialogHeader>
@@ -284,15 +289,15 @@ const Dashboard = () => {
               />
             </div>
           </div>
-          <DialogFooter className="flex-row-reverse sm:justify-end">
+          <DialogFooter className="flex-row sm:justify-end">
+            <Button onClick={handleCreateLibrary} className="text-base py-5 px-6">إنشاء مكتبة</Button>
             <Button
               variant="outline"
               onClick={() => setIsCreateDialogOpen(false)}
-              className="text-base"
+              className="text-base mr-2"
             >
               إلغاء
             </Button>
-            <Button onClick={handleCreateLibrary} className="text-base py-5 px-6">إنشاء مكتبة</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -301,8 +306,8 @@ const Dashboard = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="font-cairo">
           <DialogHeader>
-            <DialogTitle className="text-xl tracking-wide">تعديل المكتبة</DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogTitle className="text-xl tracking-wide text-right">تعديل المكتبة</DialogTitle>
+            <DialogDescription className="text-base text-right">
               تحديث معلومات المكتبة الخاصة بك.
             </DialogDescription>
           </DialogHeader>
@@ -335,11 +340,11 @@ const Dashboard = () => {
               />
             </div>
           </div>
-          <DialogFooter className="flex-row-reverse sm:justify-end">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-base">
+          <DialogFooter className="flex-row sm:justify-end">
+            <Button onClick={handleEditLibrary} className="text-base py-5 px-6">حفظ التغييرات</Button>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-base mr-2">
               إلغاء
             </Button>
-            <Button onClick={handleEditLibrary} className="text-base py-5 px-6">حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
