@@ -21,8 +21,8 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: [
-					"-apple-system", "BlinkMacSystemFont", "San Francisco", "Segoe UI", "Roboto", 
-					"Helvetica Neue", "sans-serif"
+					"'Noto Kufi Arabic'", "'Cairo'", "'Rubik'", "'Tajawal'", "-apple-system", "BlinkMacSystemFont", 
+					"Segoe UI", "Roboto", "Helvetica Neue", "sans-serif"
 				],
 			},
 			colors: {

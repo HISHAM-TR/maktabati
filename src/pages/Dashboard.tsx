@@ -153,8 +153,8 @@ const Dashboard = () => {
           {/* رأس لوحة التحكم */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold mb-2">مكتباتي</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-3xl font-bold mb-2 tracking-wide">مكتباتي</h1>
+              <p className="text-muted-foreground text-lg">
                 إدارة مجموعات الكتب الخاصة بك حسب المكتبة
               </p>
             </div>
@@ -163,7 +163,7 @@ const Dashboard = () => {
                 setFormData({ name: "", description: "" });
                 setIsCreateDialogOpen(true);
               }}
-              className="mt-4 md:mt-0"
+              className="mt-4 md:mt-0 text-base py-5 px-6"
             >
               <Plus className="h-5 w-5 ml-2" />
               إنشاء مكتبة
@@ -199,7 +199,7 @@ const Dashboard = () => {
                 <Library className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-2">لم يتم العثور على مكتبات</h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6 text-lg">
                 {libraries.length > 0
                   ? "جرب مصطلح بحث مختلف."
                   : "قم بإنشاء مكتبتك الأولى للبدء."}
@@ -209,6 +209,7 @@ const Dashboard = () => {
                   setFormData({ name: "", description: "" });
                   setIsCreateDialogOpen(true);
                 }}
+                className="text-base py-5 px-6"
               >
                 <Plus className="h-5 w-5 ml-2" />
                 إنشاء مكتبة
@@ -222,16 +223,16 @@ const Dashboard = () => {
 
       {/* حوار إنشاء مكتبة */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="font-noto-kufi">
           <DialogHeader>
-            <DialogTitle>إنشاء مكتبة جديدة</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl tracking-wide">إنشاء مكتبة جديدة</DialogTitle>
+            <DialogDescription className="text-base">
               قم بإنشاء مكتبة جديدة لتنظيم كتبك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
+              <Label htmlFor="name" className="text-right text-base">
                 الاسم
               </Label>
               <Input
@@ -240,12 +241,12 @@ const Dashboard = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right py-5 text-base"
                 placeholder="أدخل اسم المكتبة"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
+              <Label htmlFor="description" className="text-right text-base">
                 الوصف
               </Label>
               <Textarea
@@ -254,7 +255,7 @@ const Dashboard = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right py-3 text-base"
                 placeholder="وصف المكتبة الخاصة بك"
                 rows={4}
               />
@@ -264,26 +265,27 @@ const Dashboard = () => {
             <Button
               variant="outline"
               onClick={() => setIsCreateDialogOpen(false)}
+              className="text-base"
             >
               إلغاء
             </Button>
-            <Button onClick={handleCreateLibrary}>إنشاء مكتبة</Button>
+            <Button onClick={handleCreateLibrary} className="text-base py-5 px-6">إنشاء مكتبة</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* حوار تعديل المكتبة */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="font-noto-kufi">
           <DialogHeader>
-            <DialogTitle>تعديل المكتبة</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl tracking-wide">تعديل المكتبة</DialogTitle>
+            <DialogDescription className="text-base">
               تحديث معلومات المكتبة الخاصة بك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-name" className="text-right">
+              <Label htmlFor="edit-name" className="text-right text-base">
                 الاسم
               </Label>
               <Input
@@ -292,11 +294,11 @@ const Dashboard = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right py-5 text-base"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="edit-description" className="text-right">
+              <Label htmlFor="edit-description" className="text-right text-base">
                 الوصف
               </Label>
               <Textarea
@@ -305,16 +307,16 @@ const Dashboard = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right py-3 text-base"
                 rows={4}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-base">
               إلغاء
             </Button>
-            <Button onClick={handleEditLibrary}>حفظ التغييرات</Button>
+            <Button onClick={handleEditLibrary} className="text-base py-5 px-6">حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
