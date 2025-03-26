@@ -32,7 +32,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("يجب استخدام useAuth داخل AuthProvider");
   }
   return context;
 };
@@ -42,12 +42,12 @@ const queryClient = new QueryClient();
 const App = () => {
   const [user, setUser] = useState<AuthUser>(null);
 
-  // Mock authentication functions
+  // وظائف المصادقة التجريبية
   const login = async (email: string, password: string) => {
-    // In a real app, this would make an API call
-    console.log("Logging in with:", email, password);
+    // في تطبيق حقيقي، سيتم إجراء طلب API
+    console.log("تسجيل الدخول باستخدام:", email, password);
     
-    // Mock successful login
+    // محاكاة تسجيل دخول ناجح
     if (email && password) {
       const mockUser = {
         id: "123",
@@ -57,18 +57,18 @@ const App = () => {
       };
       
       setUser(mockUser);
-      // In a real app, store auth token in localStorage/session
+      // في تطبيق حقيقي، قم بتخزين رمز المصادقة في localStorage/session
       localStorage.setItem("user", JSON.stringify(mockUser));
     } else {
-      throw new Error("Invalid credentials");
+      throw new Error("بيانات اعتماد غير صالحة");
     }
   };
 
   const register = async (name: string, email: string, password: string) => {
-    // In a real app, this would make an API call
-    console.log("Registering:", name, email, password);
+    // في تطبيق حقيقي، سيتم إجراء طلب API
+    console.log("التسجيل:", name, email, password);
     
-    // Mock successful registration
+    // محاكاة تسجيل ناجح
     if (name && email && password) {
       const mockUser = {
         id: "123",
@@ -78,10 +78,10 @@ const App = () => {
       };
       
       setUser(mockUser);
-      // In a real app, store auth token in localStorage/session
+      // في تطبيق حقيقي، قم بتخزين رمز المصادقة في localStorage/session
       localStorage.setItem("user", JSON.stringify(mockUser));
     } else {
-      throw new Error("Invalid registration data");
+      throw new Error("بيانات تسجيل غير صالحة");
     }
   };
 

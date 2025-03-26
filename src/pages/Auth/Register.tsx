@@ -31,17 +31,17 @@ const Register = () => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      toast.error("Please fill in all required fields");
+      toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("كلمتا المرور غير متطابقتين");
       return;
     }
     
     if (formData.password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+      toast.error("يجب أن تكون كلمة المرور 8 أحرف على الأقل");
       return;
     }
     
@@ -49,10 +49,10 @@ const Register = () => {
     
     try {
       await register(formData.name, formData.email, formData.password);
-      toast.success("Registration successful");
+      toast.success("تم إنشاء الحساب بنجاح");
       navigate("/dashboard");
     } catch (error) {
-      let message = "Registration failed";
+      let message = "فشل إنشاء الحساب";
       if (error instanceof Error) {
         message = error.message;
       }
@@ -63,32 +63,32 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-secondary/30 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-secondary/30 px-4" dir="rtl">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-reverse space-x-2">
             <Book className="h-8 w-8 text-primary" />
-            <span className="font-semibold text-2xl">Library Manager</span>
+            <span className="font-semibold text-2xl">نظام إدارة المكتبات</span>
           </Link>
         </div>
         
         <Card className="w-full animate-fade-in glass border-0 shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Create an Account</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">إنشاء حساب جديد</CardTitle>
             <CardDescription className="text-center">
-              Enter your information to create an account
+              أدخل معلوماتك لإنشاء حساب جديد
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">الاسم الكامل</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="name"
-                    placeholder="John Doe"
-                    className="pl-10"
+                    placeholder="أحمد محمد"
+                    className="pr-10"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
@@ -96,14 +96,14 @@ const Register = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">البريد الإلكتروني</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="you@example.com"
-                    className="pl-10"
+                    placeholder="your@email.com"
+                    className="pr-10"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
@@ -111,30 +111,30 @@ const Register = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">كلمة المرور</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
-                    className="pl-10"
+                    className="pr-10"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters long
+                  يجب أن تكون كلمة المرور 8 أحرف على الأقل
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
                     type="password"
-                    className="pl-10"
+                    className="pr-10"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
@@ -148,12 +148,12 @@ const Register = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Creating account...
+                    جاري إنشاء الحساب...
                   </div>
                 ) : (
                   <>
-                    Create Account
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    إنشاء حساب
+                    <ArrowRight className="mr-2 h-4 w-4" />
                   </>
                 )}
               </Button>
@@ -161,9 +161,9 @@ const Register = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm">
-              Already have an account?{" "}
+              لديك حساب بالفعل؟{" "}
               <Link to="/login" className="text-primary hover:underline">
-                Sign in
+                تسجيل الدخول
               </Link>
             </div>
           </CardFooter>
@@ -171,7 +171,7 @@ const Register = () => {
         
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <Link to="/" className="hover:underline">
-            Back to Home
+            العودة إلى الصفحة الرئيسية
           </Link>
         </div>
       </div>

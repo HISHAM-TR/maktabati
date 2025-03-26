@@ -1,152 +1,190 @@
 
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Book, Settings, Search, UserPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useAuth } from "@/App";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { useAuth } from "@/App";
+import SearchBar from "@/components/ui/SearchBar";
+import { Button } from "@/components/ui/button";
+import { BookOpen, BookText, Library, Users } from "lucide-react";
 
 const Index = () => {
-  // Set title on mount
-  useEffect(() => {
-    document.title = "Library Management System";
-  }, []);
-
   const { user } = useAuth();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
       
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-24">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8 animate-slide-up">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-                Manage Your Personal Library With Ease
+      {/* الصفحة الرئيسية */}
+      <main className="flex-1">
+        {/* قسم الترحيب */}
+        <section className="relative py-20 overflow-hidden">
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                نظام إدارة المكتبات الشخصية
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Organize, track, and discover your book collection with our modern library management system.
+              <p className="text-xl mb-8 text-muted-foreground">
+                منصة متكاملة لإدارة مكتبتك الشخصية وتنظيم كتبك بطريقة سهلة وفعالة
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              
+              <div className="flex flex-wrap justify-center gap-4 mb-12">
                 {user ? (
                   <Link to="/dashboard">
-                    <Button size="lg" className="w-full sm:w-auto">
-                      Go to Dashboard
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                    <Button size="lg" className="gap-2">
+                      <BookOpen className="h-5 w-5" />
+                      الذهاب إلى لوحة التحكم
                     </Button>
                   </Link>
                 ) : (
                   <>
                     <Link to="/register">
-                      <Button size="lg" className="w-full sm:w-auto">
-                        Get Started
-                        <ArrowRight className="ml-2 h-5 w-5" />
+                      <Button size="lg" className="gap-2">
+                        <Users className="h-5 w-5" />
+                        إنشاء حساب جديد
                       </Button>
                     </Link>
                     <Link to="/login">
-                      <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                        Sign In
+                      <Button variant="outline" size="lg" className="gap-2">
+                        دخول إلى حسابك
                       </Button>
                     </Link>
                   </>
                 )}
               </div>
+              
+              <div className="relative max-w-md mx-auto">
+                <SearchBar 
+                  onSearch={(query) => console.log("البحث عن:", query)} 
+                  placeholder="ابحث عن كتاب أو مؤلف..."
+                />
+                <p className="mt-2 text-sm text-muted-foreground">
+                  يمكنك البحث عن الكتب، المؤلفين، أو التصنيفات
+                </p>
+              </div>
             </div>
-            <div className="md:w-1/2 flex justify-center animate-fade-in">
-              <div className="glass p-8 rounded-2xl max-w-md">
-                <div className="grid grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-primary/5 p-4 rounded-xl flex flex-col items-center justify-center aspect-square">
-                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                        <Book className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="h-2 w-16 bg-primary/10 rounded-full mt-2"></div>
-                      <div className="h-2 w-10 bg-primary/10 rounded-full mt-2"></div>
-                    </div>
-                  ))}
+          </div>
+          
+          {/* خلفية زخرفية */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent"></div>
+          <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute -right-40 -bottom-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"></div>
+        </section>
+        
+        {/* قسم المميزات */}
+        <section className="py-16 bg-secondary/30">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">مميزات نظام إدارة المكتبات</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Library className="h-8 w-8 text-primary" />
                 </div>
+                <h3 className="text-xl font-semibold mb-3">إدارة مكتبتك الشخصية</h3>
+                <p className="text-muted-foreground">
+                  أنشئ مكتبات متعددة ونظم كتبك حسب التصنيفات المختلفة بطريقة سهلة
+                </p>
+              </div>
+              
+              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <BookText className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">تنظيم المجموعات</h3>
+                <p className="text-muted-foreground">
+                  صنف كتبك حسب المؤلف، الموضوع، سنة النشر أو أي تصنيف تختاره
+                </p>
+              </div>
+              
+              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">إدارة مستخدمي المكتبة</h3>
+                <p className="text-muted-foreground">
+                  تحكم في صلاحيات المستخدمين ومن يمكنه الوصول إلى كتبك
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      
-      {/* Features Section */}
-      <section className="py-16 bg-secondary/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="glass p-6 rounded-xl animate-fade-in">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Book className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Personal Libraries</h3>
-              <p className="text-muted-foreground">
-                Create and manage multiple libraries to organize your book collection by genres, authors, or any system you prefer.
-              </p>
-            </div>
-            
-            <div className="glass p-6 rounded-xl animate-fade-in" style={{ animationDelay: "100ms" }}>
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Search className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Advanced Search</h3>
-              <p className="text-muted-foreground">
-                Easily find any book in your collection with powerful search capabilities by title, author, or category.
-              </p>
-            </div>
-            
-            <div className="glass p-6 rounded-xl animate-fade-in" style={{ animationDelay: "200ms" }}>
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <Settings className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Admin Controls</h3>
-              <p className="text-muted-foreground">
-                Administrators can manage users, monitor libraries, and access detailed statistics about the system.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* CTA Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="glass p-8 md:p-12 rounded-2xl text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to organize your collection?</h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of book lovers who are managing their personal libraries with our system.
+        </section>
+        
+        {/* قسم كيفية الاستخدام */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-8">كيفية استخدام النظام</h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              بخطوات بسيطة يمكنك البدء في إدارة مكتبتك الشخصية واستعراض مجموعة كتبك
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              {user ? (
-                <Link to="/dashboard">
-                  <Button size="lg">
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link to="/register">
-                    <Button size="lg">
-                      Create an Account
-                      <UserPlus className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link to="/login">
-                    <Button size="lg" variant="outline">
-                      Sign In
-                    </Button>
-                  </Link>
-                </>
-              )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              <div className="p-4 text-center">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+                  1
+                </div>
+                <h3 className="font-semibold mb-2">إنشاء حساب</h3>
+                <p className="text-sm text-muted-foreground">
+                  سجل حساب جديد وأكمل معلومات ملفك الشخصي
+                </p>
+              </div>
+              
+              <div className="p-4 text-center">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+                  2
+                </div>
+                <h3 className="font-semibold mb-2">أنشئ مكتبتك</h3>
+                <p className="text-sm text-muted-foreground">
+                  قم بإنشاء مكتبة جديدة وحدد تصنيفاتها
+                </p>
+              </div>
+              
+              <div className="p-4 text-center">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+                  3
+                </div>
+                <h3 className="font-semibold mb-2">أضف كتبك</h3>
+                <p className="text-sm text-muted-foreground">
+                  أضف كتبك مع كافة المعلومات المتعلقة بها
+                </p>
+              </div>
+              
+              <div className="p-4 text-center">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+                  4
+                </div>
+                <h3 className="font-semibold mb-2">البحث والتنظيم</h3>
+                <p className="text-sm text-muted-foreground">
+                  استعرض ونظم كتبك بشكل سهل وسريع
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+        
+        {/* قسم الاتصال */}
+        <section className="py-16 bg-secondary/30">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-6">ابدأ اليوم في تنظيم مكتبتك</h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              انضم إلى آلاف المستخدمين الذين ينظمون مكتباتهم الشخصية باستخدام نظامنا
+            </p>
+            
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link to="/register">
+                <Button size="lg" className="gap-2">
+                  <Users className="h-5 w-5" />
+                  سجل الآن مجاناً
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="outline" size="lg">
+                  تسجيل الدخول إلى حسابك
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
       
       <Footer />
     </div>
