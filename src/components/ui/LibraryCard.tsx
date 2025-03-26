@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Book, MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Book, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -52,14 +52,14 @@ const LibraryCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardHeader className="pb-2 relative">
-        <div className="absolute right-2 top-2">
+        <div className="absolute left-2 top-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <MoreHorizontal className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={() => onEdit(id)}>
                 <Edit className="h-4 w-4 ml-2" />
                 تعديل
