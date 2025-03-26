@@ -4,7 +4,6 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/App";
 import { Menu, X, Book, User, LogOut } from "lucide-react";
-import ThemeSwitch from "@/components/ui/ThemeSwitch";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -87,22 +86,18 @@ const Header = () => {
                   <span className="text-sm font-medium">{user.name}</span>
                 </div>
                 
-                <div className="flex items-center space-x-reverse space-x-4">
-                  <ThemeSwitch />
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={handleLogout}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleLogout}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
               </div>
             </>
           ) : (
             <div className="flex items-center space-x-reverse space-x-4">
-              <ThemeSwitch />
               <NavLink to="/login">
                 <Button variant="ghost">تسجيل الدخول</Button>
               </NavLink>
@@ -172,25 +167,19 @@ const Header = () => {
                     <span className="text-sm font-medium">{user.name}</span>
                   </div>
                   
-                  <div className="flex items-center space-x-reverse space-x-2">
-                    <ThemeSwitch />
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={handleLogout}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <LogOut className="h-4 w-4 ml-2" />
-                      تسجيل الخروج
-                    </Button>
-                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={handleLogout}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <LogOut className="h-4 w-4 ml-2" />
+                    تسجيل الخروج
+                  </Button>
                 </div>
               </>
             ) : (
               <div className="flex flex-col space-y-2 pt-2 border-t border-border">
-                <div className="flex items-center justify-end px-4 py-2">
-                  <ThemeSwitch />
-                </div>
                 <NavLink to="/login" className="w-full">
                   <Button variant="outline" className="w-full">تسجيل الدخول</Button>
                 </NavLink>
