@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -33,7 +32,6 @@ import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
 
-// بيانات المكتبات الوهمية
 const libraryData = {
   "1": {
     id: "1",
@@ -52,7 +50,6 @@ const libraryData = {
   },
 };
 
-// بيانات الكتب الوهمية
 const initialBooksData = {
   "1": [
     {
@@ -111,7 +108,6 @@ const initialBooksData = {
   ],
 };
 
-// تصنيفات الكتب
 const bookCategories = [
   "خيال",
   "خيال علمي",
@@ -143,14 +139,12 @@ const Library = () => {
     description: "",
   });
 
-  // تحميل بيانات المكتبة عند التحميل
   useEffect(() => {
     document.title = "المكتبة | نظام إدارة المكتبات";
     
     if (id && libraryData[id as keyof typeof libraryData]) {
       setLibrary(libraryData[id as keyof typeof libraryData]);
       
-      // تحميل الكتب لهذه المكتبة
       if (initialBooksData[id as keyof typeof initialBooksData]) {
         setBooks(initialBooksData[id as keyof typeof initialBooksData]);
         setFilteredBooks(initialBooksData[id as keyof typeof initialBooksData]);
@@ -158,7 +152,6 @@ const Library = () => {
     }
   }, [id]);
 
-  // معالجة البحث
   const handleSearch = (query: string) => {
     if (!query.trim()) {
       setFilteredBooks(books);
@@ -176,7 +169,6 @@ const Library = () => {
     setFilteredBooks(results);
   };
 
-  // إضافة كتاب جديد
   const handleAddBook = () => {
     if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
       toast.error("العنوان والمؤلف والتصنيف مطلوبين");
@@ -200,7 +192,6 @@ const Library = () => {
     toast.success("تمت إضافة الكتاب بنجاح");
   };
 
-  // تعديل كتاب
   const handleEditBook = () => {
     if (!activeBook) return;
     if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
@@ -227,7 +218,6 @@ const Library = () => {
     toast.success("تم تحديث الكتاب بنجاح");
   };
 
-  // حذف كتاب
   const handleDeleteBook = (id: string) => {
     const updatedBooks = books.filter((book) => book.id !== id);
     setBooks(updatedBooks);
@@ -235,13 +225,11 @@ const Library = () => {
     toast.success("تم حذف الكتاب بنجاح");
   };
 
-  // عرض تفاصيل الكتاب
   const handleViewBook = (book: BookType) => {
     setActiveBook(book);
     setIsViewDialogOpen(true);
   };
 
-  // فتح مربع حوار التعديل
   const handleEditDialogOpen = (book: BookType) => {
     setActiveBook(book);
     setFormData({
@@ -285,7 +273,6 @@ const Library = () => {
 
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          {/* رأس المكتبة */}
           <div className="mb-8">
             <div className="flex items-center mb-2">
               <Link to="/dashboard" className="text-muted-foreground hover:text-primary ml-4">
@@ -298,7 +285,6 @@ const Library = () => {
             </p>
           </div>
 
-          {/* شريط الإجراءات */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div className="mb-4 md:mb-0 md:w-1/2">
               <SearchBar
@@ -323,7 +309,6 @@ const Library = () => {
             </Button>
           </div>
 
-          {/* شبكة الكتب */}
           {filteredBooks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredBooks.map((book) => (
@@ -369,7 +354,6 @@ const Library = () => {
 
       <Footer />
 
-      {/* مربع حوار إضافة كتاب */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent dir="rtl" className="font-cairo">
           <DialogHeader>
@@ -454,7 +438,6 @@ const Library = () => {
         </DialogContent>
       </Dialog>
 
-      {/* مربع حوار تعديل كتاب */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent dir="rtl" className="font-cairo">
           <DialogHeader>
@@ -536,9 +519,8 @@ const Library = () => {
         </DialogContent>
       </Dialog>
 
-      {/* مربع حوار عرض الكتاب */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[525px]" dir="rtl" className="font-cairo">
+        <DialogContent dir="rtl" className="font-cairo sm:max-w-[525px]">
           {activeBook && (
             <>
               <DialogHeader>
