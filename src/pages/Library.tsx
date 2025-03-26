@@ -34,6 +34,11 @@ import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
 // إزالة استيراد ThemeSwitch
 
+// تحديث نوع الكتاب بإضافة عدد المجلدات
+type ExtendedBookType = BookType & {
+  volumes?: number;
+};
+
 const libraryData = {
   "1": {
     id: "1",
@@ -60,6 +65,7 @@ const initialBooksData = {
       author: "ج.ر.ر. تولكين",
       category: "خيال",
       description: "رواية خيالية ملحمية عن مهمة لتدمير خاتم قوي.",
+      volumes: 3,
     },
     {
       id: "1-2",
@@ -67,6 +73,7 @@ const initialBooksData = {
       author: "فرانك هربرت",
       category: "خيال علمي",
       description: "رواية خيال علمي تدور في مستقبل بعيد وسط مجتمع إقطاعي بين النجوم.",
+      volumes: 1,
     },
     {
       id: "1-3",
@@ -74,6 +81,7 @@ const initialBooksData = {
       author: "جين أوستن",
       category: "كلاسيكي",
       description: "رواية رومانسية تتبع التطور العاطفي للبطلة إليزابيث بينيت.",
+      volumes: 1,
     },
   ],
   "2": [
@@ -83,6 +91,7 @@ const initialBooksData = {
       author: "روبرت سي. مارتن",
       category: "برمجة",
       description: "دليل لحرفية البرمجيات الرشيقة.",
+      volumes: 1,
     },
     {
       id: "2-2",
@@ -90,6 +99,7 @@ const initialBooksData = {
       author: "إريك جاما، ريتشارد هيلم، رالف جونسون، جون فليسيدس",
       category: "برمجة",
       description: "عناصر البرمجيات الموجهة للكائنات القابلة لإعادة الاستخدام.",
+      volumes: 1,
     },
   ],
   "3": [
@@ -99,6 +109,7 @@ const initialBooksData = {
       author: "أفلاطون",
       category: "فلسفة",
       description: "حوار سقراطي بخصوص العدالة، ونظام وطبيعة الدولة العادلة، والإنسان العادل.",
+      volumes: 1,
     },
     {
       id: "3-2",
@@ -106,6 +117,7 @@ const initialBooksData = {
       author: "فريدريك نيتشه",
       category: "فلسفة",
       description: "مقدمة لفلسفة المستقبل.",
+      volumes: 1,
     },
   ],
 };
@@ -126,13 +138,13 @@ const initialBookCategories = [
 const Library = () => {
   const { id } = useParams<{ id: string }>();
   const [library, setLibrary] = useState<any>(null);
-  const [books, setBooks] = useState<BookType[]>([]);
-  const [filteredBooks, setFilteredBooks] = useState<BookType[]>([]);
+  const [books, setBooks] = useState<ExtendedBookType[]>([]);
+  const [filteredBooks, setFilteredBooks] = useState<ExtendedBookType[]>([]);
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [activeBook, setActiveBook] = useState<BookType | null>(null);
+  const [activeBook, setActiveBook] = useState<ExtendedBookType | null>(null);
   
   const [bookCategories, setBookCategories] = useState<string[]>(initialBookCategories);
   const [newCategory, setNewCategory] = useState<string>("");
@@ -143,6 +155,7 @@ const Library = () => {
     author: "",
     category: "",
     description: "",
+    volumes: 1,
   });
 
   useEffect(() => {
@@ -194,6 +207,7 @@ const Library = () => {
       author: "",
       category: "",
       description: "",
+      volumes: 1,
     });
     toast.success("تمت إضافة الكتاب بنجاح");
   };
@@ -220,6 +234,7 @@ const Library = () => {
       author: "",
       category: "",
       description: "",
+      volumes: 1,
     });
     toast.success("تم تحديث الكتاب بنجاح");
   };
@@ -231,18 +246,19 @@ const Library = () => {
     toast.success("تم حذف الكتاب بنجاح");
   };
 
-  const handleViewBook = (book: BookType) => {
+  const handleViewBook = (book: ExtendedBookType) => {
     setActiveBook(book);
     setIsViewDialogOpen(true);
   };
 
-  const handleEditDialogOpen = (book: BookType) => {
+  const handleEditDialogOpen = (book: ExtendedBookType) => {
     setActiveBook(book);
     setFormData({
       title: book.title,
       author: book.author,
       category: book.category,
       description: book.description,
+      volumes: book.volumes || 1,
     });
     setIsEditDialogOpen(true);
   };
@@ -326,6 +342,7 @@ const Library = () => {
                   author: "",
                   category: "",
                   description: "",
+                  volumes: 1,
                 });
                 setIsAddDialogOpen(true);
               }}
@@ -366,6 +383,7 @@ const Library = () => {
                     author: "",
                     category: "",
                     description: "",
+                    volumes: 1,
                   });
                   setIsAddDialogOpen(true);
                 }}
@@ -474,6 +492,22 @@ const Library = () => {
                   </div>
                 )}
               </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="volumes" className="text-right text-lg">
+                عدد المجلدات
+              </Label>
+              <Input
+                id="volumes"
+                type="number"
+                min="1"
+                value={formData.volumes}
+                onChange={(e) =>
+                  setFormData({ ...formData, volumes: parseInt(e.target.value) || 1 })
+                }
+                className="col-span-3 text-right py-6 text-lg"
+                placeholder="أدخل عدد المجلدات"
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="description" className="text-right text-lg">
@@ -593,6 +627,22 @@ const Library = () => {
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="edit-volumes" className="text-right text-lg">
+                عدد المجلدات
+              </Label>
+              <Input
+                id="edit-volumes"
+                type="number"
+                min="1"
+                value={formData.volumes}
+                onChange={(e) =>
+                  setFormData({ ...formData, volumes: parseInt(e.target.value) || 1 })
+                }
+                className="col-span-3 text-right py-6 text-lg"
+                placeholder="أدخل عدد المجلدات"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-description" className="text-right text-lg">
                 الوصف
               </Label>
@@ -633,6 +683,11 @@ const Library = () => {
                   <BookIcon className="h-5 w-5 text-muted-foreground" />
                   <span className="font-medium text-lg">التصنيف:</span>
                   <span className="text-lg">{activeBook.category}</span>
+                </div>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <BookIcon className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">عدد المجلدات:</span>
+                  <span className="text-lg">{activeBook.volumes || 1}</span>
                 </div>
                 <div className="flex items-center space-x-reverse space-x-2">
                   <Calendar className="h-5 w-5 text-muted-foreground" />

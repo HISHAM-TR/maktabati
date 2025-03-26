@@ -19,6 +19,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import LibraryCard from "@/components/ui/LibraryCard";
 import SearchBar from "@/components/ui/SearchBar";
+import LibraryStats from "@/components/ui/LibraryStats";
 import { useAuth } from "@/App";
 
 // بيانات وهمية للمكتبات
@@ -42,6 +43,14 @@ const initialLibraries = [
     bookCount: 8,
   },
 ];
+
+// بيانات وهمية للإحصائيات
+const statsData = {
+  totalLibraries: 3,
+  totalBooks: 67,
+  totalCategories: 10,
+  totalVolumes: 85,
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -153,9 +162,9 @@ const Dashboard = () => {
           {/* رأس لوحة التحكم */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold mb-2 tracking-wide">مكتباتي</h1>
+              <h1 className="text-3xl font-bold mb-2 tracking-wide">لوحة التحكم</h1>
               <p className="text-muted-foreground text-lg">
-                إدارة مجموعات الكتب الخاصة بك حسب المكتبة
+                مرحبًا{user?.name ? ` ${user.name}` : ""}، قم بإدارة المكتبات والكتب الخاصة بك
               </p>
             </div>
             <Button
@@ -170,8 +179,22 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {/* شريط البحث */}
+          {/* إحصائيات المكتبة */}
+          <LibraryStats 
+            totalLibraries={statsData.totalLibraries} 
+            totalBooks={statsData.totalBooks} 
+            totalCategories={statsData.totalCategories} 
+            totalVolumes={statsData.totalVolumes} 
+          />
+
+          {/* قسم المكتبات */}
           <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">مكتباتي</h2>
+              <p className="text-muted-foreground">
+                إجمالي المكتبات: {libraries.length}
+              </p>
+            </div>
             <SearchBar
               onSearch={handleSearch}
               placeholder="ابحث عن المكتبات حسب الاسم أو الوصف..."
@@ -223,7 +246,7 @@ const Dashboard = () => {
 
       {/* حوار إنشاء مكتبة */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="font-noto-kufi">
+        <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-xl tracking-wide">إنشاء مكتبة جديدة</DialogTitle>
             <DialogDescription className="text-base">
@@ -261,7 +284,7 @@ const Dashboard = () => {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-row-reverse sm:justify-end">
             <Button
               variant="outline"
               onClick={() => setIsCreateDialogOpen(false)}
@@ -276,7 +299,7 @@ const Dashboard = () => {
 
       {/* حوار تعديل المكتبة */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="font-noto-kufi">
+        <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-xl tracking-wide">تعديل المكتبة</DialogTitle>
             <DialogDescription className="text-base">
@@ -312,7 +335,7 @@ const Dashboard = () => {
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-row-reverse sm:justify-end">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-base">
               إلغاء
             </Button>
