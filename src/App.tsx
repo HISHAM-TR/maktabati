@@ -13,15 +13,15 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import NotFound from "./pages/NotFound";
 
-type AuthUser = {
+export type User = {
   id: string;
   email: string;
   name: string;
   role: "user" | "admin";
-} | null;
+};
 
 type AuthContextType = {
-  user: AuthUser;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
