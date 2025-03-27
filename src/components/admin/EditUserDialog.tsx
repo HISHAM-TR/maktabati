@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Mail, Check, AlertCircle } from "lucide-react";
+import { Mail, Check, AlertCircle, Shield } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,35 +13,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  registrationDate: string;
-  lastLogin: string;
-  libraryCount: number;
-  role?: "user" | "admin";
-}
+import { User, UserFormData } from "./types";
 
 interface EditUserDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   activeUser: User | null;
-  userFormData: {
-    name: string;
-    email: string;
-    status: string;
-    role: "user" | "admin";
-  };
-  setUserFormData: React.Dispatch<React.SetStateAction<{
-    name: string;
-    email: string;
-    status: string;
-    role: "user" | "admin";
-  }>>;
+  userFormData: UserFormData;
+  setUserFormData: React.Dispatch<React.SetStateAction<UserFormData>>;
   handleEditUser: () => void;
 }
 
@@ -99,6 +80,38 @@ const EditUserDialog = ({
               >
                 <Mail className="h-4 w-4" />
               </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="role" className="text-right">
+              الصلاحيات
+            </Label>
+            <div className="col-span-3">
+              <RadioGroup
+                value={userFormData.role}
+                onValueChange={(value) => 
+                  setUserFormData({ ...userFormData, role: value as "user" | "admin" })
+                }
+                className="flex flex-row space-x-reverse space-x-4"
+                dir="rtl"
+              >
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <RadioGroupItem value="user" id="user" />
+                  <Label htmlFor="user" className="cursor-pointer">مستخدم</Label>
+                </div>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <RadioGroupItem value="admin" id="admin" />
+                  <Label htmlFor="admin" className="cursor-pointer">مشرف</Label>
+                </div>
+              </RadioGroup>
+              <div className="mt-2 flex items-center">
+                <Shield className="h-4 w-4 text-muted-foreground ml-2" />
+                <span className="text-xs text-muted-foreground">
+                  {userFormData.role === "admin" 
+                    ? "يملك المشرف كافة الصلاحيات في النظام" 
+                    : "المستخدم العادي يمكنه إدارة مكتباته الخاصة فقط"}
+                </span>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
