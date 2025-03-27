@@ -14,7 +14,56 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/App";
-import { Book, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Book, Mail, Lock, User, ArrowRight, Globe, Phone } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// قائمة رموز الدول
+const countryCodes = [
+  { code: "+966", country: "السعودية 🇸🇦" },
+  { code: "+971", country: "الإمارات 🇦🇪" },
+  { code: "+965", country: "الكويت 🇰🇼" },
+  { code: "+974", country: "قطر 🇶🇦" },
+  { code: "+973", country: "البحرين 🇧🇭" },
+  { code: "+968", country: "عمان 🇴🇲" },
+  { code: "+962", country: "الأردن 🇯🇴" },
+  { code: "+20", country: "مصر 🇪🇬" },
+  { code: "+961", country: "لبنان 🇱🇧" },
+  { code: "+970", country: "فلسطين 🇵🇸" },
+  { code: "+963", country: "سوريا 🇸🇾" },
+  { code: "+964", country: "العراق 🇮🇶" },
+  { code: "+216", country: "تونس 🇹🇳" },
+  { code: "+212", country: "المغرب 🇲🇦" },
+  { code: "+213", country: "الجزائر 🇩🇿" },
+  { code: "+218", country: "ليبيا 🇱🇾" },
+  { code: "+249", country: "السودان 🇸🇩" },
+];
+
+// قائمة الدول
+const countries = [
+  "السعودية",
+  "الإمارات",
+  "الكويت",
+  "قطر",
+  "البحرين",
+  "عمان",
+  "الأردن",
+  "مصر",
+  "لبنان",
+  "فلسطين",
+  "سوريا",
+  "العراق",
+  "تونس",
+  "المغرب",
+  "الجزائر",
+  "ليبيا",
+  "السودان",
+];
 
 const Register = () => {
   const navigate = useNavigate();
@@ -25,12 +74,15 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    country: "",
+    phoneCode: "+966",
+    phoneNumber: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.country || !formData.phoneNumber) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
     }
@@ -45,10 +97,20 @@ const Register = () => {
       return;
     }
     
+    if (!/^\d+$/.test(formData.phoneNumber)) {
+      toast.error("رقم الهاتف يجب أن يتكون من أرقام فقط");
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      await register(formData.name, formData.email, formData.password);
+      // إضافة معلومات إضافية للمستخدم
+      const fullPhoneNumber = `${formData.phoneCode}${formData.phoneNumber}`;
+      await register(formData.name, formData.email, formData.password, {
+        country: formData.country,
+        phoneNumber: fullPhoneNumber
+      });
       toast.success("تم إنشاء الحساب بنجاح");
       navigate("/dashboard");
     } catch (error) {
@@ -95,6 +157,7 @@ const Register = () => {
                   />
                 </div>
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="email">البريد الإلكتروني</Label>
                 <div className="relative">
@@ -110,6 +173,61 @@ const Register = () => {
                   />
                 </div>
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="country">البلد</Label>
+                <div className="relative">
+                  <Globe className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Select
+                    value={formData.country}
+                    onValueChange={(value) => setFormData({ ...formData, country: value })}
+                    required
+                  >
+                    <SelectTrigger className="w-full pr-10">
+                      <SelectValue placeholder="اختر البلد" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem key={country} value={country}>{country}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="phone">رقم الجوال</Label>
+                <div className="flex space-x-reverse space-x-2">
+                  <div className="relative flex-1">
+                    <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="5xxxxxxxx"
+                      className="pr-10"
+                      value={formData.phoneNumber}
+                      onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <Select
+                    value={formData.phoneCode}
+                    onValueChange={(value) => setFormData({ ...formData, phoneCode: value })}
+                  >
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue placeholder="+966" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countryCodes.map((item) => (
+                        <SelectItem key={item.code} value={item.code}>
+                          {item.country} {item.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="password">كلمة المرور</Label>
                 <div className="relative">
@@ -127,6 +245,7 @@ const Register = () => {
                   يجب أن تكون كلمة المرور 8 أحرف على الأقل
                 </p>
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
                 <div className="relative">
@@ -141,6 +260,7 @@ const Register = () => {
                   />
                 </div>
               </div>
+              
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center">

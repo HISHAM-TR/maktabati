@@ -11,6 +11,7 @@ import Library from "./pages/Library";
 import Admin from "./pages/Admin";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 export type User = {
@@ -18,12 +19,19 @@ export type User = {
   email: string;
   name: string;
   role: "user" | "admin";
+  country?: string;
+  phoneNumber?: string;
 };
 
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (
+    name: string, 
+    email: string, 
+    password: string, 
+    additionalData?: { country?: string; phoneNumber?: string }
+  ) => Promise<void>;
   logout: () => void;
 };
 
@@ -67,6 +75,8 @@ const App = () => {
         email,
         name: email.split("@")[0],
         role: email.includes("admin") ? "admin" as const : "user" as const,
+        country: "السعودية",
+        phoneNumber: "+966 5XXXXXXXX"
       };
       
       setUser(mockUser);
@@ -77,9 +87,14 @@ const App = () => {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (
+    name: string, 
+    email: string, 
+    password: string, 
+    additionalData?: { country?: string; phoneNumber?: string }
+  ) => {
     // في تطبيق حقيقي، سيتم إجراء طلب API
-    console.log("التسجيل:", name, email, password);
+    console.log("التسجيل:", name, email, password, additionalData);
     
     // محاكاة تسجيل ناجح
     if (name && email && password) {
@@ -88,6 +103,8 @@ const App = () => {
         email,
         name,
         role: "user" as const,
+        country: additionalData?.country || "السعودية",
+        phoneNumber: additionalData?.phoneNumber || ""
       };
       
       setUser(mockUser);
@@ -113,6 +130,7 @@ const App = () => {
               <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
               <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
               <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+              <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
               <Route path="/library/:id" element={user ? <Library /> : <Navigate to="/login" />} />
               <Route path="/admin" element={user?.role === "admin" ? <Admin /> : <Navigate to="/dashboard" />} />
               <Route path="*" element={<NotFound />} />
