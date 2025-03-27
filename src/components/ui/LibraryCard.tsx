@@ -42,12 +42,13 @@ const LibraryCard = ({
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      dir="rtl"
     >
-      <CardHeader className="pb-2 relative">
+      <CardHeader className="pb-2 relative text-right">
         <CardActions id={id} onEdit={onEdit} onDelete={onDelete} />
         <CardIcon />
-        <CardTitle className="text-xl">{name}</CardTitle>
-        <CardDescription className="line-clamp-2">{description}</CardDescription>
+        <CardTitle className="text-xl font-cairo">{name}</CardTitle>
+        <CardDescription className="line-clamp-2 text-right">{description}</CardDescription>
       </CardHeader>
       
       <CardContent>
@@ -56,7 +57,7 @@ const LibraryCard = ({
       
       <CardFooter>
         <Link to={`/library/${id}`} className="w-full">
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full font-cairo">
             عرض المكتبة
           </Button>
         </Link>
