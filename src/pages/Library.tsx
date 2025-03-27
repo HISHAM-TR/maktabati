@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -42,6 +41,7 @@ import {
 import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import LibraryStats from "@/components/ui/stats/LibraryStats";
 
 type ExtendedBookType = BookType & {
   volumes?: number;
@@ -184,8 +184,9 @@ const Library = () => {
       setLibrary(libraryData[id as keyof typeof libraryData]);
       
       if (initialBooksData[id as keyof typeof initialBooksData]) {
-        setBooks(initialBooksData[id as keyof typeof initialBooksData]);
-        setFilteredBooks(initialBooksData[id as keyof typeof initialBooksData]);
+        const booksData = initialBooksData[id as keyof typeof initialBooksData] as ExtendedBookType[];
+        setBooks(booksData);
+        setFilteredBooks(booksData);
       }
     }
   }, [id]);
@@ -317,6 +318,15 @@ const Library = () => {
     }
   };
 
+  const getStatusCounts = () => {
+    return {
+      available: books.filter(book => book.status === "available").length,
+      borrowed: books.filter(book => book.status === "borrowed").length,
+      lost: books.filter(book => book.status === "lost").length,
+      damaged: books.filter(book => book.status === "damaged").length
+    };
+  };
+
   if (!library) {
     return (
       <div className="flex flex-col min-h-screen font-cairo" dir="rtl">
@@ -362,6 +372,14 @@ const Library = () => {
               </p>
             </div>
           </div>
+
+          <LibraryStats
+            totalLibraries={1}
+            totalBooks={books.length}
+            totalCategories={[...new Set(books.map(book => book.category))].length}
+            totalVolumes={books.reduce((sum, book) => sum + (book.volumes || 1), 0)}
+            statusCounts={getStatusCounts()}
+          />
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div className="mb-4 md:mb-0 md:w-1/2">
