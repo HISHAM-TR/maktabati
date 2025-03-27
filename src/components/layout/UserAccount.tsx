@@ -1,7 +1,7 @@
 
 import { User as UserType } from "@/App";
 import { Button } from "@/components/ui/button";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Pencil } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import ThemeSwitch from "@/components/ui/ThemeSwitch";
 
@@ -29,12 +29,15 @@ const UserAccount = ({ user, handleLogout }: UserAccountProps) => {
 
   return (
     <div className="hidden md:flex items-center space-x-reverse space-x-4">
-      <div className="flex items-center space-x-reverse space-x-2">
+      <NavLink to="/profile" className="flex items-center space-x-reverse space-x-2 hover:opacity-80 transition-opacity">
         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
           <User className="h-4 w-4 text-primary" />
         </div>
         <span className="text-sm font-medium">{user.name}</span>
-      </div>
+        <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-primary/10">
+          <Pencil className="h-3 w-3" />
+        </Button>
+      </NavLink>
       
       <div className="flex items-center space-x-reverse space-x-2">
         <Button 
