@@ -25,7 +25,6 @@ const SearchBar = ({
     <form 
       onSubmit={handleSubmit}
       className="w-full max-w-md"
-      dir="rtl"
     >
       {label && (
         <label className="block text-foreground font-medium mb-2 text-right text-lg">

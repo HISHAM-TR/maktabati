@@ -76,6 +76,7 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Cairo', sans-serif;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+    direction: rtl;
   }
 
   html {
