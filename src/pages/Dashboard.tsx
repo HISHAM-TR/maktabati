@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Header from "@/components/layout/Header";
@@ -38,6 +37,12 @@ const statsData = {
   totalBooks: 67,
   totalCategories: 10,
   totalVolumes: 85,
+  statusCounts: {
+    available: 45,
+    borrowed: 12,
+    lost: 3,
+    damaged: 7
+  }
 };
 
 const Dashboard = () => {
@@ -160,6 +165,7 @@ const Dashboard = () => {
             totalBooks={statsData.totalBooks} 
             totalCategories={statsData.totalCategories} 
             totalVolumes={statsData.totalVolumes} 
+            statusCounts={statsData.statusCounts}
           />
 
           {/* قسم المكتبات */}
