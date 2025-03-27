@@ -24,7 +24,7 @@ const SearchBar = ({
   return (
     <form 
       onSubmit={handleSubmit}
-      className="w-full max-w-md"
+      className="w-full max-w-md mx-auto"
     >
       {label && (
         <label className="block text-foreground font-medium mb-2 text-right text-lg">
@@ -39,6 +39,7 @@ const SearchBar = ({
           onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
           className="pr-10 pl-12 py-2 w-full bg-white text-right"
+          dir="rtl"
         />
         <button
           type="submit"
