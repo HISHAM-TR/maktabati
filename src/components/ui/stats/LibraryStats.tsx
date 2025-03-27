@@ -4,10 +4,12 @@ import {
   Book, 
   BookOpen, 
   BookText,
-  BookCopy
+  BookCopy,
+  CheckCircle,
+  AlertTriangle,
+  XCircle
 } from "lucide-react";
 import StatCard from './StatCard';
-import StatusStats from './StatusStats';
 
 export type LibraryStatsProps = {
   totalLibraries: number;
@@ -31,7 +33,8 @@ const LibraryStats = ({
 }: LibraryStatsProps) => {
   return (
     <div className="mb-10" dir="rtl">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <h3 className="text-xl font-bold mb-4">إحصائيات المكتبة</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <StatCard 
           title="إجمالي المكتبات" 
           value={totalLibraries} 
@@ -58,7 +61,34 @@ const LibraryStats = ({
         />
       </div>
       
-      {statusCounts && <StatusStats statusCounts={statusCounts} />}
+      {statusCounts && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard 
+            title="متاح" 
+            value={statusCounts.available} 
+            icon={<CheckCircle className="h-6 w-6 text-white" />} 
+            color="bg-green-500"
+          />
+          <StatCard 
+            title="مستعار" 
+            value={statusCounts.borrowed} 
+            icon={<BookOpen className="h-6 w-6 text-white" />} 
+            color="bg-blue-500"
+          />
+          <StatCard 
+            title="مفقود" 
+            value={statusCounts.lost} 
+            icon={<XCircle className="h-6 w-6 text-white" />} 
+            color="bg-red-500"
+          />
+          <StatCard 
+            title="تالف" 
+            value={statusCounts.damaged} 
+            icon={<AlertTriangle className="h-6 w-6 text-white" />} 
+            color="bg-yellow-500"
+          />
+        </div>
+      )}
     </div>
   );
 };
