@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   Users,
@@ -11,6 +10,8 @@ import {
   AlertCircle,
   Check,
   X,
+  UserPlus,
+  Shield,
 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -39,6 +40,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import SearchBar from "@/components/ui/SearchBar";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // بيانات وهمية للمستخدمين
 const initialUsers = [
@@ -173,6 +179,18 @@ const initialLibrariesData = [
   },
 ];
 
+// مخطط التحقق من صحة نموذج إنشاء المستخدم
+const createUserSchema = z.object({
+  name: z.string().min(2, { message: "الاسم يجب أن يحتوي على حرفين على الأقل" }),
+  email: z.string().email({ message: "البريد الإلكتروني غير صالح" }),
+  password: z.string().min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
+  role: z.enum(["user", "admin"], {
+    required_error: "يرجى اختيار دور المستخدم",
+  }),
+});
+
+type CreateUserFormValues = z.infer<typeof createUserSchema>;
+
 const Admin = () => {
   const [users, setUsers] = useState(initialUsers);
   const [libraries, setLibraries] = useState(initialLibrariesData);
@@ -181,10 +199,22 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [activeUser, setActiveUser] = useState<any>(null);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [userFormData, setUserFormData] = useState({
     name: "",
     email: "",
     status: "",
+  });
+
+  // نموذج إنشاء المستخدم
+  const createUserForm = useForm<CreateUserFormValues>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "user",
+    },
   });
 
   // تعيين العنوان عند التحميل
@@ -260,6 +290,33 @@ const Admin = () => {
     setIsEditUserDialogOpen(false);
     setActiveUser(null);
     toast.success("تم تحديث المستخدم بنجاح");
+  };
+
+  // إنشاء مستخدم جديد
+  const handleCreateUser = (values: CreateUserFormValues) => {
+    // إنشاء مستخدم جديد بمعرف فريد
+    const newUser = {
+      id: `user-${Date.now()}`,
+      name: values.name,
+      email: values.email,
+      status: "active",
+      registrationDate: new Date().toISOString().split('T')[0],
+      lastLogin: "-",
+      libraryCount: 0,
+      role: values.role
+    };
+
+    // إضافة المستخدم الجديد إلى القائمة
+    const updatedUsers = [newUser, ...users];
+    setUsers(updatedUsers);
+    setFilteredUsers(updatedUsers);
+    
+    // إغلاق الحوار وإعادة تعيين النموذج
+    setIsCreateUserDialogOpen(false);
+    createUserForm.reset();
+    
+    // إظهار رسالة نجاح
+    toast.success(`تم إنشاء المستخدم ${values.name} بنجاح`);
   };
 
   // تبديل حالة المستخدم
@@ -428,11 +485,20 @@ const Admin = () => {
 
             {/* علامة تبويب المستخدمين */}
             <TabsContent value="users" className="animate-fade-in">
-              <div className="mb-6">
-                <SearchBar
-                  onSearch={handleUserSearch}
-                  placeholder="ابحث عن المستخدمين بالاسم أو البريد الإلكتروني..."
-                />
+              <div className="flex justify-between items-center mb-6">
+                <Button 
+                  onClick={() => setIsCreateUserDialogOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  إضافة مستخدم جديد
+                </Button>
+                <div className="flex-1 mr-4">
+                  <SearchBar
+                    onSearch={handleUserSearch}
+                    placeholder="ابحث عن المستخدمين بالاسم أو البريد الإلكتروني..."
+                  />
+                </div>
               </div>
 
               <Card>
@@ -443,6 +509,7 @@ const Admin = () => {
                       <TableRow>
                         <TableHead className="text-right">الاسم</TableHead>
                         <TableHead className="text-right">البريد الإلكتروني</TableHead>
+                        <TableHead className="text-right">الدور</TableHead>
                         <TableHead className="text-right">الحالة</TableHead>
                         <TableHead className="text-right">تاريخ التسجيل</TableHead>
                         <TableHead className="text-right">آخر تسجيل دخول</TableHead>
@@ -462,6 +529,11 @@ const Admin = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">{user.email}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant={user.role === "admin" ? "secondary" : "outline"}>
+                              {user.role === "admin" ? "مشرف" : "مستخدم"}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="text-right">
                             <Badge
                               variant={
@@ -716,6 +788,132 @@ const Admin = () => {
             </Button>
             <Button onClick={handleEditUser}>حفظ التغييرات</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* حوار إنشاء مستخدم جديد */}
+      <Dialog
+        open={isCreateUserDialogOpen}
+        onOpenChange={(open) => {
+          setIsCreateUserDialogOpen(open);
+          if (!open) createUserForm.reset();
+        }}
+      >
+        <DialogContent className="rtl:text-right ltr:text-left">
+          <DialogHeader>
+            <DialogTitle>إضافة مستخدم جديد</DialogTitle>
+            <DialogDescription>
+              أدخل بيانات المستخدم الجديد. جميع الحقول مطلوبة.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...createUserForm}>
+            <form onSubmit={createUserForm.handleSubmit(handleCreateUser)} className="space-y-6">
+              <FormField
+                control={createUserForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الاسم</FormLabel>
+                    <FormControl>
+                      <Input placeholder="أدخل اسم المستخدم" dir="rtl" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createUserForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>البريد الإلكتروني</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="email" 
+                        placeholder="user@example.com" 
+                        dir="ltr" 
+                        className="text-right" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createUserForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>كلمة المرور</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="password" 
+                        placeholder="******" 
+                        dir="ltr" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      كلمة المرور يجب أن تتكون من 6 أحرف على الأقل
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={createUserForm.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>دور المستخدم</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-col space-y-1"
+                      >
+                        <FormItem className="flex items-center space-x-reverse space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="user" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            مستخدم عادي
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-reverse space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="admin" />
+                          </FormControl>
+                          <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                            <Shield className="h-4 w-4" />
+                            مشرف
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter className="flex-row-reverse sm:justify-start">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateUserDialogOpen(false)}
+                >
+                  إلغاء
+                </Button>
+                <Button type="submit">إنشاء المستخدم</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
