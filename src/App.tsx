@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -40,7 +39,7 @@ export const useAuth = () => {
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [user, setUser] = useState<AuthUser>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   // Check for saved user on initial load
   useEffect(() => {
