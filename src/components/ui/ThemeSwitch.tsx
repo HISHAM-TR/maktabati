@@ -1,10 +1,12 @@
 
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import "../ui/theme-switch.css";
 
 const ThemeSwitch = () => {
   const [isDarkMode, setIsDarkMode] = useLocalStorage<boolean>("dark-mode", false);
+  const isMobile = useIsMobile();
 
   // تطبيق السمة المحفوظة عند تحميل الصفحة
   useEffect(() => {
@@ -20,7 +22,7 @@ const ThemeSwitch = () => {
   };
 
   return (
-    <div className="theme-switch-wrapper">
+    <div className={`theme-switch-wrapper ${isMobile ? 'theme-switch-mobile' : ''}`}>
       <label className="theme-switch">
         <input 
           className="theme-switch__checkbox" 
@@ -63,6 +65,6 @@ const ThemeSwitch = () => {
       </label>
     </div>
   );
-}
+};
 
 export default ThemeSwitch;

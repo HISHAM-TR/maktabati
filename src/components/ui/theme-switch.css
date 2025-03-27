@@ -1,4 +1,3 @@
-
 .theme-switch-wrapper {
   display: flex;
   align-items: center;
@@ -6,7 +5,7 @@
 }
 
 .theme-switch {
-  --toggle-size: 20px;
+  --toggle-size: 16px;
   /* the size is adjusted using font-size,
      this is not transform scale,
      so you can choose any size */
@@ -29,6 +28,22 @@
   --back-clouds-color: #aacadf;
   --transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
   --circle-transition: 0.3s cubic-bezier(0, -0.02, 0.35, 1.17);
+}
+
+.theme-switch-mobile {
+  transform: scale(0.8);
+  transform-origin: center;
+}
+
+@media (max-width: 640px) {
+  .theme-switch {
+    --toggle-size: 14px;
+  }
+  
+  .theme-switch-wrapper {
+    transform: scale(0.85);
+    transform-origin: center;
+  }
 }
 
 .theme-switch,
