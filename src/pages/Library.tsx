@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -141,6 +142,19 @@ const initialBooksData: {
   ],
 };
 
+const initialBookCategories = [
+  "خيال",
+  "خيال علمي",
+  "كلاسيكي",
+  "برمجة",
+  "فلسفة",
+  "سيرة ذاتية",
+  "تاريخ",
+  "تطوير ذاتي",
+  "غموض",
+  "إثارة",
+];
+
 const Library = () => {
   const { id } = useParams<{ id: string }>();
   const [library, setLibrary] = useState<any>(null);
@@ -191,7 +205,7 @@ const Library = () => {
         book.title.toLowerCase().includes(query.toLowerCase()) ||
         book.author.toLowerCase().includes(query.toLowerCase()) ||
         book.category.toLowerCase().includes(query.toLowerCase()) ||
-        book.description.toLowerCase().includes(query.toLowerCase())
+        book.description?.toLowerCase().includes(query.toLowerCase())
     );
 
     setFilteredBooks(results);
@@ -868,4 +882,39 @@ const Library = () => {
                   <div className="flex items-center space-x-reverse space-x-2">
                     <Calendar className="h-5 w-5 text-blue-500" />
                     <span className="font-medium text-lg">تاريخ الإعارة:</span>
-                    <span className="text-lg">{format(new Date(activeBook.borrowDate),
+                    <span className="text-lg">{format(new Date(activeBook.borrowDate), "yyyy-MM-dd")}</span>
+                  </div>
+                )}
+                
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <Calendar className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">تمت الإضافة في:</span>
+                  <span className="text-lg">{new Date().toLocaleDateString('ar-EG')}</span>
+                </div>
+                <div className="mt-4">
+                  <h4 className="text-lg font-medium mb-2">الوصف:</h4>
+                  <p className="text-muted-foreground text-lg">
+                    {activeBook.description || "لا يوجد وصف متاح."}
+                  </p>
+                </div>
+              </div>
+              <DialogFooter className="flex-row-reverse sm:justify-end">
+                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="text-lg py-6 px-8">
+                  إغلاق
+                </Button>
+                <Button onClick={() => {
+                  setIsViewDialogOpen(false);
+                  handleEditDialogOpen(activeBook);
+                }} className="text-lg py-6 px-8">
+                  تعديل الكتاب
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Library;
