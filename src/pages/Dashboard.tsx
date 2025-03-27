@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import LibraryStats from "@/components/ui/LibraryStats";
+import LibraryStats from "@/components/ui/stats/LibraryStats";
 import { useAuth } from "@/App";
 import LibraryDialogs from "@/components/dashboard/LibraryDialogs";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
