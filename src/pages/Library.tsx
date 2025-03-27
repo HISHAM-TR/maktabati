@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -5,7 +6,8 @@ import {
   Plus, 
   Book as BookIcon, 
   User,
-  Calendar
+  Calendar,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +33,15 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BookCard, { BookType } from "@/components/ui/BookCard";
 import SearchBar from "@/components/ui/SearchBar";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
 
 type ExtendedBookType = BookType & {
   volumes?: number;
@@ -63,6 +74,7 @@ const initialBooksData = {
       category: "خيال",
       description: "رواية خيالية ملحمية عن مهمة لتدمير خاتم قوي.",
       volumes: 3,
+      status: "available",
     },
     {
       id: "1-2",
@@ -71,6 +83,8 @@ const initialBooksData = {
       category: "خيال علمي",
       description: "رواية خيال علمي تدور في مستقبل بعيد وسط مجتمع إقطاعي بين النجوم.",
       volumes: 1,
+      status: "borrowed",
+      borrowDate: new Date(2023, 5, 15),
     },
     {
       id: "1-3",
@@ -79,6 +93,7 @@ const initialBooksData = {
       category: "كلاسيكي",
       description: "رواية رومانسية تتبع التطور العاطفي للبطلة إليزابيث بينيت.",
       volumes: 1,
+      status: "lost",
     },
   ],
   "2": [
@@ -89,6 +104,7 @@ const initialBooksData = {
       category: "برمجة",
       description: "دليل لحرفية البرمجيات الرشيقة.",
       volumes: 1,
+      status: "available",
     },
     {
       id: "2-2",
@@ -97,6 +113,7 @@ const initialBooksData = {
       category: "برمجة",
       description: "عناصر البرمجيات الموجهة للكائنات القابلة لإعادة الاستخدام.",
       volumes: 1,
+      status: "damaged",
     },
   ],
   "3": [
@@ -107,6 +124,7 @@ const initialBooksData = {
       category: "فلسفة",
       description: "حوار سقراطي بخصوص العدالة، ونظام وطبيعة الدولة العادلة، والإنسان العادل.",
       volumes: 1,
+      status: "available",
     },
     {
       id: "3-2",
@@ -115,6 +133,8 @@ const initialBooksData = {
       category: "فلسفة",
       description: "مقدمة لفلسفة المستقبل.",
       volumes: 1,
+      status: "borrowed",
+      borrowDate: new Date(2023, 4, 10),
     },
   ],
 };
@@ -153,6 +173,8 @@ const Library = () => {
     category: "",
     description: "",
     volumes: 1,
+    status: "available" as "available" | "borrowed" | "lost" | "damaged",
+    borrowDate: null as Date | null,
   });
 
   useEffect(() => {
@@ -199,13 +221,7 @@ const Library = () => {
     setBooks([newBook, ...books]);
     setFilteredBooks([newBook, ...books]);
     setIsAddDialogOpen(false);
-    setFormData({
-      title: "",
-      author: "",
-      category: "",
-      description: "",
-      volumes: 1,
-    });
+    resetFormData();
     toast.success("تمت إضافة الكتاب بنجاح");
   };
 
@@ -226,14 +242,20 @@ const Library = () => {
     setFilteredBooks(updatedBooks);
     setIsEditDialogOpen(false);
     setActiveBook(null);
+    resetFormData();
+    toast.success("تم تحديث الكتاب بنجاح");
+  };
+
+  const resetFormData = () => {
     setFormData({
       title: "",
       author: "",
       category: "",
       description: "",
       volumes: 1,
+      status: "available",
+      borrowDate: null,
     });
-    toast.success("تم تحديث الكتاب بنجاح");
   };
 
   const handleDeleteBook = (id: string) => {
@@ -254,8 +276,10 @@ const Library = () => {
       title: book.title,
       author: book.author,
       category: book.category,
-      description: book.description,
+      description: book.description || "",
       volumes: book.volumes || 1,
+      status: book.status || "available",
+      borrowDate: book.borrowDate || null,
     });
     setIsEditDialogOpen(true);
   };
@@ -276,6 +300,21 @@ const Library = () => {
     setNewCategory("");
     setIsAddingCategory(false);
     toast.success("تمت إضافة التصنيف الجديد");
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "available":
+        return "متاح";
+      case "borrowed":
+        return "مستعار";
+      case "lost":
+        return "مفقود";
+      case "damaged":
+        return "تالف";
+      default:
+        return "غير معروف";
+    }
   };
 
   if (!library) {
@@ -334,13 +373,7 @@ const Library = () => {
             </div>
             <Button
               onClick={() => {
-                setFormData({
-                  title: "",
-                  author: "",
-                  category: "",
-                  description: "",
-                  volumes: 1,
-                });
+                resetFormData();
                 setIsAddDialogOpen(true);
               }}
               className="text-lg py-6 px-8"
@@ -375,13 +408,7 @@ const Library = () => {
               </p>
               <Button
                 onClick={() => {
-                  setFormData({
-                    title: "",
-                    author: "",
-                    category: "",
-                    description: "",
-                    volumes: 1,
-                  });
+                  resetFormData();
                   setIsAddDialogOpen(true);
                 }}
                 className="text-lg py-6 px-8"
@@ -506,6 +533,75 @@ const Library = () => {
                 placeholder="أدخل عدد المجلدات"
               />
             </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="status" className="text-right text-lg pt-2">
+                حالة الكتاب
+              </Label>
+              <div className="col-span-3">
+                <RadioGroup 
+                  value={formData.status} 
+                  onValueChange={(value: "available" | "borrowed" | "lost" | "damaged") => 
+                    setFormData({ ...formData, status: value })
+                  }
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="available" id="available" />
+                    <Label htmlFor="available" className="text-lg cursor-pointer">متاح</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="borrowed" id="borrowed" />
+                    <Label htmlFor="borrowed" className="text-lg cursor-pointer">مستعار</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="lost" id="lost" />
+                    <Label htmlFor="lost" className="text-lg cursor-pointer">مفقود</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="damaged" id="damaged" />
+                    <Label htmlFor="damaged" className="text-lg cursor-pointer">تالف</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+            
+            {formData.status === "borrowed" && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right text-lg">
+                  تاريخ الإعارة
+                </Label>
+                <div className="col-span-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-right font-normal text-lg py-6",
+                          !formData.borrowDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="ml-2 h-4 w-4" />
+                        {formData.borrowDate ? (
+                          format(formData.borrowDate, "yyyy-MM-dd")
+                        ) : (
+                          <span>اختر تاريخ الإعارة</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={formData.borrowDate || undefined}
+                        onSelect={(date) => setFormData({ ...formData, borrowDate: date })}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="description" className="text-right text-lg">
                 الوصف
@@ -639,6 +735,75 @@ const Library = () => {
                 placeholder="أدخل عدد المجلدات"
               />
             </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="edit-status" className="text-right text-lg pt-2">
+                حالة الكتاب
+              </Label>
+              <div className="col-span-3">
+                <RadioGroup 
+                  value={formData.status} 
+                  onValueChange={(value: "available" | "borrowed" | "lost" | "damaged") => 
+                    setFormData({ ...formData, status: value })
+                  }
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="available" id="edit-available" />
+                    <Label htmlFor="edit-available" className="text-lg cursor-pointer">متاح</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="borrowed" id="edit-borrowed" />
+                    <Label htmlFor="edit-borrowed" className="text-lg cursor-pointer">مستعار</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="lost" id="edit-lost" />
+                    <Label htmlFor="edit-lost" className="text-lg cursor-pointer">مفقود</Label>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <RadioGroupItem value="damaged" id="edit-damaged" />
+                    <Label htmlFor="edit-damaged" className="text-lg cursor-pointer">تالف</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
+            
+            {formData.status === "borrowed" && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right text-lg">
+                  تاريخ الإعارة
+                </Label>
+                <div className="col-span-3">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-right font-normal text-lg py-6",
+                          !formData.borrowDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="ml-2 h-4 w-4" />
+                        {formData.borrowDate ? (
+                          format(formData.borrowDate, "yyyy-MM-dd")
+                        ) : (
+                          <span>اختر تاريخ الإعارة</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={formData.borrowDate || undefined}
+                        onSelect={(date) => setFormData({ ...formData, borrowDate: date })}
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="edit-description" className="text-right text-lg">
                 الوصف
@@ -686,6 +851,20 @@ const Library = () => {
                   <span className="font-medium text-lg">عدد المجلدات:</span>
                   <span className="text-lg">{activeBook.volumes || 1}</span>
                 </div>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <AlertCircle className="h-5 w-5 text-muted-foreground" />
+                  <span className="font-medium text-lg">الحالة:</span>
+                  <span className="text-lg">{getStatusText(activeBook.status || "available")}</span>
+                </div>
+                
+                {activeBook.status === "borrowed" && activeBook.borrowDate && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <Calendar className="h-5 w-5 text-blue-500" />
+                    <span className="font-medium text-lg">تاريخ الإعارة:</span>
+                    <span className="text-lg">{format(new Date(activeBook.borrowDate), "yyyy-MM-dd")}</span>
+                  </div>
+                )}
+                
                 <div className="flex items-center space-x-reverse space-x-2">
                   <Calendar className="h-5 w-5 text-muted-foreground" />
                   <span className="font-medium text-lg">تمت الإضافة في:</span>

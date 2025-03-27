@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Book, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
+import { Book, MoreHorizontal, Edit, Trash2, Eye, Calendar, AlertCircle } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 export interface BookType {
   id: string;
@@ -24,6 +25,9 @@ export interface BookType {
   author: string;
   category: string;
   description: string;
+  status?: "available" | "borrowed" | "lost" | "damaged";
+  borrowDate?: Date | null;
+  returnDate?: Date | null;
 }
 
 interface BookCardProps {
@@ -48,6 +52,19 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
 
   const handleView = () => {
     onView(book);
+  };
+
+  const getStatusBadge = () => {
+    switch (book.status) {
+      case "borrowed":
+        return <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">مستعار</Badge>;
+      case "lost":
+        return <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200">مفقود</Badge>;
+      case "damaged":
+        return <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-200">تالف</Badge>;
+      default:
+        return <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">متاح</Badge>;
+    }
   };
 
   return (
@@ -94,10 +111,13 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
           <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-2">
             <Book className="h-5 w-5 text-primary" />
           </div>
-          <div>
+          <div className="flex flex-col">
             <Badge variant="outline" className="font-normal">
               {book.category}
             </Badge>
+            <div className="mt-1">
+              {getStatusBadge()}
+            </div>
           </div>
         </div>
         
@@ -111,6 +131,20 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
         <p className="text-sm text-muted-foreground line-clamp-2">
           {book.description || "لا يوجد وصف متاح."}
         </p>
+        
+        {book.status === "borrowed" && book.borrowDate && (
+          <div className="flex items-center mt-2 text-xs text-muted-foreground">
+            <Calendar className="h-3 w-3 ml-1 text-blue-500" />
+            <span>تاريخ الإعارة: {format(new Date(book.borrowDate), "yyyy-MM-dd")}</span>
+          </div>
+        )}
+        
+        {(book.status === "lost" || book.status === "damaged") && (
+          <div className="flex items-center mt-2 text-xs text-muted-foreground">
+            <AlertCircle className="h-3 w-3 ml-1 text-red-500" />
+            <span>{book.status === "lost" ? "مفقود منذ" : "تالف منذ"}: {new Date().toLocaleDateString('ar-EG')}</span>
+          </div>
+        )}
       </CardContent>
       
       <CardFooter className="flex justify-between pt-1">
