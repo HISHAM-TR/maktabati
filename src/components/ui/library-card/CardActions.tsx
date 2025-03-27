@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import HamburgerMenu from "../HamburgerMenu";
+import { useState } from "react";
 
 interface CardActionsProps {
   id: string;
@@ -18,6 +19,8 @@ interface CardActionsProps {
 }
 
 const CardActions = ({ id, onEdit, onDelete, position = "right" }: CardActionsProps) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const handleDelete = () => {
     toast.success("تم حذف المكتبة بنجاح");
     onDelete(id);
@@ -25,7 +28,7 @@ const CardActions = ({ id, onEdit, onDelete, position = "right" }: CardActionsPr
 
   return (
     <div className={`absolute ${position === "left" ? "left-2" : "right-2"} top-2`}>
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="p-0 h-8 w-8">
             <HamburgerMenu />
