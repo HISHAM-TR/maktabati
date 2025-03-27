@@ -36,6 +36,10 @@ const Header = () => {
     navigate("/");
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled ? "glass shadow-sm py-3" : "bg-transparent py-4"
@@ -124,19 +128,18 @@ const Header = () => {
             )}
           </div>
           
-          {/* زر القائمة المتنقلة - تم استبداله بالزر الجديد */}
-          <label 
+          {/* زر القائمة المتنقلة */}
+          <button 
             className="md:hidden relative cursor-pointer"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
           >
-            <input type="checkbox" className="hidden peer" checked={isMenuOpen} readOnly />
             <svg 
               viewBox="0 0 32 32" 
-              className="h-8 w-8 transition-transform duration-600 ease-[cubic-bezier(0.4,0,0.2,1)] peer-checked:rotate-[-45deg]"
-              aria-label={isMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+              className={`h-8 w-8 transition-transform duration-600 ease-[cubic-bezier(0.4,0,0.2,1)] ${isMenuOpen ? 'rotate-[-45deg]' : ''}`}
             >
               <path 
-                className="line line-top-bottom fill-none stroke-foreground stroke-[3] stroke-round stroke-linejoin-round transition-all duration-600 ease-[cubic-bezier(0.4,0,0.2,1)] [stroke-dasharray:12_63] peer-checked:[stroke-dasharray:20_300] peer-checked:[stroke-dashoffset:-32.42]" 
+                className={`line line-top-bottom fill-none stroke-foreground stroke-[3] stroke-round stroke-linejoin-round transition-all duration-600 ease-[cubic-bezier(0.4,0,0.2,1)] [stroke-dasharray:12_63] ${isMenuOpen ? '[stroke-dasharray:20_300] [stroke-dashoffset:-32.42]' : ''}`}
                 d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22" 
               />
               <path 
@@ -144,7 +147,7 @@ const Header = () => {
                 d="M7 16 27 16" 
               />
             </svg>
-          </label>
+          </button>
         </div>
       </div>
       
