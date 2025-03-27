@@ -45,7 +45,7 @@ const LibraryCard = ({
       dir="rtl"
     >
       <CardHeader className="pb-2 relative text-right">
-        <CardActions id={id} onEdit={onEdit} onDelete={onDelete} />
+        <CardActions id={id} onEdit={onEdit} onDelete={onDelete} position="left" />
         <CardIcon />
         <CardTitle className="text-xl font-cairo">{name}</CardTitle>
         <CardDescription className="line-clamp-2 text-right">{description}</CardDescription>

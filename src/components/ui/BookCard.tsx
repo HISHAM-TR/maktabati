@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -6,8 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Book, MoreVertical, Pencil, Eye, Trash2 } from "lucide-react";
+import { Book, Pencil, Eye, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import HamburgerMenu from "./HamburgerMenu";
 
 export type BookType = {
   id: string;
@@ -43,7 +46,7 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden border border-muted h-full flex flex-col">
+    <Card className="overflow-hidden border border-muted h-full flex flex-col" dir="rtl">
       <CardContent className="pt-6 px-6 flex-grow">
         <div className="flex justify-between items-start">
           <div className="h-12 w-12 rounded-full flex items-center justify-center bg-primary/10 mb-4">
@@ -51,9 +54,11 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger className="outline-none">
-              <MoreVertical className="h-5 w-5 text-muted-foreground" />
+              <Button variant="ghost" size="icon" className="p-0 h-8 w-8">
+                <HamburgerMenu />
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={() => onView(book)}>
                 <Eye className="h-4 w-4 ml-2" />
                 عرض التفاصيل
@@ -72,23 +77,23 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <h3 className="text-xl font-bold mb-1 line-clamp-1">{book.title}</h3>
-        <p className="text-muted-foreground mb-2 line-clamp-1">{book.author}</p>
-        <div className="flex space-x-reverse space-x-2 mb-3">
+        <h3 className="text-xl font-bold mb-1 line-clamp-1 text-right">{book.title}</h3>
+        <p className="text-muted-foreground mb-2 line-clamp-1 text-right">{book.author}</p>
+        <div className="flex space-x-reverse space-x-2 mb-3 justify-end">
           <Badge variant="outline">{book.category}</Badge>
           {getStatusBadge()}
         </div>
-        <p className="text-muted-foreground text-sm line-clamp-3">
+        <p className="text-muted-foreground text-sm line-clamp-3 text-right">
           {book.description || "لا يوجد وصف متاح"}
         </p>
       </CardContent>
       <CardFooter className="border-t px-6 py-3 bg-muted/30">
         {book.status === "borrowed" && book.borrowDate ? (
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground text-right w-full">
             تاريخ الإعارة: {format(new Date(book.borrowDate), "yyyy-MM-dd")}
           </div>
         ) : (
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-muted-foreground text-right w-full">
             أضيف بتاريخ: {new Date().toLocaleDateString("ar-EG")}
           </div>
         )}
