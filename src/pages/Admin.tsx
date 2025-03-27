@@ -46,8 +46,18 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-// بيانات وهمية للمستخدمين
-const initialUsers = [
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  registrationDate: string;
+  lastLogin: string;
+  libraryCount: number;
+  role?: "user" | "admin";
+}
+
+const initialUsers: User[] = [
   {
     id: "1",
     name: "أحمد محمد",
@@ -56,6 +66,7 @@ const initialUsers = [
     registrationDate: "2023-01-15",
     lastLogin: "2023-06-20",
     libraryCount: 3,
+    role: "user"
   },
   {
     id: "2",
@@ -65,6 +76,7 @@ const initialUsers = [
     registrationDate: "2023-02-10",
     lastLogin: "2023-06-18",
     libraryCount: 2,
+    role: "user"
   },
   {
     id: "3",
@@ -74,15 +86,17 @@ const initialUsers = [
     registrationDate: "2023-03-05",
     lastLogin: "2023-05-12",
     libraryCount: 1,
+    role: "user"
   },
   {
     id: "4",
     name: "نورا سالم",
     email: "noura@example.com",
     status: "active",
-    registrationDate: "2023-04-20",
+    registrationDate: "2023-06-21",
     lastLogin: "2023-06-21",
     libraryCount: 4,
+    role: "user"
   },
   {
     id: "5",
@@ -92,10 +106,10 @@ const initialUsers = [
     registrationDate: "2023-06-15",
     lastLogin: "-",
     libraryCount: 0,
+    role: "admin"
   },
 ];
 
-// بيانات وهمية للمكتبات
 const initialLibrariesData = [
   {
     id: "1",
@@ -179,7 +193,6 @@ const initialLibrariesData = [
   },
 ];
 
-// مخطط التحقق من صحة نموذج إنشاء المستخدم
 const createUserSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يحتوي على حرفين على الأقل" }),
   email: z.string().email({ message: "البريد الإلكتروني غير صالح" }),
@@ -192,21 +205,21 @@ const createUserSchema = z.object({
 type CreateUserFormValues = z.infer<typeof createUserSchema>;
 
 const Admin = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [libraries, setLibraries] = useState(initialLibrariesData);
-  const [filteredUsers, setFilteredUsers] = useState(initialUsers);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(initialUsers);
   const [filteredLibraries, setFilteredLibraries] = useState(initialLibrariesData);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [activeUser, setActiveUser] = useState<any>(null);
+  const [activeUser, setActiveUser] = useState<User | null>(null);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [userFormData, setUserFormData] = useState({
     name: "",
     email: "",
     status: "",
+    role: "user" as "user" | "admin"
   });
 
-  // نموذج إنشاء المستخدم
   const createUserForm = useForm<CreateUserFormValues>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
@@ -217,18 +230,15 @@ const Admin = () => {
     },
   });
 
-  // تعيين العنوان عند التحميل
   useEffect(() => {
     document.title = "لوحة المشرف | نظام إدارة المكتبات";
   }, []);
 
-  // حساب الإحصائيات
   const totalUsers = users.length;
   const activeUsers = users.filter((user) => user.status === "active").length;
   const totalLibraries = libraries.length;
   const totalBooks = libraries.reduce((sum, lib) => sum + lib.bookCount, 0);
 
-  // معالجة بحث المستخدمين
   const handleUserSearch = (query: string) => {
     if (!query.trim()) {
       setFilteredUsers(users);
@@ -244,7 +254,6 @@ const Admin = () => {
     setFilteredUsers(results);
   };
 
-  // معالجة بحث المكتبات
   const handleLibrarySearch = (query: string) => {
     if (!query.trim()) {
       setFilteredLibraries(libraries);
@@ -261,13 +270,13 @@ const Admin = () => {
     setFilteredLibraries(results);
   };
 
-  // تعديل المستخدم
-  const openEditUserDialog = (user: any) => {
+  const openEditUserDialog = (user: User) => {
     setActiveUser(user);
     setUserFormData({
       name: user.name,
       email: user.email,
       status: user.status,
+      role: user.role || "user"
     });
     setIsEditUserDialogOpen(true);
   };
@@ -292,10 +301,8 @@ const Admin = () => {
     toast.success("تم تحديث المستخدم بنجاح");
   };
 
-  // إنشاء مستخدم جديد
   const handleCreateUser = (values: CreateUserFormValues) => {
-    // إنشاء مستخدم جديد بمعرف فريد
-    const newUser = {
+    const newUser: User = {
       id: `user-${Date.now()}`,
       name: values.name,
       email: values.email,
@@ -306,20 +313,16 @@ const Admin = () => {
       role: values.role
     };
 
-    // إضافة المستخدم الجديد إلى القائمة
     const updatedUsers = [newUser, ...users];
     setUsers(updatedUsers);
     setFilteredUsers(updatedUsers);
     
-    // إغلاق الحوار وإعادة تعيين النموذج
     setIsCreateUserDialogOpen(false);
     createUserForm.reset();
     
-    // إظهار رسالة نجاح
     toast.success(`تم إنشاء المستخدم ${values.name} بنجاح`);
   };
 
-  // تبديل حالة المستخدم
   const toggleUserStatus = (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     
@@ -347,7 +350,6 @@ const Admin = () => {
               <TabsTrigger value="libraries">المكتبات</TabsTrigger>
             </TabsList>
 
-            {/* علامة تبويب لوحة المعلومات */}
             <TabsContent value="dashboard" className="animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <Card>
@@ -483,7 +485,6 @@ const Admin = () => {
               </div>
             </TabsContent>
 
-            {/* علامة تبويب المستخدمين */}
             <TabsContent value="users" className="animate-fade-in">
               <div className="flex justify-between items-center mb-6">
                 <Button 
@@ -598,7 +599,6 @@ const Admin = () => {
               </Card>
             </TabsContent>
 
-            {/* علامة تبويب المكتبات */}
             <TabsContent value="libraries" className="animate-fade-in">
               <div className="mb-6">
                 <SearchBar
@@ -665,7 +665,6 @@ const Admin = () => {
 
       <Footer />
 
-      {/* حوار تعديل المستخدم */}
       <Dialog
         open={isEditUserDialogOpen}
         onOpenChange={setIsEditUserDialogOpen}
@@ -791,7 +790,6 @@ const Admin = () => {
         </DialogContent>
       </Dialog>
 
-      {/* حوار إنشاء مستخدم جديد */}
       <Dialog
         open={isCreateUserDialogOpen}
         onOpenChange={(open) => {
