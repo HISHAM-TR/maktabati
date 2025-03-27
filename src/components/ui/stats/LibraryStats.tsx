@@ -32,59 +32,59 @@ const LibraryStats = ({
   statusCounts 
 }: LibraryStatsProps) => {
   return (
-    <div className="mb-10" dir="rtl">
-      <h3 className="text-xl font-bold mb-4">إحصائيات المكتبة</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+    <div className="mb-8" dir="rtl">
+      <h3 className="text-lg font-bold mb-3 font-cairo">إحصائيات المكتبة</h3>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
         <StatCard 
           title="إجمالي المكتبات" 
           value={totalLibraries} 
-          icon={<BookOpen className="h-6 w-6 text-white" />} 
+          icon={<BookOpen className="h-5 w-5 text-white" />} 
           color="bg-primary/90"
         />
         <StatCard 
           title="إجمالي الكتب" 
           value={totalBooks} 
-          icon={<Book className="h-6 w-6 text-white" />} 
+          icon={<Book className="h-5 w-5 text-white" />} 
           color="bg-green-600"
         />
         <StatCard 
           title="التصنيفات" 
           value={totalCategories} 
-          icon={<BookText className="h-6 w-6 text-white" />} 
+          icon={<BookText className="h-5 w-5 text-white" />} 
           color="bg-amber-600"
         />
         <StatCard 
           title="إجمالي المجلدات" 
           value={totalVolumes} 
-          icon={<BookCopy className="h-6 w-6 text-white" />} 
+          icon={<BookCopy className="h-5 w-5 text-white" />} 
           color="bg-indigo-600"
         />
       </div>
       
       {statusCounts && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard 
             title="متاح" 
             value={statusCounts.available} 
-            icon={<CheckCircle className="h-6 w-6 text-white" />} 
+            icon={<CheckCircle className="h-5 w-5 text-white" />} 
             color="bg-green-500"
           />
           <StatCard 
             title="مستعار" 
             value={statusCounts.borrowed} 
-            icon={<BookOpen className="h-6 w-6 text-white" />} 
+            icon={<BookOpen className="h-5 w-5 text-white" />} 
             color="bg-blue-500"
           />
           <StatCard 
             title="مفقود" 
             value={statusCounts.lost} 
-            icon={<XCircle className="h-6 w-6 text-white" />} 
+            icon={<XCircle className="h-5 w-5 text-white" />} 
             color="bg-red-500"
           />
           <StatCard 
             title="تالف" 
             value={statusCounts.damaged} 
-            icon={<AlertTriangle className="h-6 w-6 text-white" />} 
+            icon={<AlertTriangle className="h-5 w-5 text-white" />} 
             color="bg-yellow-500"
           />
         </div>
