@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -46,30 +45,82 @@ export const useAuth = () => {
   return context;
 };
 
+export type LibraryType = {
+  id: string;
+  name: string;
+  description: string;
+  books?: any[];
+};
+
+type LibraryContextType = {
+  libraries: Record<string, LibraryType>;
+  addLibrary: (library: LibraryType) => void;
+  updateLibrary: (library: LibraryType) => void;
+  deleteLibrary: (id: string) => void;
+  getLibrary: (id: string) => LibraryType | undefined;
+};
+
+export const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
+
+export const useLibrary = () => {
+  const context = useContext(LibraryContext);
+  if (context === undefined) {
+    throw new Error("يجب استخدام useLibrary داخل LibraryProvider");
+  }
+  return context;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [libraries, setLibraries] = useState<Record<string, LibraryType>>({});
 
-  // Check for saved user on initial load
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
+    const savedLibraries = localStorage.getItem("libraries");
+    if (savedLibraries) {
       try {
-        setUser(JSON.parse(savedUser));
+        setLibraries(JSON.parse(savedLibraries));
       } catch (error) {
-        console.error("Error parsing saved user:", error);
-        localStorage.removeItem("user");
+        console.error("Error parsing saved libraries:", error);
+        localStorage.removeItem("libraries");
       }
     }
   }, []);
 
-  // وظائف المصادقة التجريبية
+  useEffect(() => {
+    localStorage.setItem("libraries", JSON.stringify(libraries));
+  }, [libraries]);
+
+  const addLibrary = (library: LibraryType) => {
+    setLibraries(prevLibraries => {
+      const updatedLibraries = { ...prevLibraries, [library.id]: library };
+      return updatedLibraries;
+    });
+  };
+
+  const updateLibrary = (library: LibraryType) => {
+    setLibraries(prevLibraries => {
+      if (!prevLibraries[library.id]) return prevLibraries;
+      return { ...prevLibraries, [library.id]: library };
+    });
+  };
+
+  const deleteLibrary = (id: string) => {
+    setLibraries(prevLibraries => {
+      const updatedLibraries = { ...prevLibraries };
+      delete updatedLibraries[id];
+      return updatedLibraries;
+    });
+  };
+
+  const getLibrary = (id: string) => {
+    return libraries[id];
+  };
+
   const login = async (email: string, password: string) => {
-    // في تطبيق حقيقي، سيتم إجراء طلب API
     console.log("تسجيل الدخول باستخدام:", email, password);
     
-    // محاكاة تسجيل دخول ناجح
     if (email && password) {
       const mockUser = {
         id: "123",
@@ -81,7 +132,6 @@ const App = () => {
       };
       
       setUser(mockUser);
-      // في تطبيق حقيقي، قم بتخزين رمز المصادقة في localStorage/session
       localStorage.setItem("user", JSON.stringify(mockUser));
     } else {
       throw new Error("بيانات اعتماد غير صالحة");
@@ -94,10 +144,8 @@ const App = () => {
     password: string, 
     additionalData?: { country?: string; phoneNumber?: string }
   ) => {
-    // في تطبيق حقيقي، سيتم إجراء طلب API
     console.log("التسجيل:", name, email, password, additionalData);
     
-    // محاكاة تسجيل ناجح
     if (name && email && password) {
       const mockUser = {
         id: "123",
@@ -109,7 +157,6 @@ const App = () => {
       };
       
       setUser(mockUser);
-      // في تطبيق حقيقي، قم بتخزين رمز المصادقة في localStorage/session
       localStorage.setItem("user", JSON.stringify(mockUser));
     } else {
       throw new Error("بيانات تسجيل غير صالحة");
@@ -129,22 +176,24 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo }}>
-        <BrowserRouter>
-          <TooltipProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-              <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
-              <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-              <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
-              <Route path="/library/:id" element={user ? <Library /> : <Navigate to="/login" />} />
-              <Route path="/admin" element={user?.role === "admin" ? <Admin /> : <Navigate to="/dashboard" />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </BrowserRouter>
+        <LibraryContext.Provider value={{ libraries, addLibrary, updateLibrary, deleteLibrary, getLibrary }}>
+          <BrowserRouter>
+            <TooltipProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+                <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+                <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+                <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+                <Route path="/library/:id" element={user ? <Library /> : <Navigate to="/login" />} />
+                <Route path="/admin" element={user?.role === "admin" ? <Admin /> : <Navigate to="/dashboard" />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </BrowserRouter>
+        </LibraryContext.Provider>
       </AuthContext.Provider>
     </QueryClientProvider>
   );

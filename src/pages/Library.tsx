@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   ChevronRight, 
   Plus, 
@@ -43,105 +42,13 @@ import { format } from "date-fns";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import LibraryStats from "@/components/ui/stats/LibraryStats";
+import { useLibrary } from "@/App";
 
 type ExtendedBookType = BookType & {
   volumes?: number;
 };
 
-const libraryData = {
-  "1": {
-    id: "1",
-    name: "مجموعة الروايات",
-    description: "مجموعتي من الروايات، بما في ذلك الخيال والخيال العلمي والتاريخي.",
-  },
-  "2": {
-    id: "2",
-    name: "كتب التقنية",
-    description: "كتب البرمجة والتكنولوجيا المرجعية.",
-  },
-  "3": {
-    id: "3",
-    name: "الفلسفة",
-    description: "مجموعة من نصوص الفلسفة الكلاسيكية والحديثة.",
-  },
-};
-
-const initialBooksData: {
-  [key: string]: ExtendedBookType[]
-} = {
-  "1": [
-    {
-      id: "1-1",
-      title: "سيد الخواتم",
-      author: "ج.ر.ر. تولكين",
-      category: "خيال",
-      description: "رواية خيالية ملحمية عن مهمة لتدمير خاتم قوي.",
-      volumes: 3,
-      status: "available" as "available" | "borrowed" | "lost" | "damaged",
-    },
-    {
-      id: "1-2",
-      title: "كثبان",
-      author: "فرانك هربرت",
-      category: "خيال علمي",
-      description: "رواية خيال علمي تدور في مستقبل بعيد وسط مجتمع إقطاعي بين النجوم.",
-      volumes: 1,
-      status: "borrowed" as "available" | "borrowed" | "lost" | "damaged",
-      borrowDate: new Date(2023, 5, 15),
-    },
-    {
-      id: "1-3",
-      title: "كبرياء وتحامل",
-      author: "جين أوستن",
-      category: "كلاسيكي",
-      description: "رواية رومانسية تتبع التطور العاطفي للبطلة إليزابيث بينيت.",
-      volumes: 1,
-      status: "lost" as "available" | "borrowed" | "lost" | "damaged",
-    },
-  ],
-  "2": [
-    {
-      id: "2-1",
-      title: "كود نظيف",
-      author: "روبرت سي. مارتن",
-      category: "برمجة",
-      description: "دليل لحرفية البرمجيات الرشيقة.",
-      volumes: 1,
-      status: "available" as "available" | "borrowed" | "lost" | "damaged",
-    },
-    {
-      id: "2-2",
-      title: "أنماط التصميم",
-      author: "إريك جاما، ريتشارد هيلم، رالف جونسون، جون فليسيدس",
-      category: "برمجة",
-      description: "عناصر البرمجيات الموجهة للكائنات القابلة لإعادة الاستخدام.",
-      volumes: 1,
-      status: "damaged" as "available" | "borrowed" | "lost" | "damaged",
-    },
-  ],
-  "3": [
-    {
-      id: "3-1",
-      title: "الجمهورية",
-      author: "أفلاطون",
-      category: "فلسفة",
-      description: "حوار سقراطي بخصوص العدالة، ونظام وطبيعة الدولة العادلة، والإنسان العادل.",
-      volumes: 1,
-      status: "available" as "available" | "borrowed" | "lost" | "damaged",
-    },
-    {
-      id: "3-2",
-      title: "ما وراء الخير والشر",
-      author: "فريدريك نيتشه",
-      category: "فلسفة",
-      description: "مقدمة لفلسفة المستقبل.",
-      volumes: 1,
-      status: "borrowed" as "available" | "borrowed" | "lost" | "damaged",
-      borrowDate: new Date(2023, 4, 10),
-    },
-  ],
-};
-
+// Default categories when creating a new library
 const initialBookCategories = [
   "خيال",
   "خيال علمي",
@@ -157,6 +64,9 @@ const initialBookCategories = [
 
 const Library = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { getLibrary, updateLibrary } = useLibrary();
+  
   const [library, setLibrary] = useState<any>(null);
   const [books, setBooks] = useState<ExtendedBookType[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<ExtendedBookType[]>([]);
@@ -183,16 +93,37 @@ const Library = () => {
   useEffect(() => {
     document.title = "المكتبة | نظام إدارة المكتبات";
     
-    if (id && libraryData[id as keyof typeof libraryData]) {
-      setLibrary(libraryData[id as keyof typeof libraryData]);
+    if (id) {
+      const foundLibrary = getLibrary(id);
       
-      if (initialBooksData[id as keyof typeof initialBooksData]) {
-        const booksData = initialBooksData[id as keyof typeof initialBooksData] as ExtendedBookType[];
-        setBooks(booksData);
-        setFilteredBooks(booksData);
+      if (foundLibrary) {
+        setLibrary(foundLibrary);
+        setBooks(foundLibrary.books || []);
+        setFilteredBooks(foundLibrary.books || []);
+      } else {
+        // Create an empty library for new IDs
+        setLibrary({
+          id,
+          name: "مكتبة جديدة",
+          description: "وصف المكتبة الجديدة",
+          books: []
+        });
+        setBooks([]);
+        setFilteredBooks([]);
       }
     }
-  }, [id]);
+  }, [id, getLibrary]);
+
+  // When books are updated, update the library in context
+  useEffect(() => {
+    if (library && id) {
+      const updatedLibrary = {
+        ...library,
+        books: books
+      };
+      updateLibrary(updatedLibrary);
+    }
+  }, [books, library, id, updateLibrary]);
 
   const handleSearch = (query: string) => {
     if (!query.trim()) {
@@ -222,8 +153,9 @@ const Library = () => {
       ...formData,
     };
 
-    setBooks([newBook, ...books]);
-    setFilteredBooks([newBook, ...books]);
+    const updatedBooks = [newBook, ...books];
+    setBooks(updatedBooks);
+    setFilteredBooks(updatedBooks);
     setIsAddDialogOpen(false);
     resetFormData();
     toast.success("تمت إضافة الكتاب بنجاح");
@@ -339,9 +271,9 @@ const Library = () => {
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <BookIcon className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold mb-4">المكتبة غير موجودة</h1>
+            <h1 className="text-3xl font-bold mb-4">جاري تحميل المكتبة...</h1>
             <p className="text-xl text-muted-foreground mb-8">
-              المكتبة التي تبحث عنها غير موجودة.
+              يرجى الانتظار بينما يتم تحميل بيانات المكتبة.
             </p>
             <Link to="/dashboard">
               <Button className="text-lg py-6 px-8">
@@ -685,7 +617,7 @@ const Library = () => {
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="edit-category" className="text-right text-lg pt-3">
-                التصنيف *
+                ال��صنيف *
               </Label>
               <div className="col-span-3">
                 {isAddingCategory ? (
