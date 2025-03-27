@@ -280,10 +280,10 @@ const Admin = () => {
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 text-right">
           <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
               <TabsTrigger value="users">المستخدمون</TabsTrigger>
@@ -436,24 +436,24 @@ const Admin = () => {
               </div>
 
               <Card>
-                <CardContent className="p-0">
-                  <Table>
+                <CardContent className="p-0 overflow-x-auto">
+                  <Table className="w-full">
                     <TableCaption>قائمة جميع المستخدمين المسجلين</TableCaption>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>الاسم</TableHead>
-                        <TableHead>البريد الإلكتروني</TableHead>
-                        <TableHead>الحالة</TableHead>
-                        <TableHead>تاريخ التسجيل</TableHead>
-                        <TableHead>آخر تسجيل دخول</TableHead>
-                        <TableHead>المكتبات</TableHead>
-                        <TableHead>الإجراءات</TableHead>
+                        <TableHead className="text-right">الاسم</TableHead>
+                        <TableHead className="text-right">البريد الإلكتروني</TableHead>
+                        <TableHead className="text-right">الحالة</TableHead>
+                        <TableHead className="text-right">تاريخ التسجيل</TableHead>
+                        <TableHead className="text-right">آخر تسجيل دخول</TableHead>
+                        <TableHead className="text-right">المكتبات</TableHead>
+                        <TableHead className="text-right">الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.map((user) => (
                         <TableRow key={user.id}>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-right">
                             <div className="flex items-center space-x-reverse space-x-2">
                               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                                 <User className="h-4 w-4 text-primary" />
@@ -461,8 +461,8 @@ const Admin = () => {
                               <span>{user.name}</span>
                             </div>
                           </TableCell>
-                          <TableCell>{user.email}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">{user.email}</TableCell>
+                          <TableCell className="text-right">
                             <Badge
                               variant={
                                 user.status === "active"
@@ -476,15 +476,15 @@ const Admin = () => {
                                user.status === "inactive" ? "غير نشط" : "معلق"}
                             </Badge>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">
                             <div className="flex items-center space-x-reverse space-x-2">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span>{user.registrationDate}</span>
                             </div>
                           </TableCell>
-                          <TableCell>{user.lastLogin}</TableCell>
-                          <TableCell>{user.libraryCount}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">{user.lastLogin}</TableCell>
+                          <TableCell className="text-right">{user.libraryCount}</TableCell>
+                          <TableCell className="text-right">
                             <div className="flex space-x-reverse space-x-2">
                               <Button
                                 variant="ghost"
@@ -536,22 +536,22 @@ const Admin = () => {
               </div>
 
               <Card>
-                <CardContent className="p-0">
-                  <Table>
+                <CardContent className="p-0 overflow-x-auto">
+                  <Table className="w-full">
                     <TableCaption>قائمة جميع المكتبات</TableCaption>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>الاسم</TableHead>
-                        <TableHead>المالك</TableHead>
-                        <TableHead>الكتب</TableHead>
-                        <TableHead>تاريخ الإنشاء</TableHead>
-                        <TableHead>الإجراءات</TableHead>
+                        <TableHead className="text-right">الاسم</TableHead>
+                        <TableHead className="text-right">المالك</TableHead>
+                        <TableHead className="text-right">الكتب</TableHead>
+                        <TableHead className="text-right">تاريخ الإنشاء</TableHead>
+                        <TableHead className="text-right">الإجراءات</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredLibraries.map((library) => (
                         <TableRow key={library.id}>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium text-right">
                             <div className="flex items-center space-x-reverse space-x-2">
                               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                                 <Library className="h-4 w-4 text-primary" />
@@ -559,7 +559,7 @@ const Admin = () => {
                               <span>{library.name}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">
                             <div className="flex items-center space-x-reverse space-x-2">
                               <User className="h-4 w-4 text-muted-foreground" />
                               <span>{library.owner}</span>
@@ -568,14 +568,14 @@ const Admin = () => {
                               {library.ownerEmail}
                             </div>
                           </TableCell>
-                          <TableCell>{library.bookCount}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">{library.bookCount}</TableCell>
+                          <TableCell className="text-right">
                             <div className="flex items-center space-x-reverse space-x-2">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span>{library.creationDate}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-right">
                             <Button variant="ghost" size="sm">
                               عرض
                             </Button>
@@ -598,7 +598,7 @@ const Admin = () => {
         open={isEditUserDialogOpen}
         onOpenChange={setIsEditUserDialogOpen}
       >
-        <DialogContent>
+        <DialogContent className="rtl:text-right ltr:text-left">
           <DialogHeader>
             <DialogTitle>تعديل المستخدم</DialogTitle>
             <DialogDescription>
@@ -616,7 +616,7 @@ const Admin = () => {
                 onChange={(e) =>
                   setUserFormData({ ...userFormData, name: e.target.value })
                 }
-                className="col-span-3"
+                className="col-span-3 text-right"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -630,7 +630,7 @@ const Admin = () => {
                   onChange={(e) =>
                     setUserFormData({ ...userFormData, email: e.target.value })
                   }
-                  className="flex-1"
+                  className="flex-1 text-right"
                 />
                 <Button
                   variant="outline"
@@ -707,7 +707,7 @@ const Admin = () => {
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-row-reverse sm:justify-start">
             <Button
               variant="outline"
               onClick={() => setIsEditUserDialogOpen(false)}
