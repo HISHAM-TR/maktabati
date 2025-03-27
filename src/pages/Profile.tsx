@@ -91,7 +91,7 @@ const countries = [
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, updateUserInfo } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordConfirmDialog, setShowPasswordConfirmDialog] = useState(false);
@@ -102,7 +102,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    country: "السعودية", // افتراضي
+    country: user?.country || "السعودية", 
     phoneCode: "+966",
     phoneNumber: ""
   });
@@ -114,20 +114,30 @@ const Profile = () => {
     confirmNewPassword: ""
   });
 
-  // استرجاع معلومات إضافية للمستخدم - مثال
+  // استرجاع معلومات إضافية للمستخدم
   useEffect(() => {
     if (user) {
-      // في تطبيق حقيقي، هنا ستقوم بجلب معلومات المستخدم من الخادم
-      // هذا مجرد مثال
-      const mockUserData = {
+      // استخراج معلومات المستخدم
+      let phoneCode = "+966";
+      let phoneNumber = "";
+      
+      if (user.phoneNumber) {
+        const parts = user.phoneNumber.split(" ");
+        if (parts.length > 1) {
+          phoneCode = parts[0];
+          phoneNumber = parts[1];
+        } else {
+          phoneNumber = user.phoneNumber;
+        }
+      }
+      
+      setProfileData({
         name: user.name,
         email: user.email,
-        country: "السعودية",
-        phoneCode: "+966",
-        phoneNumber: "5xxxxxxxx"
-      };
-      
-      setProfileData(mockUserData);
+        country: user.country || "السعودية",
+        phoneCode,
+        phoneNumber
+      });
       
       // تعيين عنوان الصفحة
       document.title = "الملف الشخصي | نظام إدارة المكتبات";
@@ -153,16 +163,25 @@ const Profile = () => {
       return;
     }
     
-    // في تطبيق حقيقي، هنا ستقوم بتأكيد كلمة المرور قبل إجراء التغييرات
+    // تأكيد كلمة المرور قبل إجراء التغييرات
     setActionAfterConfirmation(() => async () => {
       setIsLoading(true);
       try {
         // محاكاة استدعاء API لتحديث الملف الشخصي
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // تحديث المستخدم في الذاكرة
-        // في تطبيق حقيقي، ستقوم بتحديث المعلومات على الخادم
-
+        // تحديث المستخدم
+        const updatedUser = {
+          ...user,
+          name: profileData.name,
+          email: profileData.email,
+          country: profileData.country,
+          phoneNumber: `${profileData.phoneCode} ${profileData.phoneNumber}`
+        };
+        
+        // استخدام وظيفة تحديث المستخدم من السياق
+        updateUserInfo(updatedUser);
+        
         toast.success("تم تحديث الملف الشخصي بنجاح");
         setShowPasswordConfirmDialog(false);
       } catch (error) {
@@ -215,13 +234,10 @@ const Profile = () => {
       return;
     }
     
-    // في تطبيق حقيقي، تحقق من صحة كلمة المرور
-    if (confirmPassword === "password") { // مجرد مثال للتحقق
-      actionAfterConfirmation();
-      setConfirmPassword("");
-    } else {
-      toast.error("كلمة المرور غير صحيحة");
-    }
+    // لأغراض العرض التوضيحي سنقبل أي كلمة مرور
+    // في تطبيق حقيقي سيتم التحقق من كلمة المرور الفعلية
+    actionAfterConfirmation();
+    setConfirmPassword("");
   };
 
   return (

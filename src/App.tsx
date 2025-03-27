@@ -33,6 +33,7 @@ type AuthContextType = {
     additionalData?: { country?: string; phoneNumber?: string }
   ) => Promise<void>;
   logout: () => void;
+  updateUserInfo: (updatedUser: User) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -115,6 +116,11 @@ const App = () => {
     }
   };
 
+  const updateUserInfo = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -122,7 +128,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ user, login, register, logout }}>
+      <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo }}>
         <BrowserRouter>
           <TooltipProvider>
             <Routes>
