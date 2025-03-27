@@ -24,7 +24,7 @@ const SearchBar = ({
   return (
     <form 
       onSubmit={handleSubmit}
-      className="relative w-full max-w-md mx-auto"
+      className="w-full max-w-md"
       dir="rtl"
     >
       {label && (
