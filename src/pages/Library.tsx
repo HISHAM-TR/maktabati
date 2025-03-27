@@ -65,7 +65,9 @@ const libraryData = {
   },
 };
 
-const initialBooksData = {
+const initialBooksData: {
+  [key: string]: ExtendedBookType[]
+} = {
   "1": [
     {
       id: "1-1",
@@ -74,7 +76,7 @@ const initialBooksData = {
       category: "خيال",
       description: "رواية خيالية ملحمية عن مهمة لتدمير خاتم قوي.",
       volumes: 3,
-      status: "available",
+      status: "available" as "available" | "borrowed" | "lost" | "damaged",
     },
     {
       id: "1-2",
@@ -83,7 +85,7 @@ const initialBooksData = {
       category: "خيال علمي",
       description: "رواية خيال علمي تدور في مستقبل بعيد وسط مجتمع إقطاعي بين النجوم.",
       volumes: 1,
-      status: "borrowed",
+      status: "borrowed" as "available" | "borrowed" | "lost" | "damaged",
       borrowDate: new Date(2023, 5, 15),
     },
     {
@@ -93,7 +95,7 @@ const initialBooksData = {
       category: "كلاسيكي",
       description: "رواية رومانسية تتبع التطور العاطفي للبطلة إليزابيث بينيت.",
       volumes: 1,
-      status: "lost",
+      status: "lost" as "available" | "borrowed" | "lost" | "damaged",
     },
   ],
   "2": [
@@ -104,7 +106,7 @@ const initialBooksData = {
       category: "برمجة",
       description: "دليل لحرفية البرمجيات الرشيقة.",
       volumes: 1,
-      status: "available",
+      status: "available" as "available" | "borrowed" | "lost" | "damaged",
     },
     {
       id: "2-2",
@@ -113,7 +115,7 @@ const initialBooksData = {
       category: "برمجة",
       description: "عناصر البرمجيات الموجهة للكائنات القابلة لإعادة الاستخدام.",
       volumes: 1,
-      status: "damaged",
+      status: "damaged" as "available" | "borrowed" | "lost" | "damaged",
     },
   ],
   "3": [
@@ -124,7 +126,7 @@ const initialBooksData = {
       category: "فلسفة",
       description: "حوار سقراطي بخصوص العدالة، ونظام وطبيعة الدولة العادلة، والإنسان العادل.",
       volumes: 1,
-      status: "available",
+      status: "available" as "available" | "borrowed" | "lost" | "damaged",
     },
     {
       id: "3-2",
@@ -133,24 +135,11 @@ const initialBooksData = {
       category: "فلسفة",
       description: "مقدمة لفلسفة المستقبل.",
       volumes: 1,
-      status: "borrowed",
+      status: "borrowed" as "available" | "borrowed" | "lost" | "damaged",
       borrowDate: new Date(2023, 4, 10),
     },
   ],
 };
-
-const initialBookCategories = [
-  "خيال",
-  "خيال علمي",
-  "كلاسيكي",
-  "برمجة",
-  "فلسفة",
-  "سيرة ذاتية",
-  "تاريخ",
-  "تطوير ذاتي",
-  "غموض",
-  "إثارة",
-];
 
 const Library = () => {
   const { id } = useParams<{ id: string }>();
@@ -879,39 +868,4 @@ const Library = () => {
                   <div className="flex items-center space-x-reverse space-x-2">
                     <Calendar className="h-5 w-5 text-blue-500" />
                     <span className="font-medium text-lg">تاريخ الإعارة:</span>
-                    <span className="text-lg">{format(new Date(activeBook.borrowDate), "yyyy-MM-dd")}</span>
-                  </div>
-                )}
-                
-                <div className="flex items-center space-x-reverse space-x-2">
-                  <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium text-lg">تمت الإضافة في:</span>
-                  <span className="text-lg">{new Date().toLocaleDateString('ar-EG')}</span>
-                </div>
-                <div className="mt-4">
-                  <h4 className="text-lg font-medium mb-2">الوصف:</h4>
-                  <p className="text-muted-foreground text-lg">
-                    {activeBook.description || "لا يوجد وصف متاح."}
-                  </p>
-                </div>
-              </div>
-              <DialogFooter className="flex-row-reverse sm:justify-end">
-                <Button variant="outline" onClick={() => setIsViewDialogOpen(false)} className="text-lg py-6 px-8">
-                  إغلاق
-                </Button>
-                <Button onClick={() => {
-                  setIsViewDialogOpen(false);
-                  handleEditDialogOpen(activeBook);
-                }} className="text-lg py-6 px-8">
-                  تعديل الكتاب
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-export default Library;
+                    <span className="text-lg">{format(new Date(activeBook.borrowDate),
