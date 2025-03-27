@@ -74,17 +74,19 @@
   
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Cairo', sans-serif !important;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
     direction: rtl;
   }
 
   html {
     @apply scroll-smooth;
+    font-family: 'Cairo', sans-serif;
   }
 
   [dir="rtl"] {
     text-align: right;
+    font-family: 'Cairo', sans-serif;
   }
 }
 
