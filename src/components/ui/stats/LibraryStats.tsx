@@ -34,7 +34,7 @@ const LibraryStats = ({
   return (
     <div className="mb-8" dir="rtl">
       <h3 className="text-lg font-bold mb-3 font-cairo">إحصائيات المكتبة</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard 
           title="إجمالي المكتبات" 
           value={totalLibraries} 
@@ -59,36 +59,36 @@ const LibraryStats = ({
           icon={<BookCopy className="h-5 w-5 text-white" />} 
           color="bg-indigo-600"
         />
+        
+        {statusCounts && (
+          <>
+            <StatCard 
+              title="متاح" 
+              value={statusCounts.available} 
+              icon={<CheckCircle className="h-5 w-5 text-white" />} 
+              color="bg-green-500"
+            />
+            <StatCard 
+              title="مستعار" 
+              value={statusCounts.borrowed} 
+              icon={<BookOpen className="h-5 w-5 text-white" />} 
+              color="bg-blue-500"
+            />
+            <StatCard 
+              title="مفقود" 
+              value={statusCounts.lost} 
+              icon={<XCircle className="h-5 w-5 text-white" />} 
+              color="bg-red-500"
+            />
+            <StatCard 
+              title="تالف" 
+              value={statusCounts.damaged} 
+              icon={<AlertTriangle className="h-5 w-5 text-white" />} 
+              color="bg-yellow-500"
+            />
+          </>
+        )}
       </div>
-      
-      {statusCounts && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatCard 
-            title="متاح" 
-            value={statusCounts.available} 
-            icon={<CheckCircle className="h-5 w-5 text-white" />} 
-            color="bg-green-500"
-          />
-          <StatCard 
-            title="مستعار" 
-            value={statusCounts.borrowed} 
-            icon={<BookOpen className="h-5 w-5 text-white" />} 
-            color="bg-blue-500"
-          />
-          <StatCard 
-            title="مفقود" 
-            value={statusCounts.lost} 
-            icon={<XCircle className="h-5 w-5 text-white" />} 
-            color="bg-red-500"
-          />
-          <StatCard 
-            title="تالف" 
-            value={statusCounts.damaged} 
-            icon={<AlertTriangle className="h-5 w-5 text-white" />} 
-            color="bg-yellow-500"
-          />
-        </div>
-      )}
     </div>
   );
 };
