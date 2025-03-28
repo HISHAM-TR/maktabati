@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -48,7 +47,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// قائمة رموز الدول
 const countryCodes = [
   { code: "+966", country: "السعودية 🇸🇦" },
   { code: "+971", country: "الإمارات 🇦🇪" },
@@ -69,7 +67,6 @@ const countryCodes = [
   { code: "+249", country: "السودان 🇸🇩" },
 ];
 
-// قائمة الدول
 const countries = [
   "السعودية",
   "الإمارات",
@@ -99,7 +96,6 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [actionAfterConfirmation, setActionAfterConfirmation] = useState<() => void>(() => {});
 
-  // معلومات الملف الشخصي
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -109,17 +105,14 @@ const Profile = () => {
     profileImage: user?.profileImage || ""
   });
 
-  // معلومات تغيير كلمة المرور
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmNewPassword: ""
   });
 
-  // استرجاع معلومات إضافية للمستخدم
   useEffect(() => {
     if (user) {
-      // استخراج معلومات المستخدم
       let phoneCode = "+966";
       let phoneNumber = "";
       
@@ -142,20 +135,16 @@ const Profile = () => {
         profileImage: user.profileImage || ""
       });
       
-      // تعيين عنوان الصفحة
       document.title = "الملف الشخصي | نظام إدارة المكتبات";
     }
   }, [user]);
 
-  // التحقق من وجود المستخدم
   if (!user) {
     navigate("/login");
     return null;
   }
 
-  // تحديث الملف الشخصي
   const handleUpdateProfile = () => {
-    // التحقق من صحة البيانات
     if (!profileData.name || !profileData.email || !profileData.country || !profileData.phoneNumber) {
       toast.error("يرجى ملء جميع الحقول المطلوبة");
       return;
@@ -166,14 +155,11 @@ const Profile = () => {
       return;
     }
     
-    // تأكيد كلمة المرور قبل إجراء التغييرات
     setActionAfterConfirmation(() => async () => {
       setIsLoading(true);
       try {
-        // محاكاة استدعاء API لتحديث الملف الشخصي
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // تحديث المستخدم
         const updatedUser = {
           ...user,
           name: profileData.name,
@@ -183,7 +169,6 @@ const Profile = () => {
           profileImage: profileData.profileImage
         };
         
-        // استخدام وظيفة تحديث المستخدم من السياق
         updateUserInfo(updatedUser);
         
         toast.success("تم تحديث الملف الشخصي بنجاح");
@@ -198,9 +183,7 @@ const Profile = () => {
     setShowPasswordConfirmDialog(true);
   };
 
-  // تغيير كلمة المرور
   const handleChangePassword = () => {
-    // التحقق من صحة البيانات
     if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmNewPassword) {
       toast.error("يرجى ملء جميع حقول كلمة المرور");
       return;
@@ -216,11 +199,9 @@ const Profile = () => {
       return;
     }
     
-    // محاكاة تغيير كلمة المرور
     setIsLoading(true);
     
     setTimeout(() => {
-      // في تطبيق حقيقي، ستقوم بالتحقق من كلمة المرور الحالية وتغيير كلمة المرور على الخادم
       toast.success("تم تغيير كلمة المرور بنجاح");
       setPasswordData({
         currentPassword: "",
@@ -231,20 +212,16 @@ const Profile = () => {
     }, 1500);
   };
 
-  // تأكيد العملية بكلمة المرور
   const handleConfirmPasswordSubmit = () => {
     if (!confirmPassword) {
       toast.error("يرجى إدخال كلمة المرور للمتابعة");
       return;
     }
     
-    // لأغراض العرض التوضيحي سنقبل أي كلمة مرور
-    // في تطبيق حقيقي سيتم التحقق من كلمة المرور الفعلية
     actionAfterConfirmation();
     setConfirmPassword("");
   };
 
-  // تحديث صورة الملف الشخصي
   const handleProfileImageChange = (imageBase64: string) => {
     setProfileData({
       ...profileData,
@@ -266,7 +243,6 @@ const Profile = () => {
               <TabsTrigger value="security" className="cairo-medium">الأمان والخصوصية</TabsTrigger>
             </TabsList>
             
-            {/* تبويب الملف الشخصي */}
             <TabsContent value="profile" className="animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <Card className="md:col-span-2">
@@ -404,11 +380,11 @@ const Profile = () => {
                     
                     <div className="space-y-4">
                       <h3 className="text-sm font-medium cairo-medium">معلومات العضوية</h3>
-                      <div className="grid grid-cols-2 gap-2 text-sm text-right">
-                        <div className="text-muted-foreground cairo-regular">الدور</div>
-                        <div className="cairo-regular">{user.role === "admin" ? "مشرف" : "مستخدم"}</div>
-                        <div className="text-muted-foreground cairo-regular">الحالة</div>
-                        <div className="text-green-600 cairo-regular">نشط</div>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="text-left cairo-regular">مشرف</div>
+                        <div className="text-right text-muted-foreground cairo-regular">الدور</div>
+                        <div className="text-left text-green-600 cairo-regular">نشط</div>
+                        <div className="text-right text-muted-foreground cairo-regular">الحالة</div>
                       </div>
                     </div>
                   </CardContent>
@@ -416,7 +392,6 @@ const Profile = () => {
               </div>
             </TabsContent>
             
-            {/* تبويب الأمان والخصوصية */}
             <TabsContent value="security" className="animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <Card className="md:col-span-2">
@@ -563,7 +538,6 @@ const Profile = () => {
       
       <Footer />
       
-      {/* حوار تأكيد كلمة المرور */}
       <Dialog open={showPasswordConfirmDialog} onOpenChange={setShowPasswordConfirmDialog}>
         <DialogContent className="cairo-regular">
           <DialogHeader>
