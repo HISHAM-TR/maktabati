@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -70,24 +69,36 @@
 
   * {
     @apply border-border selection:bg-primary/10 selection:text-primary;
-    font-family: 'Cairo', sans-serif !important;
+    font-family: "Cairo", sans-serif !important;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
   }
   
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Cairo', sans-serif !important;
+    font-family: "Cairo", sans-serif !important;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
     direction: rtl;
   }
 
   html {
     @apply scroll-smooth;
-    font-family: 'Cairo', sans-serif !important;
+    font-family: "Cairo", sans-serif !important;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
   }
 
   [dir="rtl"] {
     text-align: right;
-    font-family: 'Cairo', sans-serif !important;
+    font-family: "Cairo", sans-serif !important;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
   }
 }
 
@@ -181,5 +192,36 @@
 
   .hamburger-menu {
     display: inline-block;
+  }
+
+  /* Cairo font utility classes for different weights */
+  .cairo-light {
+    font-family: "Cairo", sans-serif !important;
+    font-weight: 300;
+  }
+  
+  .cairo-regular {
+    font-family: "Cairo", sans-serif !important;
+    font-weight: 400;
+  }
+  
+  .cairo-medium {
+    font-family: "Cairo", sans-serif !important;
+    font-weight: 500;
+  }
+  
+  .cairo-semibold {
+    font-family: "Cairo", sans-serif !important;
+    font-weight: 600;
+  }
+  
+  .cairo-bold {
+    font-family: "Cairo", sans-serif !important;
+    font-weight: 700;
+  }
+  
+  .cairo-black {
+    font-family: "Cairo", sans-serif !important;
+    font-weight: 900;
   }
 }
