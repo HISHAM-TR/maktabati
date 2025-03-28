@@ -19,18 +19,18 @@ const Index = () => {
         {/* قسم الترحيب */}
         <section className="relative py-20 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl mx-auto text-center">
+            <div className="max-w-3xl mx-auto text-center animate-fade-in">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 نظام إدارة المكتبات الشخصية
               </h1>
-              <p className="text-xl mb-8 text-muted-foreground">
+              <p className="text-xl mb-8 text-muted-foreground animate-[fade-in_0.6s_ease-out_0.2s_both]">
                 منصة متكاملة لإدارة مكتبتك الشخصية وتنظيم كتبك بطريقة سهلة وفعالة
               </p>
               
-              <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <div className="flex flex-wrap justify-center gap-4 mb-12 animate-[fade-in_0.8s_ease-out_0.4s_both]">
                 {user ? (
                   <Link to="/dashboard">
-                    <Button size="lg" className="gap-2">
+                    <Button size="lg" className="gap-2 transition-transform hover:scale-105 duration-300">
                       <BookOpen className="h-5 w-5" />
                       الذهاب إلى لوحة التحكم
                     </Button>
@@ -38,13 +38,13 @@ const Index = () => {
                 ) : (
                   <>
                     <Link to="/register">
-                      <Button size="lg" className="gap-2">
+                      <Button size="lg" className="gap-2 transition-transform hover:scale-105 duration-300">
                         <Users className="h-5 w-5" />
                         إنشاء حساب جديد
                       </Button>
                     </Link>
                     <Link to="/login">
-                      <Button variant="outline" size="lg" className="gap-2">
+                      <Button variant="outline" size="lg" className="gap-2 transition-transform hover:scale-105 duration-300">
                         دخول إلى حسابك
                       </Button>
                     </Link>
@@ -52,7 +52,7 @@ const Index = () => {
                 )}
               </div>
               
-              <div className="relative max-w-md mx-auto">
+              <div className="relative max-w-md mx-auto animate-[fade-in_1s_ease-out_0.6s_both]">
                 <SearchBar 
                   onSearch={(query) => console.log("البحث عن:", query)} 
                   placeholder="ابحث عن كتاب أو مؤلف..."
@@ -66,17 +66,17 @@ const Index = () => {
           
           {/* خلفية زخرفية */}
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent"></div>
-          <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"></div>
-          <div className="absolute -right-40 -bottom-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl"></div>
+          <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl animate-[pulse_4s_ease-in-out_infinite]"></div>
+          <div className="absolute -right-40 -bottom-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl animate-[pulse_5s_ease-in-out_1s_infinite]"></div>
         </section>
         
         {/* قسم المميزات */}
         <section className="py-16 bg-secondary/30">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">مميزات نظام إدارة المكتبات</h2>
+            <h2 className="text-3xl font-bold text-center mb-12 animate-[fade-in_0.8s_ease-out]">مميزات نظام إدارة المكتبات</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
+              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center transform transition-all hover:scale-105 duration-300 animate-[fade-in_0.8s_ease-out_0.1s_both]">
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Library className="h-8 w-8 text-primary" />
                 </div>
@@ -86,7 +86,7 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
+              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center transform transition-all hover:scale-105 duration-300 animate-[fade-in_0.8s_ease-out_0.3s_both]">
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <BookText className="h-8 w-8 text-primary" />
                 </div>
@@ -96,7 +96,7 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center">
+              <div className="bg-background p-6 rounded-lg shadow-sm flex flex-col items-center text-center transform transition-all hover:scale-105 duration-300 animate-[fade-in_0.8s_ease-out_0.5s_both]">
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
@@ -112,14 +112,14 @@ const Index = () => {
         {/* قسم كيفية الاستخدام */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-8">كيفية استخدام النظام</h2>
-            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-8 animate-[fade-in_0.8s_ease-out]">كيفية استخدام النظام</h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto animate-[fade-in_0.8s_ease-out_0.2s_both]">
               بخطوات بسيطة يمكنك البدء في إدارة مكتبتك الشخصية واستعراض مجموعة كتبك
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <div className="p-4 text-center">
-                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+              <div className="p-4 text-center animate-[fade-in_0.8s_ease-out_0.2s_both] transform transition-all hover:translate-y-[-5px] duration-300">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4 animate-[pulse_3s_ease-in-out_infinite]">
                   1
                 </div>
                 <h3 className="font-semibold mb-2">إنشاء حساب</h3>
@@ -128,8 +128,8 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="p-4 text-center">
-                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+              <div className="p-4 text-center animate-[fade-in_0.8s_ease-out_0.4s_both] transform transition-all hover:translate-y-[-5px] duration-300">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4 animate-[pulse_3s_ease-in-out_0.5s_infinite]">
                   2
                 </div>
                 <h3 className="font-semibold mb-2">أنشئ مكتبتك</h3>
@@ -138,8 +138,8 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="p-4 text-center">
-                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+              <div className="p-4 text-center animate-[fade-in_0.8s_ease-out_0.6s_both] transform transition-all hover:translate-y-[-5px] duration-300">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4 animate-[pulse_3s_ease-in-out_1s_infinite]">
                   3
                 </div>
                 <h3 className="font-semibold mb-2">أضف كتبك</h3>
@@ -148,8 +148,8 @@ const Index = () => {
                 </p>
               </div>
               
-              <div className="p-4 text-center">
-                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4">
+              <div className="p-4 text-center animate-[fade-in_0.8s_ease-out_0.8s_both] transform transition-all hover:translate-y-[-5px] duration-300">
+                <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-white font-bold mx-auto mb-4 animate-[pulse_3s_ease-in-out_1.5s_infinite]">
                   4
                 </div>
                 <h3 className="font-semibold mb-2">البحث والتنظيم</h3>
@@ -162,7 +162,7 @@ const Index = () => {
         </section>
         
         {/* قسم الاتصال */}
-        <section className="py-16 bg-secondary/30">
+        <section className="py-16 bg-secondary/30 animate-[fade-in_1s_ease-out]">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold mb-6">ابدأ اليوم في تنظيم مكتبتك</h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -171,13 +171,13 @@ const Index = () => {
             
             <div className="flex flex-wrap justify-center gap-4">
               <Link to="/register">
-                <Button size="lg" className="gap-2">
+                <Button size="lg" className="gap-2 transform transition-all hover:scale-105 duration-300">
                   <Users className="h-5 w-5" />
                   سجل الآن مجاناً
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" className="transform transition-all hover:scale-105 duration-300">
                   تسجيل الدخول إلى حسابك
                 </Button>
               </Link>
