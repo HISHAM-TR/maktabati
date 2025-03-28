@@ -22,13 +22,13 @@ import {
   User,
   Mail,
   Lock,
-  Globe,
   Phone,
   Save,
   AlertTriangle,
   Check,
   Loader2,
-  Flag
+  Flag,
+  Globe
 } from "lucide-react";
 import {
   Dialog,
@@ -140,6 +140,11 @@ const Profile = () => {
     }
   }, [user]);
 
+  const getCountryFlag = (countryName: string) => {
+    const country = countries.find(c => c.name === countryName);
+    return country ? country.flag : "🏳️";
+  };
+
   if (!user) {
     navigate("/login");
     return null;
@@ -230,11 +235,6 @@ const Profile = () => {
     });
   };
 
-  const getCountryFlag = (countryName: string) => {
-    const country = countries.find(c => c.name === countryName);
-    return country ? country.flag : "🏳️";
-  };
-
   return (
     <div className="flex flex-col min-h-screen cairo-regular" dir="rtl">
       <Header />
@@ -300,17 +300,19 @@ const Profile = () => {
                         >
                           <SelectTrigger className="w-full pr-10 text-right cairo-regular">
                             <SelectValue placeholder="اختر البلد">
-                              <span className="flex items-center">
-                                <span className="ml-2">{getCountryFlag(profileData.country)}</span>
-                                {profileData.country}
-                              </span>
+                              {profileData.country && (
+                                <span className="flex items-center">
+                                  <span className="ml-2 text-xl">{getCountryFlag(profileData.country)}</span>
+                                  {profileData.country}
+                                </span>
+                              )}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="cairo-regular">
                             {countries.map((country) => (
                               <SelectItem key={country.name} value={country.name} className="text-right">
                                 <span className="flex items-center">
-                                  <span className="ml-2">{country.flag}</span>
+                                  <span className="ml-2 text-xl">{country.flag}</span>
                                   {country.name}
                                 </span>
                               </SelectItem>
@@ -340,16 +342,20 @@ const Profile = () => {
                         >
                           <SelectTrigger className="w-[110px] cairo-regular">
                             <SelectValue placeholder="+966">
-                              <span className="flex items-center justify-center">
-                                {profileData.phoneCode}
-                              </span>
+                              {profileData.phoneCode && (
+                                <span className="flex items-center justify-center">
+                                  {countryCodes.find(c => c.code === profileData.phoneCode)?.country.split(' ')[1] || ''}
+                                  {' '}
+                                  {profileData.phoneCode}
+                                </span>
+                              )}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="cairo-regular">
                             {countryCodes.map((item) => (
                               <SelectItem key={item.code} value={item.code} className="text-right">
                                 <span className="flex items-center">
-                                  <span className="ml-2">{item.country}</span>
+                                  <span className="ml-2 text-xl">{item.country}</span>
                                 </span>
                               </SelectItem>
                             ))}

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/App";
-import { Book, Mail, Lock, User, ArrowRight, Globe, Phone, Flag } from "lucide-react";
+import { Book, Mail, Lock, User, ArrowRight, Phone, Flag } from "lucide-react";
 import ImageUpload from "@/components/ui/ImageUpload";
 import {
   Select,
@@ -80,7 +81,7 @@ const Register = () => {
     profileImage: ""
   });
 
-  // البحث عن علم الدولة المحددة
+  // البحث عن علم الدولة المحددة - تحسين عرض العلم
   const getCountryFlag = (countryName: string) => {
     const country = countries.find(c => c.name === countryName);
     return country ? country.flag : "🏳️";
@@ -209,7 +210,7 @@ const Register = () => {
                       <SelectValue placeholder="اختر البلد">
                         {formData.country && (
                           <span className="flex items-center">
-                            <span className="ml-2">{getCountryFlag(formData.country)}</span>
+                            <span className="ml-2 text-xl">{getCountryFlag(formData.country)}</span>
                             {formData.country}
                           </span>
                         )}
@@ -219,7 +220,7 @@ const Register = () => {
                       {countries.map((country) => (
                         <SelectItem key={country.name} value={country.name}>
                           <span className="flex items-center">
-                            <span className="ml-2">{country.flag}</span>
+                            <span className="ml-2 text-xl">{country.flag}</span>
                             {country.name}
                           </span>
                         </SelectItem>
@@ -249,12 +250,22 @@ const Register = () => {
                     onValueChange={(value) => setFormData({ ...formData, phoneCode: value })}
                   >
                     <SelectTrigger className="w-[110px]">
-                      <SelectValue placeholder="+966" />
+                      <SelectValue placeholder="+966">
+                        {formData.phoneCode && (
+                          <span className="flex items-center">
+                            {countryCodes.find(c => c.code === formData.phoneCode)?.country.split(' ')[1] || ''}
+                            {' '}
+                            {formData.phoneCode}
+                          </span>
+                        )}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {countryCodes.map((item) => (
                         <SelectItem key={item.code} value={item.code}>
-                          {item.country}
+                          <span className="flex items-center">
+                            <span className="ml-2 text-xl">{item.country}</span>
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
