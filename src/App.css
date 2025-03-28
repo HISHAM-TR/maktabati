@@ -138,3 +138,60 @@
   background-size: 200% auto;
   animation: text-gradient 3s linear infinite;
 }
+
+/* Arabic text typing animation */
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-cursor {
+  from, to {
+    border-left-color: transparent;
+  }
+  50% {
+    border-left-color: var(--primary);
+  }
+}
+
+.typewriter {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  animation: typewriter 3.5s steps(40, end) 0.5s 1 normal both;
+}
+
+.typewriter-container {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.typewriter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  right: 0;
+  width: 0.125em;
+  height: 100%;
+  animation: blink-cursor 0.8s step-end infinite;
+}
+
+/* Sequential text reveal animation */
+.text-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.text-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
