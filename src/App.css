@@ -88,3 +88,53 @@
 .slide-right {
   animation: slide-right 0.8s ease-out forwards;
 }
+
+/* New text animations */
+@keyframes text-focus-in {
+  0% {
+    filter: blur(12px);
+    opacity: 0;
+  }
+  100% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+.text-focus-in {
+  animation: text-focus-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+}
+
+@keyframes text-shadow-drop {
+  0% {
+    text-shadow: 0 0 0 transparent;
+  }
+  100% {
+    text-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.text-shadow-drop {
+  animation: text-shadow-drop 1.2s both;
+}
+
+@keyframes text-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-gradient:hover {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(90deg, var(--primary) 0%, #4a8eff 50%, var(--primary) 100%);
+  background-size: 200% auto;
+  animation: text-gradient 3s linear infinite;
+}

@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useAuth } from "@/App";
 import Header from "@/components/layout/Header";
@@ -20,10 +19,10 @@ const Index = () => {
         <section className="relative py-20 overflow-hidden">
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-3xl mx-auto text-center animate-fade-in">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 float animate-[slide-right_1.2s_ease-out] relative overflow-hidden after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-0 after:bg-primary after:transition-all after:duration-1000 hover:after:w-full">
                 نظام إدارة المكتبات الشخصية
               </h1>
-              <p className="text-xl mb-8 text-muted-foreground animate-[fade-in_0.6s_ease-out_0.2s_both]">
+              <p className="text-xl mb-8 text-muted-foreground slide-up animate-[slide-up_1.5s_ease-out] transition-all duration-300 hover:text-primary">
                 منصة متكاملة لإدارة مكتبتك الشخصية وتنظيم كتبك بطريقة سهلة وفعالة
               </p>
               
