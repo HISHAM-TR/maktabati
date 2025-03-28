@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/App";
 import { Book, Mail, Lock, User, ArrowRight, Globe, Phone } from "lucide-react";
+import ImageUpload from "@/components/ui/ImageUpload";
 import {
   Select,
   SelectContent,
@@ -77,6 +78,7 @@ const Register = () => {
     country: "",
     phoneCode: "+966",
     phoneNumber: "",
+    profileImage: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,10 +108,11 @@ const Register = () => {
     
     try {
       // إضافة معلومات إضافية للمستخدم
-      const fullPhoneNumber = `${formData.phoneCode}${formData.phoneNumber}`;
+      const fullPhoneNumber = `${formData.phoneCode} ${formData.phoneNumber}`;
       await register(formData.name, formData.email, formData.password, {
         country: formData.country,
-        phoneNumber: fullPhoneNumber
+        phoneNumber: fullPhoneNumber,
+        profileImage: formData.profileImage
       });
       toast.success("تم إنشاء الحساب بنجاح");
       navigate("/dashboard");
@@ -122,6 +125,14 @@ const Register = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // تحديث صورة الملف الشخصي
+  const handleProfileImageChange = (imageBase64: string) => {
+    setFormData({
+      ...formData,
+      profileImage: imageBase64
+    });
   };
 
   return (
@@ -143,6 +154,13 @@ const Register = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex justify-center mb-4">
+                <ImageUpload 
+                  initialImage={formData.profileImage}
+                  onImageChange={handleProfileImageChange}
+                />
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="name">الاسم الكامل</Label>
                 <div className="relative">

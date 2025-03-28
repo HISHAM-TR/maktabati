@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/App";
 import { toast } from "sonner";
+import ImageUpload from "@/components/ui/ImageUpload";
 import {
   Card,
   CardContent,
@@ -104,7 +105,8 @@ const Profile = () => {
     email: user?.email || "",
     country: user?.country || "السعودية", 
     phoneCode: "+966",
-    phoneNumber: ""
+    phoneNumber: "",
+    profileImage: user?.profileImage || ""
   });
 
   // معلومات تغيير كلمة المرور
@@ -136,7 +138,8 @@ const Profile = () => {
         email: user.email,
         country: user.country || "السعودية",
         phoneCode,
-        phoneNumber
+        phoneNumber,
+        profileImage: user.profileImage || ""
       });
       
       // تعيين عنوان الصفحة
@@ -176,7 +179,8 @@ const Profile = () => {
           name: profileData.name,
           email: profileData.email,
           country: profileData.country,
-          phoneNumber: `${profileData.phoneCode} ${profileData.phoneNumber}`
+          phoneNumber: `${profileData.phoneCode} ${profileData.phoneNumber}`,
+          profileImage: profileData.profileImage
         };
         
         // استخدام وظيفة تحديث المستخدم من السياق
@@ -238,6 +242,14 @@ const Profile = () => {
     // في تطبيق حقيقي سيتم التحقق من كلمة المرور الفعلية
     actionAfterConfirmation();
     setConfirmPassword("");
+  };
+
+  // تحديث صورة الملف الشخصي
+  const handleProfileImageChange = (imageBase64: string) => {
+    setProfileData({
+      ...profileData,
+      profileImage: imageBase64
+    });
   };
 
   return (
@@ -374,9 +386,11 @@ const Profile = () => {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex flex-col items-center justify-center text-center space-y-3 py-5">
-                      <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-12 w-12 text-primary" />
-                      </div>
+                      <ImageUpload 
+                        initialImage={profileData.profileImage}
+                        onImageChange={handleProfileImageChange}
+                        className="mb-4"
+                      />
                       <div>
                         <h3 className="font-medium text-lg">{user.name}</h3>
                         <p className="text-muted-foreground">{user.email}</p>

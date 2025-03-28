@@ -69,7 +69,8 @@
   }
 
   * {
-    @apply border-border selection:bg-primary/10 selection:text-primary font-cairo;
+    @apply border-border selection:bg-primary/10 selection:text-primary;
+    font-family: 'Cairo', sans-serif !important;
   }
   
   body {
@@ -81,12 +82,12 @@
 
   html {
     @apply scroll-smooth;
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Cairo', sans-serif !important;
   }
 
   [dir="rtl"] {
     text-align: right;
-    font-family: 'Cairo', sans-serif;
+    font-family: 'Cairo', sans-serif !important;
   }
 }
 

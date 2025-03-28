@@ -1,3 +1,4 @@
+
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -20,6 +21,7 @@ export type User = {
   role: "user" | "admin";
   country?: string;
   phoneNumber?: string;
+  profileImage?: string; // Added profile image field
 };
 
 type AuthContextType = {
@@ -29,7 +31,7 @@ type AuthContextType = {
     name: string, 
     email: string, 
     password: string, 
-    additionalData?: { country?: string; phoneNumber?: string }
+    additionalData?: { country?: string; phoneNumber?: string; profileImage?: string }
   ) => Promise<void>;
   logout: () => void;
   updateUserInfo: (updatedUser: User) => void;
@@ -128,7 +130,8 @@ const App = () => {
         name: email.split("@")[0],
         role: email.includes("admin") ? "admin" as const : "user" as const,
         country: "السعودية",
-        phoneNumber: "+966 5XXXXXXXX"
+        phoneNumber: "+966 5XXXXXXXX",
+        profileImage: "" // Default empty profile image
       };
       
       setUser(mockUser);
@@ -142,7 +145,7 @@ const App = () => {
     name: string, 
     email: string, 
     password: string, 
-    additionalData?: { country?: string; phoneNumber?: string }
+    additionalData?: { country?: string; phoneNumber?: string; profileImage?: string }
   ) => {
     console.log("التسجيل:", name, email, password, additionalData);
     
@@ -153,7 +156,8 @@ const App = () => {
         name,
         role: "user" as const,
         country: additionalData?.country || "السعودية",
-        phoneNumber: additionalData?.phoneNumber || ""
+        phoneNumber: additionalData?.phoneNumber || "",
+        profileImage: additionalData?.profileImage || ""
       };
       
       setUser(mockUser);
