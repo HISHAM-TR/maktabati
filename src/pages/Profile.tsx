@@ -253,17 +253,17 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen cairo-regular" dir="rtl">
       <Header />
       
       <main className="flex-1 pt-24 pb-16">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">الملف الشخصي</h1>
+          <h1 className="text-3xl font-bold mb-8 cairo-bold">الملف الشخصي</h1>
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full md:w-[400px] grid-cols-2 mb-8">
-              <TabsTrigger value="profile">معلومات الحساب</TabsTrigger>
-              <TabsTrigger value="security">الأمان والخصوصية</TabsTrigger>
+              <TabsTrigger value="profile" className="cairo-medium">معلومات الحساب</TabsTrigger>
+              <TabsTrigger value="security" className="cairo-medium">الأمان والخصوصية</TabsTrigger>
             </TabsList>
             
             {/* تبويب الملف الشخصي */}
@@ -271,20 +271,20 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <Card className="md:col-span-2">
                   <CardHeader>
-                    <CardTitle>المعلومات الشخصية</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="cairo-semibold">المعلومات الشخصية</CardTitle>
+                    <CardDescription className="cairo-regular">
                       قم بتحديث معلومات ملفك الشخصي وعنوان البريد الإلكتروني
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="name">الاسم الكامل</Label>
+                      <Label htmlFor="name" className="cairo-medium">الاسم الكامل</Label>
                       <div className="relative">
                         <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="name"
                           placeholder="الاسم الكامل"
-                          className="pr-10"
+                          className="pr-10 text-right cairo-regular"
                           value={profileData.name}
                           onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                         />
@@ -292,14 +292,14 @@ const Profile = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="email">البريد الإلكتروني</Label>
+                      <Label htmlFor="email" className="cairo-medium">البريد الإلكتروني</Label>
                       <div className="relative">
                         <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="email"
                           type="email"
                           placeholder="البريد الإلكتروني"
-                          className="pr-10"
+                          className="pr-10 text-right cairo-regular"
                           value={profileData.email}
                           onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                         />
@@ -309,19 +309,19 @@ const Profile = () => {
                     <Separator />
                     
                     <div className="space-y-2">
-                      <Label htmlFor="country">البلد</Label>
+                      <Label htmlFor="country" className="cairo-medium">البلد</Label>
                       <div className="relative">
                         <Globe className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Select
                           value={profileData.country}
                           onValueChange={(value) => setProfileData({ ...profileData, country: value })}
                         >
-                          <SelectTrigger className="w-full pr-10">
+                          <SelectTrigger className="w-full pr-10 text-right cairo-regular">
                             <SelectValue placeholder="اختر البلد" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="cairo-regular">
                             {countries.map((country) => (
-                              <SelectItem key={country} value={country}>{country}</SelectItem>
+                              <SelectItem key={country} value={country} className="text-right">{country}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -329,7 +329,7 @@ const Profile = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="phone">رقم الجوال</Label>
+                      <Label htmlFor="phone" className="cairo-medium">رقم الجوال</Label>
                       <div className="flex space-x-reverse space-x-2">
                         <div className="relative flex-1">
                           <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -337,7 +337,7 @@ const Profile = () => {
                             id="phone"
                             type="tel"
                             placeholder="5xxxxxxxx"
-                            className="pr-10"
+                            className="pr-10 text-right cairo-regular"
                             value={profileData.phoneNumber}
                             onChange={(e) => setProfileData({ ...profileData, phoneNumber: e.target.value })}
                           />
@@ -346,12 +346,12 @@ const Profile = () => {
                           value={profileData.phoneCode}
                           onValueChange={(value) => setProfileData({ ...profileData, phoneCode: value })}
                         >
-                          <SelectTrigger className="w-[110px]">
+                          <SelectTrigger className="w-[110px] cairo-regular">
                             <SelectValue placeholder="+966" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="cairo-regular">
                             {countryCodes.map((item) => (
-                              <SelectItem key={item.code} value={item.code}>
+                              <SelectItem key={item.code} value={item.code} className="text-right">
                                 {item.country} {item.code}
                               </SelectItem>
                             ))}
@@ -361,7 +361,7 @@ const Profile = () => {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button onClick={handleUpdateProfile} disabled={isLoading}>
+                    <Button onClick={handleUpdateProfile} disabled={isLoading} className="cairo-medium">
                       {isLoading ? (
                         <>
                           <Loader2 className="ml-2 h-4 w-4 animate-spin" />
@@ -379,8 +379,8 @@ const Profile = () => {
                 
                 <Card>
                   <CardHeader>
-                    <CardTitle>معلومات الحساب</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="cairo-semibold">معلومات الحساب</CardTitle>
+                    <CardDescription className="cairo-regular">
                       تفاصيل حسابك ومعلومات العضوية
                     </CardDescription>
                   </CardHeader>
@@ -392,9 +392,9 @@ const Profile = () => {
                         className="mb-4"
                       />
                       <div>
-                        <h3 className="font-medium text-lg">{user.name}</h3>
-                        <p className="text-muted-foreground">{user.email}</p>
-                        <div className="text-xs text-muted-foreground mt-1">
+                        <h3 className="font-medium text-lg cairo-semibold">{user.name}</h3>
+                        <p className="text-muted-foreground cairo-regular">{user.email}</p>
+                        <div className="text-xs text-muted-foreground mt-1 cairo-light">
                           عضو منذ {new Date().toLocaleDateString('ar-SA')}
                         </div>
                       </div>
@@ -403,12 +403,12 @@ const Profile = () => {
                     <Separator />
                     
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">معلومات العضوية</h3>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="text-muted-foreground">الدور</div>
-                        <div>{user.role === "admin" ? "مشرف" : "مستخدم"}</div>
-                        <div className="text-muted-foreground">الحالة</div>
-                        <div className="text-green-600">نشط</div>
+                      <h3 className="text-sm font-medium cairo-medium">معلومات العضوية</h3>
+                      <div className="grid grid-cols-2 gap-2 text-sm text-right">
+                        <div className="text-muted-foreground cairo-regular">الدور</div>
+                        <div className="cairo-regular">{user.role === "admin" ? "مشرف" : "مستخدم"}</div>
+                        <div className="text-muted-foreground cairo-regular">الحالة</div>
+                        <div className="text-green-600 cairo-regular">نشط</div>
                       </div>
                     </div>
                   </CardContent>
@@ -421,20 +421,20 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <Card className="md:col-span-2">
                   <CardHeader>
-                    <CardTitle>تغيير كلمة المرور</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="cairo-semibold">تغيير كلمة المرور</CardTitle>
+                    <CardDescription className="cairo-regular">
                       قم بتحديث كلمة المرور الخاصة بك لضمان أمان حسابك
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="currentPassword">كلمة المرور الحالية</Label>
+                      <Label htmlFor="currentPassword" className="cairo-medium">كلمة المرور الحالية</Label>
                       <div className="relative">
                         <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="currentPassword"
                           type="password"
-                          className="pr-10"
+                          className="pr-10 text-right cairo-regular"
                           value={passwordData.currentPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                         />
@@ -444,30 +444,30 @@ const Profile = () => {
                     <Separator />
                     
                     <div className="space-y-2">
-                      <Label htmlFor="newPassword">كلمة المرور الجديدة</Label>
+                      <Label htmlFor="newPassword" className="cairo-medium">كلمة المرور الجديدة</Label>
                       <div className="relative">
                         <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="newPassword"
                           type="password"
-                          className="pr-10"
+                          className="pr-10 text-right cairo-regular"
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground text-right cairo-light">
                         يجب أن تكون كلمة المرور 8 أحرف على الأقل
                       </p>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="confirmNewPassword">تأكيد كلمة المرور الجديدة</Label>
+                      <Label htmlFor="confirmNewPassword" className="cairo-medium">تأكيد كلمة المرور الجديدة</Label>
                       <div className="relative">
                         <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                           id="confirmNewPassword"
                           type="password"
-                          className="pr-10"
+                          className="pr-10 text-right cairo-regular"
                           value={passwordData.confirmNewPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, confirmNewPassword: e.target.value })}
                         />
@@ -475,7 +475,7 @@ const Profile = () => {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button onClick={handleChangePassword} disabled={isLoading}>
+                    <Button onClick={handleChangePassword} disabled={isLoading} className="cairo-medium">
                       {isLoading ? (
                         <>
                           <Loader2 className="ml-2 h-4 w-4 animate-spin" />
@@ -493,15 +493,15 @@ const Profile = () => {
                 
                 <Card>
                   <CardHeader>
-                    <CardTitle>أمان الحساب</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="cairo-semibold">أمان الحساب</CardTitle>
+                    <CardDescription className="cairo-regular">
                       إعدادات إضافية لضمان أمان حسابك
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">آخر تسجيل دخول</h3>
-                      <div className="text-sm text-muted-foreground">
+                      <h3 className="text-sm font-medium cairo-medium">آخر تسجيل دخول</h3>
+                      <div className="text-sm text-muted-foreground text-right cairo-regular">
                         {new Date().toLocaleString('ar-SA')}
                       </div>
                     </div>
@@ -510,12 +510,12 @@ const Profile = () => {
                     
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-medium">الجلسات النشطة</h3>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="cairo-medium">
                           إنهاء كافة الجلسات
                         </Button>
+                        <h3 className="text-sm font-medium cairo-medium">الجلسات النشطة</h3>
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-muted-foreground text-right cairo-regular">
                         جلسة واحدة نشطة (هذا الجهاز)
                       </div>
                     </div>
@@ -524,31 +524,32 @@ const Profile = () => {
                     
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="destructive" className="w-full">
+                        <Button variant="destructive" className="w-full cairo-medium">
                           <AlertTriangle className="ml-2 h-4 w-4" />
                           تسجيل الخروج من جميع الأجهزة
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="cairo-regular">
                         <DialogHeader>
-                          <DialogTitle>تسجيل الخروج من جميع الأجهزة</DialogTitle>
-                          <DialogDescription>
+                          <DialogTitle className="text-right cairo-semibold">تسجيل الخروج من جميع الأجهزة</DialogTitle>
+                          <DialogDescription className="text-right">
                             هذا سيؤدي إلى تسجيل خروجك من جميع الأجهزة المتصلة بحسابك. هل أنت متأكد؟
                           </DialogDescription>
                         </DialogHeader>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button variant="outline">إلغاء</Button>
-                          </DialogClose>
+                        <DialogFooter className="flex justify-start">
                           <Button 
                             variant="destructive"
                             onClick={() => {
                               toast.success("تم تسجيل الخروج من جميع الأجهزة");
                               setTimeout(() => logout(), 1500);
                             }}
+                            className="cairo-medium"
                           >
                             تأكيد
                           </Button>
+                          <DialogClose asChild>
+                            <Button variant="outline" className="cairo-medium">إلغاء</Button>
+                          </DialogClose>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
@@ -564,22 +565,22 @@ const Profile = () => {
       
       {/* حوار تأكيد كلمة المرور */}
       <Dialog open={showPasswordConfirmDialog} onOpenChange={setShowPasswordConfirmDialog}>
-        <DialogContent>
+        <DialogContent className="cairo-regular">
           <DialogHeader>
-            <DialogTitle>تأكيد كلمة المرور</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-right cairo-semibold">تأكيد كلمة المرور</DialogTitle>
+            <DialogDescription className="text-right">
               لحماية حسابك، يرجى إدخال كلمة المرور للمتابعة
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="password-confirm">كلمة المرور</Label>
+              <Label htmlFor="password-confirm" className="cairo-medium">كلمة المرور</Label>
               <div className="relative">
                 <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password-confirm"
                   type="password"
-                  className="pr-10"
+                  className="pr-10 text-right"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="أدخل كلمة المرور الحالية"
@@ -591,11 +592,8 @@ const Profile = () => {
               <span>لن نطلب كلمة المرور مرة أخرى لمدة 30 دقيقة</span>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPasswordConfirmDialog(false)}>
-              إلغاء
-            </Button>
-            <Button onClick={handleConfirmPasswordSubmit} disabled={isLoading}>
+          <DialogFooter className="flex justify-start">
+            <Button onClick={handleConfirmPasswordSubmit} disabled={isLoading} className="cairo-medium">
               {isLoading ? (
                 <>
                   <Loader2 className="ml-2 h-4 w-4 animate-spin" />
@@ -604,6 +602,9 @@ const Profile = () => {
               ) : (
                 "تأكيد"
               )}
+            </Button>
+            <Button variant="outline" onClick={() => setShowPasswordConfirmDialog(false)} className="cairo-medium">
+              إلغاء
             </Button>
           </DialogFooter>
         </DialogContent>
