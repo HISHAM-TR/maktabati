@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/App";
-import { Book, Mail, Lock, User, ArrowRight, Globe, Phone } from "lucide-react";
+import { Book, Mail, Lock, User, ArrowRight, Globe, Phone, Flag } from "lucide-react";
 import ImageUpload from "@/components/ui/ImageUpload";
 import {
   Select,
@@ -45,25 +44,25 @@ const countryCodes = [
   { code: "+249", country: "السودان 🇸🇩" },
 ];
 
-// قائمة الدول
+// قائمة الدول مع رموز العلم
 const countries = [
-  "السعودية",
-  "الإمارات",
-  "الكويت",
-  "قطر",
-  "البحرين",
-  "عمان",
-  "الأردن",
-  "مصر",
-  "لبنان",
-  "فلسطين",
-  "سوريا",
-  "العراق",
-  "تونس",
-  "المغرب",
-  "الجزائر",
-  "ليبيا",
-  "السودان",
+  { name: "السعودية", flag: "🇸🇦" },
+  { name: "الإمارات", flag: "🇦🇪" },
+  { name: "الكويت", flag: "🇰🇼" },
+  { name: "قطر", flag: "🇶🇦" },
+  { name: "البحرين", flag: "🇧🇭" },
+  { name: "عمان", flag: "🇴🇲" },
+  { name: "الأردن", flag: "🇯🇴" },
+  { name: "مصر", flag: "🇪🇬" },
+  { name: "لبنان", flag: "🇱🇧" },
+  { name: "فلسطين", flag: "🇵🇸" },
+  { name: "سوريا", flag: "🇸🇾" },
+  { name: "العراق", flag: "🇮🇶" },
+  { name: "تونس", flag: "🇹🇳" },
+  { name: "المغرب", flag: "🇲🇦" },
+  { name: "الجزائر", flag: "🇩🇿" },
+  { name: "ليبيا", flag: "🇱🇾" },
+  { name: "السودان", flag: "🇸🇩" },
 ];
 
 const Register = () => {
@@ -80,6 +79,12 @@ const Register = () => {
     phoneNumber: "",
     profileImage: ""
   });
+
+  // البحث عن علم الدولة المحددة
+  const getCountryFlag = (countryName: string) => {
+    const country = countries.find(c => c.name === countryName);
+    return country ? country.flag : "🏳️";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +132,6 @@ const Register = () => {
     }
   };
 
-  // تحديث صورة الملف الشخصي
   const handleProfileImageChange = (imageBase64: string) => {
     setFormData({
       ...formData,
@@ -195,18 +199,30 @@ const Register = () => {
               <div className="space-y-2">
                 <Label htmlFor="country">البلد</Label>
                 <div className="relative">
-                  <Globe className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Flag className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Select
                     value={formData.country}
                     onValueChange={(value) => setFormData({ ...formData, country: value })}
                     required
                   >
                     <SelectTrigger className="w-full pr-10">
-                      <SelectValue placeholder="اختر البلد" />
+                      <SelectValue placeholder="اختر البلد">
+                        {formData.country && (
+                          <span className="flex items-center">
+                            <span className="ml-2">{getCountryFlag(formData.country)}</span>
+                            {formData.country}
+                          </span>
+                        )}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {countries.map((country) => (
-                        <SelectItem key={country} value={country}>{country}</SelectItem>
+                        <SelectItem key={country.name} value={country.name}>
+                          <span className="flex items-center">
+                            <span className="ml-2">{country.flag}</span>
+                            {country.name}
+                          </span>
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -238,7 +254,7 @@ const Register = () => {
                     <SelectContent>
                       {countryCodes.map((item) => (
                         <SelectItem key={item.code} value={item.code}>
-                          {item.country} {item.code}
+                          {item.country}
                         </SelectItem>
                       ))}
                     </SelectContent>

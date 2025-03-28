@@ -27,7 +27,8 @@ import {
   Save,
   AlertTriangle,
   Check,
-  Loader2
+  Loader2,
+  Flag
 } from "lucide-react";
 import {
   Dialog,
@@ -68,23 +69,23 @@ const countryCodes = [
 ];
 
 const countries = [
-  "السعودية",
-  "الإمارات",
-  "الكويت",
-  "قطر",
-  "البحرين",
-  "عمان",
-  "الأردن",
-  "مصر",
-  "لبنان",
-  "فلسطين",
-  "سوريا",
-  "العراق",
-  "تونس",
-  "المغرب",
-  "الجزائر",
-  "ليبيا",
-  "السودان",
+  { name: "السعودية", flag: "🇸🇦" },
+  { name: "الإمارات", flag: "🇦🇪" },
+  { name: "الكويت", flag: "🇰🇼" },
+  { name: "قطر", flag: "🇶🇦" },
+  { name: "البحرين", flag: "🇧🇭" },
+  { name: "عمان", flag: "🇴🇲" },
+  { name: "الأردن", flag: "🇯🇴" },
+  { name: "مصر", flag: "🇪🇬" },
+  { name: "لبنان", flag: "🇱🇧" },
+  { name: "فلسطين", flag: "🇵🇸" },
+  { name: "سوريا", flag: "🇸🇾" },
+  { name: "العراق", flag: "🇮🇶" },
+  { name: "تونس", flag: "🇹🇳" },
+  { name: "المغرب", flag: "🇲🇦" },
+  { name: "الجزائر", flag: "🇩🇿" },
+  { name: "ليبيا", flag: "🇱🇾" },
+  { name: "السودان", flag: "🇸🇩" },
 ];
 
 const Profile = () => {
@@ -229,6 +230,11 @@ const Profile = () => {
     });
   };
 
+  const getCountryFlag = (countryName: string) => {
+    const country = countries.find(c => c.name === countryName);
+    return country ? country.flag : "🏳️";
+  };
+
   return (
     <div className="flex flex-col min-h-screen cairo-regular" dir="rtl">
       <Header />
@@ -287,17 +293,27 @@ const Profile = () => {
                     <div className="space-y-2">
                       <Label htmlFor="country" className="cairo-medium">البلد</Label>
                       <div className="relative">
-                        <Globe className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Flag className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Select
                           value={profileData.country}
                           onValueChange={(value) => setProfileData({ ...profileData, country: value })}
                         >
                           <SelectTrigger className="w-full pr-10 text-right cairo-regular">
-                            <SelectValue placeholder="اختر البلد" />
+                            <SelectValue placeholder="اختر البلد">
+                              <span className="flex items-center">
+                                <span className="ml-2">{getCountryFlag(profileData.country)}</span>
+                                {profileData.country}
+                              </span>
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="cairo-regular">
                             {countries.map((country) => (
-                              <SelectItem key={country} value={country} className="text-right">{country}</SelectItem>
+                              <SelectItem key={country.name} value={country.name} className="text-right">
+                                <span className="flex items-center">
+                                  <span className="ml-2">{country.flag}</span>
+                                  {country.name}
+                                </span>
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -323,12 +339,18 @@ const Profile = () => {
                           onValueChange={(value) => setProfileData({ ...profileData, phoneCode: value })}
                         >
                           <SelectTrigger className="w-[110px] cairo-regular">
-                            <SelectValue placeholder="+966" />
+                            <SelectValue placeholder="+966">
+                              <span className="flex items-center justify-center">
+                                {profileData.phoneCode}
+                              </span>
+                            </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="cairo-regular">
                             {countryCodes.map((item) => (
                               <SelectItem key={item.code} value={item.code} className="text-right">
-                                {item.country} {item.code}
+                                <span className="flex items-center">
+                                  <span className="ml-2">{item.country}</span>
+                                </span>
                               </SelectItem>
                             ))}
                           </SelectContent>
