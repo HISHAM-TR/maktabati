@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/App";
-import { Book, Mail, Lock, ArrowRight, Chrome } from "lucide-react";
+import { Book, Mail, Lock, ArrowRight } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,7 +43,16 @@ const Login = () => {
     } catch (error) {
       let message = "فشل تسجيل الدخول";
       if (error instanceof Error) {
-        message = error.message;
+        // تفصيل رسائل الخطأ للمستخدم
+        if (error.message.includes("Invalid login credentials")) {
+          message = "بيانات الدخول غير صحيحة";
+        } else if (error.message.includes("Email not confirmed")) {
+          message = "لم يتم تأكيد البريد الإلكتروني بعد، يرجى التحقق من بريدك";
+        } else if (error.message.includes("User not found")) {
+          message = "المستخدم غير موجود";
+        } else {
+          message = error.message;
+        }
       }
       toast.error(message);
     } finally {

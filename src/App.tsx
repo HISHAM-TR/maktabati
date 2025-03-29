@@ -1,3 +1,4 @@
+
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -109,7 +110,11 @@ const App = () => {
               .eq('id', session.user.id)
               .single();
 
-            if (error) throw error;
+            if (error) {
+              console.error("Error fetching profile:", error);
+              toast.error("حدث خطأ أثناء تحميل بيانات المستخدم");
+              return;
+            }
 
             if (profileData) {
               setUser({
@@ -143,6 +148,7 @@ const App = () => {
           .then(({ data: profileData, error }) => {
             if (error) {
               console.error('Error fetching user profile:', error);
+              toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
               return;
             }
 
@@ -200,7 +206,10 @@ const App = () => {
         password
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error);
+        throw error;
+      }
       
     } catch (error: any) {
       console.error("Login error:", error);
