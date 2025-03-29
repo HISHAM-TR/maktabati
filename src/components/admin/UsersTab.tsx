@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { User, Calendar, Mail, X, Check, UserPlus } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -27,7 +28,7 @@ const UsersTab = ({
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data, error } = await supabase.rpc('admin_get_all_users');
+        const { data, error } = await supabase.rpc('get_all_users');
         
         if (error) {
           throw error;
@@ -35,12 +36,12 @@ const UsersTab = ({
 
         if (data) {
           // تحويل البيانات إلى التنسيق المطلوب للواجهة
-          const formattedUsers: UserType[] = data.map((user: AdminUserResult) => ({
+          const formattedUsers: UserType[] = data.map((user: any) => ({
             id: user.id,
             name: user.name,
             email: user.email,
-            status: user.status,
-            registrationDate: new Date(user.registration_date).toLocaleDateString('ar-SA'),
+            status: user.status || 'active',
+            registrationDate: new Date(user.created_at).toLocaleDateString('ar-SA'),
             lastLogin: user.last_login ? new Date(user.last_login).toLocaleDateString('ar-SA') : '-',
             libraryCount: 0, // سنقوم بتحديثها لاحقًا
             role: user.role as "user" | "admin"

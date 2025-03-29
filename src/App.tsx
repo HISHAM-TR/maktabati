@@ -15,6 +15,7 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import { Profile as ProfileType } from "./types/database";
 
 export type User = {
   id: string;
@@ -107,7 +108,7 @@ const App = () => {
           try {
             // جلب بيانات الملف الشخصي من قاعدة البيانات
             const { data: profileData, error } = await supabase
-              .from('profiles')
+              .from<ProfileType>('profiles')
               .select('*')
               .eq('id', session.user.id)
               .single();
@@ -140,7 +141,7 @@ const App = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         supabase
-          .from('profiles')
+          .from<ProfileType>('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single()
@@ -249,7 +250,7 @@ const App = () => {
     try {
       // تحديث الملف الشخصي في قاعدة البيانات
       const { error } = await supabase
-        .from('profiles')
+        .from<ProfileType>('profiles')
         .update({
           name: updatedUser.name,
           country: updatedUser.country,
@@ -294,7 +295,6 @@ const App = () => {
                 <Route path="/admin" element={user?.role === "admin" ? <Admin /> : <Navigate to="/dashboard" />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-              <Toaster />
               <Sonner />
             </TooltipProvider>
           </BrowserRouter>

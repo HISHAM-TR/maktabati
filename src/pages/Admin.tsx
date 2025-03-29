@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -287,11 +286,7 @@ const Admin = () => {
 
             <TabsContent value="users">
               <UsersTab
-                users={users}
-                filteredUsers={filteredUsers}
-                handleUserSearch={handleUserSearch}
                 openEditUserDialog={openEditUserDialog}
-                toggleUserStatus={toggleUserStatus}
                 setIsCreateUserDialogOpen={setIsCreateUserDialogOpen}
               />
             </TabsContent>
