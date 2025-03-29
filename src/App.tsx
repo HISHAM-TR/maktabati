@@ -103,8 +103,10 @@ const App = () => {
   }, [libraries]);
 
   useEffect(() => {
+    // First, set up the auth state listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id);
         if (session?.user) {
           try {
             const { data: profileData, error } = await supabase
@@ -130,6 +132,34 @@ const App = () => {
                 profileImage: profileData.profile_image,
                 status: profileData.status
               });
+            } else {
+              // Handle the case where profile doesn't exist yet (new Google sign-in)
+              if (event === 'SIGNED_IN') {
+                const userData = {
+                  id: session.user.id,
+                  name: session.user.user_metadata.full_name || session.user.user_metadata.name || 'User',
+                  email: session.user.email,
+                  role: 'user',
+                  profile_image: session.user.user_metadata.avatar_url || session.user.user_metadata.picture
+                };
+
+                const { error: insertError } = await supabase
+                  .from('profiles')
+                  .insert([userData]);
+
+                if (insertError) {
+                  console.error('Error creating user profile:', insertError);
+                  toast.error('فشل إنشاء بيانات المستخدم');
+                } else {
+                  setUser({
+                    id: userData.id,
+                    email: userData.email || '',
+                    name: userData.name,
+                    role: 'user',
+                    profileImage: userData.profile_image
+                  });
+                }
+              }
             }
           } catch (error) {
             console.error('Error fetching user profile:', error);
@@ -141,6 +171,7 @@ const App = () => {
       }
     );
 
+    // Then, check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         supabase
@@ -170,6 +201,16 @@ const App = () => {
           });
       }
     });
+
+    // Parse the URL hash for access token (for handling redirects from OAuth)
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      if (accessToken) {
+        // Clean the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
 
     return () => {
       authListener.subscription.unsubscribe();
