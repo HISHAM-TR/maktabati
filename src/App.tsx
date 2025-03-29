@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -83,7 +82,6 @@ const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [libraries, setLibraries] = useState<Record<string, LibraryType>>({});
 
-  // تحميل المكتبات من التخزين المحلي (مؤقتًا حتى نقوم بالكامل بربط Supabase)
   useEffect(() => {
     const savedLibraries = localStorage.getItem("libraries");
     if (savedLibraries) {
@@ -96,18 +94,15 @@ const App = () => {
     }
   }, []);
 
-  // حفظ المكتبات في التخزين المحلي (مؤقتًا)
   useEffect(() => {
     localStorage.setItem("libraries", JSON.stringify(libraries));
   }, [libraries]);
 
-  // التحقق من جلسة المستخدم عند تحميل التطبيق
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
           try {
-            // جلب بيانات الملف الشخصي من قاعدة البيانات
             const { data: profileData, error } = await supabase
               .from('profiles')
               .select('*')
@@ -121,7 +116,7 @@ const App = () => {
                 id: session.user.id,
                 email: session.user.email || '',
                 name: profileData.name,
-                role: profileData.role,
+                role: profileData.role as "admin" | "user",
                 country: profileData.country,
                 phoneNumber: profileData.phone_number,
                 profileImage: profileData.profile_image,
@@ -138,7 +133,6 @@ const App = () => {
       }
     );
 
-    // التحقق من وجود جلسة حالية
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         supabase
@@ -157,7 +151,7 @@ const App = () => {
                 id: session.user.id,
                 email: session.user.email || '',
                 name: profileData.name,
-                role: profileData.role,
+                role: profileData.role as "admin" | "user",
                 country: profileData.country,
                 phoneNumber: profileData.phone_number,
                 profileImage: profileData.profile_image,
@@ -208,7 +202,6 @@ const App = () => {
 
       if (error) throw error;
       
-      // بيانات المستخدم سيتم تحميلها تلقائيًا من خلال مستمع onAuthStateChange
     } catch (error: any) {
       console.error("Login error:", error);
       throw new Error(error.message || "بيانات اعتماد غير صالحة");
@@ -222,7 +215,6 @@ const App = () => {
     additionalData?: { country?: string; phoneNumber?: string; profileImage?: string }
   ) => {
     try {
-      // إنشاء حساب المستخدم
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -238,7 +230,6 @@ const App = () => {
 
       if (error) throw error;
 
-      // التحقق من البريد الإلكتروني سيتم تفعيله من خلال Supabase
       toast.success("تم إنشاء الحساب بنجاح. الرجاء التحقق من بريدك الإلكتروني للتفعيل.");
       
     } catch (error: any) {
@@ -249,7 +240,6 @@ const App = () => {
 
   const updateUserInfo = async (updatedUser: User) => {
     try {
-      // تحديث الملف الشخصي في قاعدة البيانات
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -262,7 +252,6 @@ const App = () => {
 
       if (error) throw error;
 
-      // تحديث حالة المستخدم في التطبيق
       setUser(updatedUser);
       toast.success("تم تحديث الملف الشخصي بنجاح");
     } catch (error: any) {
@@ -277,7 +266,6 @@ const App = () => {
         throw new Error("ليس لديك صلاحية حذف المستخدمين");
       }
 
-      // Call admin function to delete user
       const { error } = await supabase.functions.invoke('admin-delete-user', {
         body: { userId }
       });
