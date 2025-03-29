@@ -322,7 +322,11 @@ const Admin = () => {
 
             <TabsContent value="users">
               <UsersTab
+                users={filteredUsers}
+                filteredUsers={filteredUsers}
+                handleUserSearch={handleUserSearch}
                 openEditUserDialog={openEditUserDialog}
+                toggleUserStatus={toggleUserStatus}
                 setIsCreateUserDialogOpen={setIsCreateUserDialogOpen}
                 handleDeleteUser={handleDeleteUser}
               />

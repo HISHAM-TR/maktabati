@@ -1,6 +1,9 @@
 
 // Custom Supabase database type definitions
 // These types complement the auto-generated types in src/integrations/supabase/types.ts
+import { Database } from "../integrations/supabase/types";
+
+export type Tables = Database['public']['Tables'];
 
 export interface Profile {
   id: string;
