@@ -120,8 +120,8 @@ const Register = () => {
         phoneNumber: fullPhoneNumber,
         profileImage: formData.profileImage
       });
-      toast.success("تم إنشاء الحساب بنجاح");
-      navigate("/dashboard");
+      
+      // لا حاجة للتوجيه هنا لأن المستخدم سيحتاج للتحقق من بريده الإلكتروني أولاً
     } catch (error) {
       let message = "فشل إنشاء الحساب";
       if (error instanceof Error) {

@@ -5,6 +5,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
@@ -21,7 +23,8 @@ export type User = {
   role: "user" | "admin";
   country?: string;
   phoneNumber?: string;
-  profileImage?: string; // Added profile image field
+  profileImage?: string;
+  status?: string;
 };
 
 type AuthContextType = {
@@ -78,6 +81,7 @@ const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [libraries, setLibraries] = useState<Record<string, LibraryType>>({});
 
+  // تحميل المكتبات من التخزين المحلي (مؤقتًا حتى نقوم بالكامل بربط Supabase)
   useEffect(() => {
     const savedLibraries = localStorage.getItem("libraries");
     if (savedLibraries) {
@@ -90,9 +94,82 @@ const App = () => {
     }
   }, []);
 
+  // حفظ المكتبات في التخزين المحلي (مؤقتًا)
   useEffect(() => {
     localStorage.setItem("libraries", JSON.stringify(libraries));
   }, [libraries]);
+
+  // التحقق من جلسة المستخدم عند تحميل التطبيق
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          try {
+            // جلب بيانات الملف الشخصي من قاعدة البيانات
+            const { data: profileData, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+
+            if (error) throw error;
+
+            if (profileData) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: profileData.name,
+                role: profileData.role,
+                country: profileData.country,
+                phoneNumber: profileData.phone_number,
+                profileImage: profileData.profile_image,
+                status: profileData.status
+              });
+            }
+          } catch (error) {
+            console.error('Error fetching user profile:', error);
+            toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
+          }
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    // التحقق من وجود جلسة حالية
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+          .then(({ data: profileData, error }) => {
+            if (error) {
+              console.error('Error fetching user profile:', error);
+              return;
+            }
+
+            if (profileData) {
+              setUser({
+                id: session.user.id,
+                email: session.user.email || '',
+                name: profileData.name,
+                role: profileData.role,
+                country: profileData.country,
+                phoneNumber: profileData.phone_number,
+                profileImage: profileData.profile_image,
+                status: profileData.status
+              });
+            }
+          });
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const addLibrary = (library: LibraryType) => {
     setLibraries(prevLibraries => {
@@ -121,23 +198,18 @@ const App = () => {
   };
 
   const login = async (email: string, password: string) => {
-    console.log("تسجيل الدخول باستخدام:", email, password);
-    
-    if (email && password) {
-      const mockUser = {
-        id: "123",
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        name: email.split("@")[0],
-        role: email.includes("admin") ? "admin" as const : "user" as const,
-        country: "السعودية",
-        phoneNumber: "+966 5XXXXXXXX",
-        profileImage: "" // Default empty profile image
-      };
+        password
+      });
+
+      if (error) throw error;
       
-      setUser(mockUser);
-      localStorage.setItem("user", JSON.stringify(mockUser));
-    } else {
-      throw new Error("بيانات اعتماد غير صالحة");
+      // بيانات المستخدم سيتم تحميلها تلقائيًا من خلال مستمع onAuthStateChange
+    } catch (error: any) {
+      console.error("Login error:", error);
+      throw new Error(error.message || "بيانات اعتماد غير صالحة");
     }
   };
 
@@ -147,34 +219,63 @@ const App = () => {
     password: string, 
     additionalData?: { country?: string; phoneNumber?: string; profileImage?: string }
   ) => {
-    console.log("التسجيل:", name, email, password, additionalData);
-    
-    if (name && email && password) {
-      const mockUser = {
-        id: "123",
+    try {
+      // إنشاء حساب المستخدم
+      const { data, error } = await supabase.auth.signUp({
         email,
-        name,
-        role: "user" as const,
-        country: additionalData?.country || "السعودية",
-        phoneNumber: additionalData?.phoneNumber || "",
-        profileImage: additionalData?.profileImage || ""
-      };
+        password,
+        options: {
+          data: {
+            name,
+            country: additionalData?.country,
+            phone_number: additionalData?.phoneNumber,
+            profile_image: additionalData?.profileImage
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      // التحقق من البريد الإلكتروني سيتم تفعيله من خلال Supabase
+      toast.success("تم إنشاء الحساب بنجاح. الرجاء التحقق من بريدك الإلكتروني للتفعيل.");
       
-      setUser(mockUser);
-      localStorage.setItem("user", JSON.stringify(mockUser));
-    } else {
-      throw new Error("بيانات تسجيل غير صالحة");
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      throw new Error(error.message || "بيانات تسجيل غير صالحة");
     }
   };
 
-  const updateUserInfo = (updatedUser: User) => {
-    setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
+  const updateUserInfo = async (updatedUser: User) => {
+    try {
+      // تحديث الملف الشخصي في قاعدة البيانات
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: updatedUser.name,
+          country: updatedUser.country,
+          phone_number: updatedUser.phoneNumber,
+          profile_image: updatedUser.profileImage
+        })
+        .eq('id', updatedUser.id);
+
+      if (error) throw error;
+
+      // تحديث حالة المستخدم في التطبيق
+      setUser(updatedUser);
+      toast.success("تم تحديث الملف الشخصي بنجاح");
+    } catch (error: any) {
+      console.error("Profile update error:", error);
+      toast.error(error.message || "فشل تحديث الملف الشخصي");
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
