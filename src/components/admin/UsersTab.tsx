@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { User, Calendar, Mail, X, Check, UserPlus } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,20 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import SearchBar from "@/components/ui/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  registrationDate: string;
-  lastLogin: string;
-  libraryCount: number;
-  role?: "user" | "admin";
-}
+import { AdminUserResult } from "@/types/database";
+import { User as UserType } from "@/components/admin/types";
 
 interface UsersTabProps {
-  openEditUserDialog: (user: User) => void;
+  openEditUserDialog: (user: UserType) => void;
   setIsCreateUserDialogOpen: (open: boolean) => void;
 }
 
@@ -29,8 +19,8 @@ const UsersTab = ({
   openEditUserDialog,
   setIsCreateUserDialogOpen
 }: UsersTabProps) => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // جلب بيانات المستخدمين من Supabase
@@ -45,7 +35,7 @@ const UsersTab = ({
 
         if (data) {
           // تحويل البيانات إلى التنسيق المطلوب للواجهة
-          const formattedUsers: User[] = data.map((user: any) => ({
+          const formattedUsers: UserType[] = data.map((user: AdminUserResult) => ({
             id: user.id,
             name: user.name,
             email: user.email,
@@ -53,7 +43,7 @@ const UsersTab = ({
             registrationDate: new Date(user.registration_date).toLocaleDateString('ar-SA'),
             lastLogin: user.last_login ? new Date(user.last_login).toLocaleDateString('ar-SA') : '-',
             libraryCount: 0, // سنقوم بتحديثها لاحقًا
-            role: user.role
+            role: user.role as "user" | "admin"
           }));
 
           // جلب عدد المكتبات لكل مستخدم
