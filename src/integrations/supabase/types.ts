@@ -9,7 +9,137 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      books: {
+        Row: {
+          author: string
+          borrow_date: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          library_id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          author: string
+          borrow_date?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          library_id: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          author?: string
+          borrow_date?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          library_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "books_library_id_fkey"
+            columns: ["library_id"]
+            isOneToOne: false
+            referencedRelation: "libraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "books_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      libraries: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "libraries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          last_login: string | null
+          name: string
+          phone_number: string | null
+          profile_image: string | null
+          role: string
+          status: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id: string
+          last_login?: string | null
+          name: string
+          phone_number?: string | null
+          profile_image?: string | null
+          role?: string
+          status?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          last_login?: string | null
+          name?: string
+          phone_number?: string | null
+          profile_image?: string | null
+          role?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,6 +148,13 @@ export type Database = {
       admin_reset_user_password: {
         Args: {
           user_email: string
+        }
+        Returns: Json
+      }
+      admin_toggle_user_status: {
+        Args: {
+          user_id: string
+          new_status: string
         }
         Returns: Json
       }

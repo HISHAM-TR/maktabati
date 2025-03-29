@@ -39,6 +39,7 @@ type AuthContextType = {
   ) => Promise<void>;
   logout: () => void;
   updateUserInfo: (updatedUser: User) => void;
+  deleteUser: (userId: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -270,6 +271,27 @@ const App = () => {
     }
   };
 
+  const deleteUser = async (userId: string) => {
+    try {
+      if (!user || user.role !== "admin") {
+        throw new Error("ليس لديك صلاحية حذف المستخدمين");
+      }
+
+      // Call admin function to delete user
+      const { error } = await supabase.functions.invoke('admin-delete-user', {
+        body: { userId }
+      });
+
+      if (error) throw error;
+      
+      toast.success("تم حذف المستخدم بنجاح");
+    } catch (error: any) {
+      console.error("Delete user error:", error);
+      toast.error(error.message || "فشل حذف المستخدم");
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await supabase.auth.signOut();
@@ -281,7 +303,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo }}>
+      <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo, deleteUser }}>
         <LibraryContext.Provider value={{ libraries, addLibrary, updateLibrary, deleteLibrary, getLibrary }}>
           <BrowserRouter>
             <TooltipProvider>

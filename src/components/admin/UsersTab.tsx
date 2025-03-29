@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { User, Calendar, Mail, X, Check, UserPlus } from "lucide-react";
+import { User, Calendar, Mail, X, Check, UserPlus, Trash2 } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,17 +8,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import SearchBar from "@/components/ui/SearchBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { AdminUserResult } from "@/types/database";
 import { User as UserType } from "@/components/admin/types";
 
 interface UsersTabProps {
   openEditUserDialog: (user: UserType) => void;
   setIsCreateUserDialogOpen: (open: boolean) => void;
+  handleDeleteUser: (userId: string) => Promise<void>;
 }
 
 const UsersTab = ({
   openEditUserDialog,
-  setIsCreateUserDialogOpen
+  setIsCreateUserDialogOpen,
+  handleDeleteUser
 }: UsersTabProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
@@ -36,28 +37,33 @@ const UsersTab = ({
 
         if (data) {
           // تحويل البيانات إلى التنسيق المطلوب للواجهة
-          const formattedUsers: UserType[] = data.map((user: any) => ({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            status: user.status || 'active',
-            registrationDate: new Date(user.created_at).toLocaleDateString('ar-SA'),
-            lastLogin: user.last_login ? new Date(user.last_login).toLocaleDateString('ar-SA') : '-',
-            libraryCount: 0, // سنقوم بتحديثها لاحقًا
-            role: user.role as "user" | "admin"
-          }));
+          const formattedUsers: UserType[] = await Promise.all(
+            data.map(async (user: any) => {
+              // جلب المعلومات الإضافية من الملف الشخصي
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('status')
+                .eq('id', user.id)
+                .single();
 
-          // جلب عدد المكتبات لكل مستخدم
-          for (const user of formattedUsers) {
-            const { data: libraryData, error: libraryError } = await supabase
-              .from('libraries')
-              .select('id')
-              .eq('user_id', user.id);
-            
-            if (!libraryError && libraryData) {
-              user.libraryCount = libraryData.length;
-            }
-          }
+              // جلب عدد المكتبات
+              const { data: libraryData } = await supabase
+                .from('libraries')
+                .select('id')
+                .eq('user_id', user.id);
+
+              return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                status: profileData?.status || 'active',
+                registrationDate: new Date(user.created_at).toLocaleDateString('ar-SA'),
+                lastLogin: '-', // سيتم تحديثه لاحقًا
+                libraryCount: libraryData?.length || 0,
+                role: user.role as "user" | "admin"
+              };
+            })
+          );
 
           setUsers(formattedUsers);
           setFilteredUsers(formattedUsers);
@@ -239,6 +245,13 @@ const UsersTab = ({
                               تفعيل
                             </>
                           )}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>
