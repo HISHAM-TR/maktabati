@@ -187,13 +187,15 @@ const Admin = () => {
 
     try {
       // تحديث بيانات المستخدم في قاعدة البيانات
+      const updateData = {
+        name: userFormData.name,
+        status: userFormData.status,
+        role: userFormData.role
+      };
+      
       const { error } = await supabase
         .from('profiles')
-        .update({
-          name: userFormData.name,
-          status: userFormData.status,
-          role: userFormData.role
-        })
+        .update(updateData)
         .eq('id', activeUser.id);
 
       if (error) throw error;

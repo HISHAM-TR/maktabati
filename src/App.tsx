@@ -133,15 +133,16 @@ const App = () => {
                     name: session.user.user_metadata?.full_name || 
                           session.user.user_metadata?.name || 
                           'User',
-                    email: session.user.email,
+                    email: session.user.email || '',
                     role: 'user',
+                    status: 'active',
                     profile_image: session.user.user_metadata?.avatar_url || 
                                   session.user.user_metadata?.picture
                   };
 
                   const { error: insertError } = await supabase
                     .from('profiles')
-                    .insert([userData]);
+                    .insert(userData);
 
                   if (insertError) {
                     console.error('Error creating user profile:', insertError);
@@ -149,7 +150,7 @@ const App = () => {
                   } else {
                     setUser({
                       id: userData.id,
-                      email: userData.email || '',
+                      email: userData.email,
                       name: userData.name,
                       role: 'user',
                       profileImage: userData.profile_image
