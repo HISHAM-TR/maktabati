@@ -220,13 +220,13 @@ const App = () => {
     try {
       const { data: adminData, error: adminError } = await supabase.auth.signInWithPassword({
         email: 'admin@admin.com',
-        password: '123'
+        password: '123456'
       });
 
       if (adminError && adminError.message.includes('Invalid login credentials')) {
         const { data, error } = await supabase.auth.signUp({
           email: 'admin@admin.com',
-          password: '123',
+          password: '123456',
         });
 
         if (error) {

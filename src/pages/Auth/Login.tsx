@@ -71,8 +71,9 @@ const Login = () => {
   const handleDefaultAdminLogin = () => {
     setFormData({
       email: "admin@admin.com",
-      password: "123"
+      password: "123456"
     });
+    toast.info("تم تعبئة بيانات المشرف الافتراضي، انقر على زر تسجيل الدخول الآن");
   };
 
   const handleResetPassword = async () => {
