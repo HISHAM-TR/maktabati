@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -23,8 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
-// قائمة رموز الدول
 const countryCodes = [
   { code: "+966", country: "السعودية 🇸🇦" },
   { code: "+971", country: "الإمارات 🇦🇪" },
@@ -45,7 +44,6 @@ const countryCodes = [
   { code: "+249", country: "السودان 🇸🇩" },
 ];
 
-// قائمة الدول مع رموز العلم
 const countries = [
   { name: "السعودية", flag: "🇸🇦" },
   { name: "الإمارات", flag: "🇦🇪" },
@@ -82,7 +80,6 @@ const Register = () => {
     profileImage: ""
   });
 
-  // البحث عن علم الدولة المحددة - تحسين عرض العلم
   const getCountryFlag = (countryName: string) => {
     const country = countries.find(c => c.name === countryName);
     return country ? country.flag : "🏳️";
@@ -114,7 +111,6 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      // إضافة معلومات إضافية للمستخدم
       const fullPhoneNumber = `${formData.phoneCode} ${formData.phoneNumber}`;
       await register(formData.name, formData.email, formData.password, {
         country: formData.country,
@@ -122,7 +118,8 @@ const Register = () => {
         profileImage: formData.profileImage
       });
       
-      // لا حاجة للتوجيه هنا لأن المستخدم سيحتاج للتحقق من بريده الإلكتروني أولاً
+      toast.success("تم إنشاء الحساب بنجاح");
+      navigate("/dashboard");
     } catch (error) {
       let message = "فشل إنشاء الحساب";
       if (error instanceof Error) {
@@ -137,7 +134,6 @@ const Register = () => {
   const handleGoogleLogin = async () => {
     try {
       setGoogleLoading(true);
-      const { supabase } = await import("@/integrations/supabase/client");
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -422,4 +418,3 @@ const Register = () => {
 };
 
 export default Register;
-

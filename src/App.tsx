@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,7 +18,8 @@ import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Contact from "./pages/Contact";
-import { Profile as ProfileType, Tables } from "./types/database";
+import MaintenancePage from "./pages/MaintenancePage";
+import { Profile as ProfileType } from "./types/database";
 
 export type User = {
   id: string;
@@ -30,6 +30,11 @@ export type User = {
   phoneNumber?: string;
   profileImage?: string;
   status?: string;
+};
+
+type MaintenanceContextType = {
+  isMaintenanceMode: boolean;
+  setMaintenanceMode: (value: boolean) => void;
 };
 
 type AuthContextType = {
@@ -47,6 +52,7 @@ type AuthContextType = {
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const MaintenanceContext = createContext<MaintenanceContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -56,7 +62,15 @@ export const useAuth = () => {
   return context;
 };
 
-export type LibraryType = {
+export const useMaintenance = () => {
+  const context = useContext(MaintenanceContext);
+  if (context === undefined) {
+    throw new Error("يجب استخدام useMaintenance داخل MaintenanceProvider");
+  }
+  return context;
+};
+
+type LibraryType = {
   id: string;
   name: string;
   description: string;
@@ -86,6 +100,18 @@ const queryClient = new QueryClient();
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
   const [libraries, setLibraries] = useState<Record<string, LibraryType>>({});
+  const [isMaintenanceMode, setMaintenanceMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    const maintenanceMode = localStorage.getItem("maintenanceMode");
+    if (maintenanceMode) {
+      setMaintenanceMode(maintenanceMode === "true");
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("maintenanceMode", isMaintenanceMode.toString());
+  }, [isMaintenanceMode]);
 
   useEffect(() => {
     const savedLibraries = localStorage.getItem("libraries");
@@ -103,19 +129,11 @@ const App = () => {
     localStorage.setItem("libraries", JSON.stringify(libraries));
   }, [libraries]);
 
-  // Handle authentication and profile creation
   useEffect(() => {
-    // Clean URL hash if it contains tokens
-    if (window.location.hash && window.location.hash.includes('access_token')) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-    
-    // Set up the auth state listener first
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event, session?.user?.id);
         
-        // Set session & user immediately to avoid UI flicker
         if (session?.user) {
           handleUserSession(session);
         } else {
@@ -124,7 +142,8 @@ const App = () => {
       }
     );
 
-    // Then check for existing session
+    checkAndCreateDefaultAdmin();
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         handleUserSession(session);
@@ -136,10 +155,8 @@ const App = () => {
     };
   }, []);
 
-  // Helper function to handle user session
   const handleUserSession = async (session: any) => {
     try {
-      // Fetch profile information
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
@@ -148,7 +165,6 @@ const App = () => {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          // Profile doesn't exist, create one
           const userData = {
             id: session.user.id,
             name: session.user.user_metadata?.full_name || 
@@ -163,7 +179,7 @@ const App = () => {
 
           const { error: insertError } = await supabase
             .from('profiles')
-            .insert(userData);
+            .insert([userData]);
 
           if (insertError) {
             console.error('Error creating user profile:', insertError);
@@ -197,6 +213,40 @@ const App = () => {
     } catch (error) {
       console.error('Error handling authentication:', error);
       toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
+    }
+  };
+
+  const checkAndCreateDefaultAdmin = async () => {
+    try {
+      const { data: adminData, error: adminError } = await supabase.auth.signInWithPassword({
+        email: 'admin@admin.com',
+        password: '123'
+      });
+
+      if (adminError && adminError.message.includes('Invalid login credentials')) {
+        const { data, error } = await supabase.auth.signUp({
+          email: 'admin@admin.com',
+          password: '123',
+        });
+
+        if (error) {
+          console.error('Error creating default admin:', error);
+          return;
+        }
+
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ role: 'admin' })
+            .eq('id', data.user.id);
+
+          if (profileError) {
+            console.error('Error setting admin role:', profileError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking default admin:', error);
     }
   };
 
@@ -260,13 +310,14 @@ const App = () => {
             country: additionalData?.country,
             phone_number: additionalData?.phoneNumber,
             profile_image: additionalData?.profileImage
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`
         }
       });
 
       if (error) throw error;
 
-      toast.success("تم إنشاء الحساب بنجاح. الرجاء التحقق من بريدك الإلكتروني للتفعيل.");
+      toast.success("تم إنشاء الحساب بنجاح.");
       
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -329,30 +380,45 @@ const App = () => {
     }
   };
 
+  const shouldBlockAccess = () => {
+    return isMaintenanceMode && (!user || user.role !== "admin");
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo, deleteUser }}>
-        <LibraryContext.Provider value={{ libraries, addLibrary, updateLibrary, deleteLibrary, getLibrary }}>
-          <BrowserRouter>
-            <TooltipProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-                <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
-                <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
-                <Route path="/library/:id" element={user ? <Library /> : <Navigate to="/login" />} />
-                <Route path="/admin" element={user?.role === "admin" ? <Admin /> : <Navigate to="/dashboard" />} />
-                <Route path="/terms" element={<TermsOfService />} />
-                <Route path="/privacy" element={<PrivacyPolicy />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Sonner />
-            </TooltipProvider>
-          </BrowserRouter>
-        </LibraryContext.Provider>
+        <MaintenanceContext.Provider value={{ isMaintenanceMode, setMaintenanceMode }}>
+          <LibraryContext.Provider value={{ libraries, addLibrary, updateLibrary, deleteLibrary, getLibrary }}>
+            <BrowserRouter>
+              <TooltipProvider>
+                <Routes>
+                  {shouldBlockAccess() ? (
+                    <>
+                      <Route path="/login" element={<Login />} />
+                      <Route path="*" element={<MaintenancePage />} />
+                    </>
+                  ) : (
+                    <>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+                      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+                      <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+                      <Route path="/library/:id" element={user ? <Library /> : <Navigate to="/login" />} />
+                      <Route path="/admin" element={user?.role === "admin" ? <Admin /> : <Navigate to="/dashboard" />} />
+                      <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/privacy" element={<PrivacyPolicy />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="*" element={<NotFound />} />
+                    </>
+                  )}
+                </Routes>
+                <Sonner />
+              </TooltipProvider>
+            </BrowserRouter>
+          </LibraryContext.Provider>
+        </MaintenanceContext.Provider>
       </AuthContext.Provider>
     </QueryClientProvider>
   );

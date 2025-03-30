@@ -13,7 +13,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true, // Enable auto detection of access tokens in URL
+    detectSessionInUrl: false,
     storage: localStorage,
     flowType: 'pkce',
     debug: true // Enable to help diagnose issues
