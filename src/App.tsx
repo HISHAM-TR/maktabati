@@ -102,12 +102,95 @@ const App = () => {
     localStorage.setItem("libraries", JSON.stringify(libraries));
   }, [libraries]);
 
+  // Handle authentication and profile creation
   useEffect(() => {
-    // First, set up the auth state listener
+    // Clean URL hash if it contains tokens
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Set up the auth state listener first
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event, session?.user?.id);
-        if (session?.user) {
+        
+        // Use setTimeout to avoid potential deadlocks
+        setTimeout(async () => {
+          if (session?.user) {
+            try {
+              // Fetch profile information
+              const { data: profileData, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+              if (error) {
+                if (error.code === 'PGRST116') {
+                  // Profile doesn't exist, create one
+                  const userData = {
+                    id: session.user.id,
+                    name: session.user.user_metadata?.full_name || 
+                          session.user.user_metadata?.name || 
+                          'User',
+                    email: session.user.email,
+                    role: 'user',
+                    profile_image: session.user.user_metadata?.avatar_url || 
+                                  session.user.user_metadata?.picture
+                  };
+
+                  const { error: insertError } = await supabase
+                    .from('profiles')
+                    .insert([userData]);
+
+                  if (insertError) {
+                    console.error('Error creating user profile:', insertError);
+                    toast.error('فشل إنشاء بيانات المستخدم');
+                  } else {
+                    setUser({
+                      id: userData.id,
+                      email: userData.email || '',
+                      name: userData.name,
+                      role: 'user',
+                      profileImage: userData.profile_image
+                    });
+                    toast.success('تم تسجيل الدخول بنجاح');
+                  }
+                } else {
+                  console.error("Error fetching profile:", error);
+                  toast.error("حدث خطأ أثناء تحميل بيانات المستخدم");
+                }
+              } else if (profileData) {
+                setUser({
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  name: profileData.name,
+                  role: profileData.role as "admin" | "user",
+                  country: profileData.country,
+                  phoneNumber: profileData.phone_number,
+                  profileImage: profileData.profile_image,
+                  status: profileData.status
+                });
+                if (event === 'SIGNED_IN') {
+                  toast.success('تم تسجيل الدخول بنجاح');
+                }
+              }
+            } catch (error) {
+              console.error('Error handling authentication:', error);
+              toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
+            }
+          } else {
+            setUser(null);
+          }
+        }, 0);
+      }
+    );
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        // Set timeout to avoid potential deadlocks
+        setTimeout(async () => {
           try {
             const { data: profileData, error } = await supabase
               .from('profiles')
@@ -115,71 +198,6 @@ const App = () => {
               .eq('id', session.user.id)
               .single();
 
-            if (error) {
-              console.error("Error fetching profile:", error);
-              toast.error("حدث خطأ أثناء تحميل بيانات المستخدم");
-              return;
-            }
-
-            if (profileData) {
-              setUser({
-                id: session.user.id,
-                email: session.user.email || '',
-                name: profileData.name,
-                role: profileData.role as "admin" | "user",
-                country: profileData.country,
-                phoneNumber: profileData.phone_number,
-                profileImage: profileData.profile_image,
-                status: profileData.status
-              });
-            } else {
-              // Handle the case where profile doesn't exist yet (new Google sign-in)
-              if (event === 'SIGNED_IN') {
-                const userData = {
-                  id: session.user.id,
-                  name: session.user.user_metadata.full_name || session.user.user_metadata.name || 'User',
-                  email: session.user.email,
-                  role: 'user',
-                  profile_image: session.user.user_metadata.avatar_url || session.user.user_metadata.picture
-                };
-
-                const { error: insertError } = await supabase
-                  .from('profiles')
-                  .insert([userData]);
-
-                if (insertError) {
-                  console.error('Error creating user profile:', insertError);
-                  toast.error('فشل إنشاء بيانات المستخدم');
-                } else {
-                  setUser({
-                    id: userData.id,
-                    email: userData.email || '',
-                    name: userData.name,
-                    role: 'user',
-                    profileImage: userData.profile_image
-                  });
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Error fetching user profile:', error);
-            toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
-          }
-        } else {
-          setUser(null);
-        }
-      }
-    );
-
-    // Then, check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data: profileData, error }) => {
             if (error) {
               console.error('Error fetching user profile:', error);
               toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
@@ -198,19 +216,12 @@ const App = () => {
                 status: profileData.status
               });
             }
-          });
+          } catch (error) {
+            console.error('Error in session handling:', error);
+          }
+        }, 0);
       }
     });
-
-    // Parse the URL hash for access token (for handling redirects from OAuth)
-    if (window.location.hash && window.location.hash.includes('access_token')) {
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      if (accessToken) {
-        // Clean the URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -337,8 +348,10 @@ const App = () => {
     try {
       await supabase.auth.signOut();
       setUser(null);
+      toast.success("تم تسجيل الخروج بنجاح");
     } catch (error) {
       console.error("Logout error:", error);
+      toast.error("حدث خطأ أثناء تسجيل الخروج");
     }
   };
 
