@@ -13,6 +13,7 @@ import Library from "./pages/Library";
 import Admin from "./pages/Admin";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
+import ResetPassword from "./pages/Auth/ResetPassword";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import TermsOfService from "./pages/TermsOfService";
@@ -114,113 +115,19 @@ const App = () => {
       async (event, session) => {
         console.log("Auth state changed:", event, session?.user?.id);
         
-        // Use setTimeout to avoid potential deadlocks
-        setTimeout(async () => {
-          if (session?.user) {
-            try {
-              // Fetch profile information
-              const { data: profileData, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-
-              if (error) {
-                if (error.code === 'PGRST116') {
-                  // Profile doesn't exist, create one
-                  const userData = {
-                    id: session.user.id,
-                    name: session.user.user_metadata?.full_name || 
-                          session.user.user_metadata?.name || 
-                          'User',
-                    email: session.user.email || '',
-                    role: 'user',
-                    status: 'active',
-                    profile_image: session.user.user_metadata?.avatar_url || 
-                                  session.user.user_metadata?.picture
-                  };
-
-                  const { error: insertError } = await supabase
-                    .from('profiles')
-                    .insert(userData);
-
-                  if (insertError) {
-                    console.error('Error creating user profile:', insertError);
-                    toast.error('فشل إنشاء بيانات المستخدم');
-                  } else {
-                    setUser({
-                      id: userData.id,
-                      email: userData.email,
-                      name: userData.name,
-                      role: 'user',
-                      profileImage: userData.profile_image
-                    });
-                    toast.success('تم تسجيل الدخول بنجاح');
-                  }
-                } else {
-                  console.error("Error fetching profile:", error);
-                  toast.error("حدث خطأ أثناء تحميل بيانات المستخدم");
-                }
-              } else if (profileData) {
-                setUser({
-                  id: session.user.id,
-                  email: session.user.email || '',
-                  name: profileData.name,
-                  role: profileData.role as "admin" | "user",
-                  country: profileData.country,
-                  phoneNumber: profileData.phone_number,
-                  profileImage: profileData.profile_image,
-                  status: profileData.status
-                });
-                if (event === 'SIGNED_IN') {
-                  toast.success('تم تسجيل الدخول بنجاح');
-                }
-              }
-            } catch (error) {
-              console.error('Error handling authentication:', error);
-              toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
-            }
-          } else {
-            setUser(null);
-          }
-        }, 0);
+        // Set session & user immediately to avoid UI flicker
+        if (session?.user) {
+          handleUserSession(session);
+        } else {
+          setUser(null);
+        }
       }
     );
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        // Set timeout to avoid potential deadlocks
-        setTimeout(async () => {
-          try {
-            const { data: profileData, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-
-            if (error) {
-              console.error('Error fetching user profile:', error);
-              toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
-              return;
-            }
-
-            if (profileData) {
-              setUser({
-                id: session.user.id,
-                email: session.user.email || '',
-                name: profileData.name,
-                role: profileData.role as "admin" | "user",
-                country: profileData.country,
-                phoneNumber: profileData.phone_number,
-                profileImage: profileData.profile_image,
-                status: profileData.status
-              });
-            }
-          } catch (error) {
-            console.error('Error in session handling:', error);
-          }
-        }, 0);
+        handleUserSession(session);
       }
     });
 
@@ -228,6 +135,70 @@ const App = () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  // Helper function to handle user session
+  const handleUserSession = async (session: any) => {
+    try {
+      // Fetch profile information
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // Profile doesn't exist, create one
+          const userData = {
+            id: session.user.id,
+            name: session.user.user_metadata?.full_name || 
+                  session.user.user_metadata?.name || 
+                  'User',
+            email: session.user.email || '',
+            role: 'user',
+            status: 'active',
+            profile_image: session.user.user_metadata?.avatar_url || 
+                          session.user.user_metadata?.picture
+          };
+
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert(userData);
+
+          if (insertError) {
+            console.error('Error creating user profile:', insertError);
+            toast.error('فشل إنشاء بيانات المستخدم');
+          } else {
+            setUser({
+              id: userData.id,
+              email: userData.email,
+              name: userData.name,
+              role: 'user',
+              profileImage: userData.profile_image
+            });
+            toast.success('تم تسجيل الدخول بنجاح');
+          }
+        } else {
+          console.error("Error fetching profile:", error);
+          toast.error("حدث خطأ أثناء تحميل بيانات المستخدم");
+        }
+      } else if (profileData) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          name: profileData.name,
+          role: profileData.role as "admin" | "user",
+          country: profileData.country,
+          phoneNumber: profileData.phone_number,
+          profileImage: profileData.profile_image,
+          status: profileData.status
+        });
+      }
+    } catch (error) {
+      console.error('Error handling authentication:', error);
+      toast.error('حدث خطأ أثناء تحميل بيانات المستخدم');
+    }
+  };
 
   const addLibrary = (library: LibraryType) => {
     setLibraries(prevLibraries => {
@@ -305,14 +276,16 @@ const App = () => {
 
   const updateUserInfo = async (updatedUser: User) => {
     try {
+      const updateData = {
+        name: updatedUser.name,
+        country: updatedUser.country,
+        phone_number: updatedUser.phoneNumber,
+        profile_image: updatedUser.profileImage
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          name: updatedUser.name,
-          country: updatedUser.country,
-          phone_number: updatedUser.phoneNumber,
-          profile_image: updatedUser.profileImage
-        })
+        .update(updateData)
         .eq('id', updatedUser.id);
 
       if (error) throw error;
@@ -366,6 +339,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
                 <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
                 <Route path="/library/:id" element={user ? <Library /> : <Navigate to="/login" />} />
