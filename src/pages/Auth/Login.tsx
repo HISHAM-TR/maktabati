@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -48,20 +49,48 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      await login(formData.email, formData.password);
-      toast.success("تم تسجيل الدخول بنجاح");
-      navigate("/dashboard");
+      // Try regular login
+      try {
+        await login(formData.email, formData.password);
+        toast.success("تم تسجيل الدخول بنجاح");
+        navigate("/dashboard");
+      } catch (loginError: any) {
+        // If the error is about email confirmation, try to log in using direct authentication
+        if (loginError?.message?.includes("Email not confirmed") || loginError?.code === "email_not_confirmed") {
+          // Login failed due to email not confirmed, try to sign up a new session
+          const { data, error: signInError } = await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password,
+          });
+          
+          if (signInError) {
+            throw signInError;
+          }
+          
+          if (data.user) {
+            toast.success("تم تسجيل الدخول بنجاح");
+            navigate("/dashboard");
+            return;
+          }
+        }
+        
+        throw loginError;
+      }
     } catch (error) {
       let message = "فشل تسجيل الدخول";
+      
       if (error instanceof Error) {
         if (error.message.includes("Invalid login credentials")) {
           message = "بيانات الدخول غير صحيحة";
         } else if (error.message.includes("User not found")) {
           message = "المستخدم غير موجود";
+        } else if (error.message.includes("Email not confirmed")) {
+          message = "البريد الإلكتروني غير مؤكد. يرجى التحقق من بريدك الإلكتروني أو التواصل مع المسؤول";
         } else {
           message = error.message;
         }
       }
+      
       toast.error(message);
     } finally {
       setIsLoading(false);
