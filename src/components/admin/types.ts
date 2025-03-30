@@ -7,7 +7,7 @@ export interface User {
   registrationDate: string;
   lastLogin: string;
   libraryCount: number;
-  role: "user" | "admin";
+  role?: "user" | "admin";
 }
 
 export interface Library {

@@ -4,7 +4,6 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { useAuth } from "@/App";
 
 // Import components
 import DashboardTab from "@/components/admin/DashboardTab";
@@ -15,19 +14,152 @@ import CreateUserDialog from "@/components/admin/CreateUserDialog";
 
 // Import types
 import { User, Library, UserFormData, CreateUserFormValues } from "@/components/admin/types";
-import { supabase } from "@/integrations/supabase/client";
+
+const initialUsers: User[] = [
+  {
+    id: "1",
+    name: "أحمد محمد",
+    email: "ahmed@example.com",
+    status: "active",
+    registrationDate: "2023-01-15",
+    lastLogin: "2023-06-20",
+    libraryCount: 3,
+    role: "user"
+  },
+  {
+    id: "2",
+    name: "سارة علي",
+    email: "sara@example.com",
+    status: "active",
+    registrationDate: "2023-02-10",
+    lastLogin: "2023-06-18",
+    libraryCount: 2,
+    role: "user"
+  },
+  {
+    id: "3",
+    name: "عمر خالد",
+    email: "omar@example.com",
+    status: "inactive",
+    registrationDate: "2023-03-05",
+    lastLogin: "2023-05-12",
+    libraryCount: 1,
+    role: "user"
+  },
+  {
+    id: "4",
+    name: "نورا سالم",
+    email: "noura@example.com",
+    status: "active",
+    registrationDate: "2023-06-21",
+    lastLogin: "2023-06-21",
+    libraryCount: 4,
+    role: "user"
+  },
+  {
+    id: "5",
+    name: "فهد محمد",
+    email: "fahad@example.com",
+    status: "pending",
+    registrationDate: "2023-06-15",
+    lastLogin: "-",
+    libraryCount: 0,
+    role: "admin"
+  },
+];
+
+const initialLibrariesData = [
+  {
+    id: "1",
+    name: "مجموعة الروايات",
+    owner: "أحمد محمد",
+    ownerEmail: "ahmed@example.com",
+    bookCount: 42,
+    creationDate: "2023-02-10",
+  },
+  {
+    id: "2",
+    name: "كتب التقنية",
+    owner: "أحمد محمد",
+    ownerEmail: "ahmed@example.com",
+    bookCount: 17,
+    creationDate: "2023-03-15",
+  },
+  {
+    id: "3",
+    name: "الفلسفة",
+    owner: "أحمد محمد",
+    ownerEmail: "ahmed@example.com",
+    bookCount: 8,
+    creationDate: "2023-04-20",
+  },
+  {
+    id: "4",
+    name: "الأدب الكلاسيكي",
+    owner: "سارة علي",
+    ownerEmail: "sara@example.com",
+    bookCount: 25,
+    creationDate: "2023-02-28",
+  },
+  {
+    id: "5",
+    name: "العلوم",
+    owner: "سارة علي",
+    ownerEmail: "sara@example.com",
+    bookCount: 13,
+    creationDate: "2023-05-05",
+  },
+  {
+    id: "6",
+    name: "كتب التاريخ",
+    owner: "عمر خالد",
+    ownerEmail: "omar@example.com",
+    bookCount: 9,
+    creationDate: "2023-04-12",
+  },
+  {
+    id: "7",
+    name: "وصفات الطبخ",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
+    bookCount: 16,
+    creationDate: "2023-03-10",
+  },
+  {
+    id: "8",
+    name: "أدلة السفر",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
+    bookCount: 11,
+    creationDate: "2023-04-05",
+  },
+  {
+    id: "9",
+    name: "مجموعة الشعر",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
+    bookCount: 22,
+    creationDate: "2023-05-15",
+  },
+  {
+    id: "10",
+    name: "كتب الفن",
+    owner: "نورا سالم",
+    ownerEmail: "noura@example.com",
+    bookCount: 7,
+    creationDate: "2023-06-01",
+  },
+];
 
 const Admin = () => {
-  const { deleteUser } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [libraries, setLibraries] = useState<Library[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [filteredLibraries, setFilteredLibraries] = useState<Library[]>([]);
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [libraries, setLibraries] = useState<Library[]>(initialLibrariesData);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(initialUsers);
+  const [filteredLibraries, setFilteredLibraries] = useState<Library[]>(initialLibrariesData);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [activeUser, setActiveUser] = useState<User | null>(null);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [userFormData, setUserFormData] = useState<UserFormData>({
     name: "",
     email: "",
@@ -37,104 +169,7 @@ const Admin = () => {
 
   useEffect(() => {
     document.title = "لوحة المشرف | نظام إدارة المكتبات";
-    fetchUsers();
-    fetchLibraries();
   }, []);
-
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
-      
-      const { data, error } = await supabase.rpc('get_all_users');
-      
-      if (error) throw error;
-
-      if (data) {
-        // تحويل البيانات إلى التنسيق المطلوب للواجهة
-        const formattedUsers: User[] = await Promise.all(
-          data.map(async (user: any) => {
-            // جلب المعلومات الإضافية من الملف الشخصي
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('status')
-              .eq('id', user.id)
-              .single();
-
-            // جلب عدد المكتبات
-            const { data: libraryData } = await supabase
-              .from('libraries')
-              .select('id')
-              .eq('user_id', user.id);
-
-            return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              status: profileData?.status || 'active',
-              registrationDate: new Date(user.created_at).toLocaleDateString('ar-SA'),
-              lastLogin: '-', // سيتم تحديثه لاحقًا
-              libraryCount: libraryData?.length || 0,
-              role: user.role as "user" | "admin"
-            };
-          })
-        );
-
-        setUsers(formattedUsers);
-        setFilteredUsers(formattedUsers);
-      }
-    } catch (error: any) {
-      console.error("Error fetching users:", error);
-      toast.error("فشل في جلب بيانات المستخدمين: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchLibraries = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('libraries')
-        .select(`
-          id,
-          name,
-          created_at,
-          profiles:user_id (
-            name,
-            email
-          )
-        `);
-      
-      if (error) throw error;
-
-      if (data) {
-        // تحويل البيانات إلى التنسيق المطلوب للواجهة
-        const formattedLibraries: Library[] = await Promise.all(
-          data.map(async (library: any) => {
-            // جلب عدد الكتب في المكتبة
-            const { data: booksData } = await supabase
-              .from('books')
-              .select('id')
-              .eq('library_id', library.id);
-
-            return {
-              id: library.id,
-              name: library.name,
-              owner: library.profiles?.name || 'غير معروف',
-              ownerEmail: library.profiles?.email || 'غير معروف',
-              bookCount: booksData?.length || 0,
-              creationDate: new Date(library.created_at).toLocaleDateString('ar-SA')
-            };
-          })
-        );
-
-        setLibraries(formattedLibraries);
-        setFilteredLibraries(formattedLibraries);
-      }
-    } catch (error: any) {
-      console.error("Error fetching libraries:", error);
-      toast.error("فشل في جلب بيانات المكتبات: " + error.message);
-    }
-  };
 
   const handleUserSearch = (query: string) => {
     if (!query.trim()) {
@@ -172,135 +207,63 @@ const Admin = () => {
     setUserFormData({
       name: user.name,
       email: user.email,
-      status: user.status || "active",
+      status: user.status,
       role: user.role || "user"
     });
     setIsEditUserDialogOpen(true);
   };
 
-  const handleEditUser = async () => {
+  const handleEditUser = () => {
     if (!activeUser) return;
     if (!userFormData.name.trim() || !userFormData.email.trim()) {
       toast.error("الاسم والبريد الإلكتروني مطلوبان");
       return;
     }
 
-    try {
-      // تحديث بيانات المستخدم في قاعدة البيانات
-      const updateData = {
-        name: userFormData.name,
-        status: userFormData.status,
-        role: userFormData.role
-      };
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', activeUser.id);
+    const updatedUsers = users.map((user) =>
+      user.id === activeUser.id
+        ? { ...user, ...userFormData }
+        : user
+    );
 
-      if (error) throw error;
-
-      // تحديث قائمة المستخدمين
-      const updatedUsers = users.map((user) =>
-        user.id === activeUser.id
-          ? { ...user, ...userFormData }
-          : user
-      );
-
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
-      setIsEditUserDialogOpen(false);
-      setActiveUser(null);
-      toast.success("تم تحديث المستخدم بنجاح");
-    } catch (error: any) {
-      console.error("Error updating user:", error);
-      toast.error("فشل في تحديث بيانات المستخدم: " + error.message);
-    }
+    setUsers(updatedUsers);
+    setFilteredUsers(updatedUsers);
+    setIsEditUserDialogOpen(false);
+    setActiveUser(null);
+    toast.success("تم تحديث المستخدم بنجاح");
   };
 
-  const handleCreateUser = async (values: CreateUserFormValues) => {
-    try {
-      // إنشاء حساب المستخدم في Supabase
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: values.email,
-        password: values.password,
-        email_confirm: true,
-        user_metadata: {
-          name: values.name,
-          role: values.role
-        }
-      });
+  const handleCreateUser = (values: CreateUserFormValues) => {
+    const newUser: User = {
+      id: `user-${Date.now()}`,
+      name: values.name,
+      email: values.email,
+      status: "active",
+      registrationDate: new Date().toISOString().split('T')[0],
+      lastLogin: "-",
+      libraryCount: 0,
+      role: values.role
+    };
 
-      if (error) throw error;
-
-      if (data.user) {
-        // إضافة المستخدم الجديد إلى القائمة
-        const newUser: User = {
-          id: data.user.id,
-          name: values.name,
-          email: values.email,
-          status: "active",
-          registrationDate: new Date().toLocaleDateString('ar-SA'),
-          lastLogin: "-",
-          libraryCount: 0,
-          role: values.role
-        };
-
-        const updatedUsers = [newUser, ...users];
-        setUsers(updatedUsers);
-        setFilteredUsers(updatedUsers);
-        
-        setIsCreateUserDialogOpen(false);
-        
-        toast.success(`تم إنشاء المستخدم ${values.name} بنجاح`);
-      }
-    } catch (error: any) {
-      console.error("Error creating user:", error);
-      toast.error("فشل في إنشاء المستخدم: " + error.message);
-    }
+    const updatedUsers = [newUser, ...users];
+    setUsers(updatedUsers);
+    setFilteredUsers(updatedUsers);
+    
+    setIsCreateUserDialogOpen(false);
+    
+    toast.success(`تم إنشاء المستخدم ${values.name} بنجاح`);
   };
 
-  const toggleUserStatus = async (id: string, currentStatus: string) => {
-    try {
-      const newStatus = currentStatus === "active" ? "inactive" : "active";
-      
-      // استدعاء دالة قاعدة البيانات لتغيير حالة المستخدم
-      const { data, error } = await supabase.rpc('admin_toggle_user_status', {
-        user_id: id,
-        new_status: newStatus
-      });
-      
-      if (error) throw error;
-      
-      // تحديث قائمة المستخدمين
-      const updatedUsers = users.map(user =>
-        user.id === id ? { ...user, status: newStatus } : user
-      );
-      
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
-      
-      toast.success(`تم تغيير حالة المستخدم إلى ${newStatus === "active" ? "نشط" : "غير نشط"}`);
-    } catch (error: any) {
-      console.error("Error toggling user status:", error);
-      toast.error("فشل في تغيير حالة المستخدم: " + error.message);
-    }
-  };
+  const toggleUserStatus = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+    
+    const updatedUsers = users.map((user) =>
+      user.id === id ? { ...user, status: newStatus } : user
+    );
 
-  const handleDeleteUser = async (userId: string) => {
-    try {
-      if (window.confirm("هل أنت متأكد من رغبتك في حذف هذا المستخدم؟ هذا الإجراء لا يمكن التراجع عنه.")) {
-        await deleteUser(userId);
-        
-        // تحديث قائمة المستخدمين بعد الحذف
-        const updatedUsers = users.filter(user => user.id !== userId);
-        setUsers(updatedUsers);
-        setFilteredUsers(updatedUsers);
-      }
-    } catch (error: any) {
-      console.error("Error deleting user:", error);
-      toast.error("فشل في حذف المستخدم: " + error.message);
-    }
+    setUsers(updatedUsers);
+    setFilteredUsers(updatedUsers);
+    toast.success(`تم تغيير حالة المستخدم إلى ${newStatus === "active" ? "نشط" : "غير نشط"}`);
   };
 
   return (
@@ -324,13 +287,12 @@ const Admin = () => {
 
             <TabsContent value="users">
               <UsersTab
-                users={filteredUsers}
+                users={users}
                 filteredUsers={filteredUsers}
                 handleUserSearch={handleUserSearch}
                 openEditUserDialog={openEditUserDialog}
                 toggleUserStatus={toggleUserStatus}
                 setIsCreateUserDialogOpen={setIsCreateUserDialogOpen}
-                handleDeleteUser={handleDeleteUser}
               />
             </TabsContent>
 

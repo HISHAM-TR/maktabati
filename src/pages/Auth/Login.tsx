@@ -15,15 +15,6 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/App";
 import { Book, Mail, Lock, ArrowRight } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,10 +24,6 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,86 +36,17 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // Try regular login
-      try {
-        await login(formData.email, formData.password);
-        toast.success("تم تسجيل الدخول بنجاح");
-        navigate("/dashboard");
-      } catch (loginError: any) {
-        // If the error is about email confirmation, try to log in using direct authentication
-        if (loginError?.message?.includes("Email not confirmed") || loginError?.code === "email_not_confirmed") {
-          // Login failed due to email not confirmed, try to sign up a new session
-          const { data, error: signInError } = await supabase.auth.signInWithPassword({
-            email: formData.email,
-            password: formData.password,
-          });
-          
-          if (signInError) {
-            throw signInError;
-          }
-          
-          if (data.user) {
-            toast.success("تم تسجيل الدخول بنجاح");
-            navigate("/dashboard");
-            return;
-          }
-        }
-        
-        throw loginError;
-      }
+      await login(formData.email, formData.password);
+      toast.success("تم تسجيل الدخول بنجاح");
+      navigate("/dashboard");
     } catch (error) {
       let message = "فشل تسجيل الدخول";
-      
-      if (error instanceof Error) {
-        if (error.message.includes("Invalid login credentials")) {
-          message = "بيانات الدخول غير صحيحة";
-        } else if (error.message.includes("User not found")) {
-          message = "المستخدم غير موجود";
-        } else if (error.message.includes("Email not confirmed")) {
-          message = "البريد الإلكتروني غير مؤكد. يرجى التحقق من بريدك الإلكتروني أو التواصل مع المسؤول";
-        } else {
-          message = error.message;
-        }
-      }
-      
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDefaultAdminLogin = () => {
-    setFormData({
-      email: "admin@admin.com",
-      password: "123456"
-    });
-    toast.info("تم تعبئة بيانات المشرف الافتراضي، انقر على زر تسجيل الدخول الآن");
-  };
-
-  const handleResetPassword = async () => {
-    if (!resetEmail || !resetEmail.includes('@')) {
-      toast.error("يرجى إدخال بريد إلكتروني صحيح");
-      return;
-    }
-
-    setResetLoading(true);
-    try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) throw error;
-      
-      setResetEmailSent(true);
-      toast.success("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
-    } catch (error) {
-      let message = "فشل إرسال رابط إعادة تعيين كلمة المرور";
       if (error instanceof Error) {
         message = error.message;
       }
       toast.error(message);
     } finally {
-      setResetLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -169,14 +87,12 @@ const Login = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">كلمة المرور</Label>
-                  <Button 
-                    type="button"
-                    variant="link" 
-                    className="text-sm text-primary p-0 h-auto"
-                    onClick={() => setForgotPasswordOpen(true)}
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary hover:underline"
                   >
                     نسيت كلمة المرور؟
-                  </Button>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -207,17 +123,6 @@ const Login = () => {
                 )}
               </Button>
             </form>
-
-            <div className="mt-4 text-center">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={handleDefaultAdminLogin}
-                className="text-sm"
-              >
-                تسجيل دخول كمشرف
-              </Button>
-            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm">
@@ -235,68 +140,6 @@ const Login = () => {
           </Link>
         </div>
       </div>
-
-      <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
-        <DialogContent className="sm:max-w-md" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="text-right">إعادة تعيين كلمة المرور</DialogTitle>
-            <DialogDescription className="text-right">
-              {!resetEmailSent ? 
-                "أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور." : 
-                "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد الخاص بك."
-              }
-            </DialogDescription>
-          </DialogHeader>
-          
-          {!resetEmailSent ? (
-            <>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reset-email" className="text-right block">البريد الإلكتروني</Label>
-                  <Input 
-                    id="reset-email" 
-                    type="email" 
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    className="text-right"
-                  />
-                </div>
-              </div>
-              <DialogFooter className="sm:justify-start flex-row-reverse">
-                <Button 
-                  type="submit" 
-                  onClick={handleResetPassword}
-                  disabled={resetLoading}
-                >
-                  {resetLoading ? (
-                    <div className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      جاري الإرسال...
-                    </div>
-                  ) : "إرسال رابط إعادة التعيين"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setForgotPasswordOpen(false)}>
-                  إلغاء
-                </Button>
-              </DialogFooter>
-            </>
-          ) : (
-            <DialogFooter className="sm:justify-start flex-row-reverse">
-              <Button type="button" onClick={() => {
-                setForgotPasswordOpen(false);
-                setResetEmailSent(false);
-                setResetEmail("");
-              }}>
-                إغلاق
-              </Button>
-            </DialogFooter>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

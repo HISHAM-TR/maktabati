@@ -1,6 +1,5 @@
 
 import { Book } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -15,24 +14,24 @@ const Footer = () => {
           </div>
           
           <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-reverse md:space-x-8">
-            <Link 
-              to="/terms" 
+            <a 
+              href="#" 
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               شروط الخدمة
-            </Link>
-            <Link 
-              to="/privacy" 
+            </a>
+            <a 
+              href="#" 
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               سياسة الخصوصية
-            </Link>
-            <Link 
-              to="/contact" 
+            </a>
+            <a 
+              href="#" 
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               اتصل بنا
-            </Link>
+            </a>
           </div>
         </div>
         
