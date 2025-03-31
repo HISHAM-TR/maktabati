@@ -1,40 +1,35 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Mail, Lock, User, UserPlus, Check } from "lucide-react";
+import { Mail, Lock, User, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/App";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import PasswordStrengthMeter from "@/components/ui/password-strength";
-
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+import { signUp, fetchCurrentUser } from "@/lib/supabase-utils";
+import { useAuth } from "@/App";
 
 const formSchema = z.object({
-  name: z.string().min(3, { message: "الاسم يجب أن يحتوي على 3 أحرف على الأقل" }),
+  name: z
+    .string()
+    .min(2, { message: "الاسم يجب أن يحتوي على حرفين على الأقل" }),
   email: z
     .string()
     .min(1, { message: "البريد الإلكتروني مطلوب" })
     .email({ message: "البريد الإلكتروني غير صحيح" }),
   password: z
     .string()
-    .min(8, { message: "كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل" })
-    .regex(/[A-Z]/, { message: "يجب أن تحتوي على حرف كبير واحد على الأقل" })
-    .regex(/[a-z]/, { message: "يجب أن تحتوي على حرف صغير واحد على الأقل" })
-    .regex(/\d/, { message: "يجب أن تحتوي على رقم واحد على الأقل" })
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: "يجب أن تحتوي على رمز خاص واحد على الأقل" }),
-  terms: z.boolean().refine(val => val === true, {
-    message: "يجب الموافقة على شروط الخدمة للمتابعة",
-  }),
+    .min(6, { message: "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل" }),
+  confirmPassword: z
+    .string()
+    .min(6, { message: "تأكيد كلمة المرور مطلوب" })
 });
 
 const Register = () => {
@@ -43,13 +38,33 @@ const Register = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // التحقق من تسجيل الدخول عند تحميل الصفحة
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await fetchCurrentUser();
+      if (user) {
+        navigate("/dashboard");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(
+      formSchema.refine(
+        (data) => data.password === data.confirmPassword,
+        {
+          message: "كلمات المرور غير متطابقة",
+          path: ["confirmPassword"],
+        }
+      )
+    ),
     defaultValues: {
       name: "",
       email: "",
       password: "",
-      terms: false,
+      confirmPassword: "",
     },
   });
 
@@ -58,18 +73,23 @@ const Register = () => {
     setError(null);
 
     try {
-      await register(values.name, values.email, values.password);
-      toast.success("تم إنشاء الحساب بنجاح");
-      navigate("/dashboard");
-    } catch (error) {
-      setError((error as Error).message);
-      toast.error("فشل إنشاء الحساب: " + (error as Error).message);
+      const { user } = await signUp(values.email, values.password, { name: values.name });
+      
+      if (user) {
+        await register(values.name, values.email, values.password);
+        toast.success("تم إنشاء الحساب بنجاح");
+        navigate("/dashboard");
+      } else {
+        throw new Error("فشل إنشاء الحساب");
+      }
+    } catch (error: any) {
+      const errorMessage = error.message || "فشل إنشاء الحساب";
+      setError(errorMessage);
+      toast.error("فشل إنشاء الحساب: " + errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  const password = form.watch("password");
 
   return (
     <div className="flex flex-col min-h-screen" dir="rtl">
@@ -81,7 +101,7 @@ const Register = () => {
             <CardHeader>
               <CardTitle className="text-2xl text-center">إنشاء حساب جديد</CardTitle>
               <CardDescription className="text-center">
-                أدخل بياناتك لإنشاء حساب جديد
+                أدخل بياناتك لإنشاء حساب جديد في المنصة
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -153,7 +173,6 @@ const Register = () => {
                             />
                           </div>
                         </FormControl>
-                        <PasswordStrengthMeter password={password} className="mt-2" />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -161,35 +180,22 @@ const Register = () => {
 
                   <FormField
                     control={form.control}
-                    name="terms"
+                    name="confirmPassword"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-reverse space-x-3 space-y-0 rounded-md p-4 border">
+                      <FormItem>
+                        <FormLabel>تأكيد كلمة المرور</FormLabel>
                         <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <div className="relative">
+                            <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              placeholder="أعد إدخال كلمة المرور"
+                              type="password"
+                              className="pl-3 pr-10"
+                              {...field}
+                            />
+                          </div>
                         </FormControl>
-                        <div className="space-y-1 leading-none">
-                          <FormLabel>
-                            أوافق على{" "}
-                            <Link
-                              to="/terms"
-                              className="text-primary hover:underline"
-                              target="_blank"
-                            >
-                              شروط الخدمة
-                            </Link>{" "}
-                            و{" "}
-                            <Link
-                              to="/privacy"
-                              className="text-primary hover:underline"
-                              target="_blank"
-                            >
-                              سياسة الخصوصية
-                            </Link>
-                          </FormLabel>
-                        </div>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -212,20 +218,6 @@ const Register = () => {
               </Form>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <div className="flex items-center justify-center space-x-reverse space-x-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
-                <span className="text-muted-foreground">
-                  أو سجل الدخول باستخدام حساب جوجل
-                </span>
-              </div>
-              <Button variant="outline" className="w-full relative">
-                <img
-                  src="https://developers.google.com/identity/images/g-logo.png"
-                  alt="Google"
-                  className="h-5 w-5 absolute right-3"
-                />
-                المتابعة باستخدام جوجل
-              </Button>
               <div className="text-center text-sm">
                 لديك حساب بالفعل؟{" "}
                 <Link

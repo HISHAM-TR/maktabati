@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,10 +11,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAuth } from "@/App";
+import ForgotPasswordDialog from "@/components/auth/ForgotPasswordDialog";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import ForgotPasswordDialog from "@/components/auth/ForgotPasswordDialog";
+import { signIn, fetchCurrentUser } from "@/lib/supabase-utils";
+import { useAuth } from "@/App";
 
 const formSchema = z.object({
   email: z
@@ -33,6 +34,18 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
+  // التحقق من تسجيل الدخول عند تحميل الصفحة
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await fetchCurrentUser();
+      if (user) {
+        navigate("/dashboard");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,12 +59,19 @@ const Login = () => {
     setError(null);
 
     try {
-      await login(values.email, values.password);
-      toast.success("تم تسجيل الدخول بنجاح");
-      navigate("/dashboard");
-    } catch (error) {
-      setError((error as Error).message);
-      toast.error("فشل تسجيل الدخول: " + (error as Error).message);
+      const { user } = await signIn(values.email, values.password);
+      
+      if (user) {
+        await login(values.email, values.password);
+        toast.success("تم تسجيل الدخول بنجاح");
+        navigate("/dashboard");
+      } else {
+        throw new Error("فشل تسجيل الدخول، يرجى التحقق من البريد الإلكتروني وكلمة المرور");
+      }
+    } catch (error: any) {
+      const errorMessage = error.message || "فشل تسجيل الدخول";
+      setError(errorMessage);
+      toast.error("فشل تسجيل الدخول: " + errorMessage);
     } finally {
       setLoading(false);
     }
