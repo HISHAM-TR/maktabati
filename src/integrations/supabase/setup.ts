@@ -10,43 +10,57 @@ export const setupSupabaseDb = async () => {
   
   try {
     // Create the profiles table if it doesn't exist
-    const { error: profilesError } = await supabase.rpc('create_profiles_if_not_exists');
+    const { error: profilesError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'profiles' }
+    });
     if (profilesError) {
       console.error('Error creating profiles table:', profilesError);
     }
     
     // Create user_roles table if it doesn't exist
-    const { error: rolesError } = await supabase.rpc('create_user_roles_if_not_exists');
+    const { error: rolesError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'user_roles' }
+    });
     if (rolesError) {
       console.error('Error creating user_roles table:', rolesError);
     }
     
     // Create libraries table if it doesn't exist
-    const { error: librariesError } = await supabase.rpc('create_libraries_if_not_exists');
+    const { error: librariesError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'libraries' }
+    });
     if (librariesError) {
       console.error('Error creating libraries table:', librariesError);
     }
     
     // Create books table if it doesn't exist
-    const { error: booksError } = await supabase.rpc('create_books_if_not_exists');
+    const { error: booksError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'books' }
+    });
     if (booksError) {
       console.error('Error creating books table:', booksError);
     }
     
     // Create site_settings table if it doesn't exist
-    const { error: settingsError } = await supabase.rpc('create_site_settings_if_not_exists');
+    const { error: settingsError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'site_settings' }
+    });
     if (settingsError) {
       console.error('Error creating site_settings table:', settingsError);
     }
     
     // Create social_links table if it doesn't exist
-    const { error: linksError } = await supabase.rpc('create_social_links_if_not_exists');
+    const { error: linksError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'social_links' }
+    });
     if (linksError) {
       console.error('Error creating social_links table:', linksError);
     }
     
     // Create tickets and ticket_responses tables if they don't exist
-    const { error: ticketsError } = await supabase.rpc('create_tickets_if_not_exists');
+    const { error: ticketsError } = await supabase.functions.invoke('setup-db-tables', {
+      body: { table: 'tickets' }
+    });
     if (ticketsError) {
       console.error('Error creating tickets table:', ticketsError);
     }

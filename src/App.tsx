@@ -19,6 +19,7 @@ import Maintenance from "./pages/Maintenance";
 import { MaintenanceSettings } from "./components/admin/types";
 import { SocialMedia } from "./components/admin/SocialMediaTab";
 import { Ticket } from "./components/tickets/TicketTypes";
+import { LibraryType } from "./types/LibraryTypes";
 
 export type User = {
   id: string;
