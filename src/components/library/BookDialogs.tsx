@@ -22,6 +22,8 @@ interface BookDialogsProps {
   bookCategories: string[];
   setBookCategories: (categories: string[]) => void;
   libraryId: string;
+  isAddDialogOpen?: boolean;
+  setIsAddDialogOpen?: (isOpen: boolean) => void;
 }
 
 // Default form data
@@ -47,13 +49,28 @@ const BookDialogs = forwardRef<
   setFilteredBooks,
   bookCategories,
   setBookCategories,
-  libraryId
+  libraryId,
+  isAddDialogOpen = false,
+  setIsAddDialogOpen
 }, ref) => {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  // Use the prop if provided, otherwise use local state
+  const [localIsAddDialogOpen, setLocalIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [activeBook, setActiveBook] = useState<BookType | null>(null);
   const [formData, setFormData] = useState<BookFormData>(defaultFormData);
+
+  // Use either the prop setter or local state setter
+  const handleAddDialogOpen = (isOpen: boolean) => {
+    if (setIsAddDialogOpen) {
+      setIsAddDialogOpen(isOpen);
+    } else {
+      setLocalIsAddDialogOpen(isOpen);
+    }
+  };
+
+  // Use either the prop value or local state value
+  const actualIsAddDialogOpen = setIsAddDialogOpen ? isAddDialogOpen : localIsAddDialogOpen;
 
   const resetFormData = () => {
     setFormData(defaultFormData);
@@ -73,7 +90,7 @@ const BookDialogs = forwardRef<
     const updatedBooks = [newBook, ...books];
     setBooks(updatedBooks);
     setFilteredBooks(updatedBooks);
-    setIsAddDialogOpen(false);
+    handleAddDialogOpen(false);
     resetFormData();
     toast.success("تمت إضافة الكتاب بنجاح");
   };
@@ -142,7 +159,7 @@ const BookDialogs = forwardRef<
   return (
     <>
       {/* Add Book Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      <Dialog open={actualIsAddDialogOpen} onOpenChange={handleAddDialogOpen}>
         <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-2xl">إضافة كتاب جديد</DialogTitle>
@@ -157,7 +174,7 @@ const BookDialogs = forwardRef<
             setBookCategories={setBookCategories}
           />
           <DialogFooter className="flex-row-reverse sm:justify-end">
-            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="text-lg py-6 px-8">
+            <Button variant="outline" onClick={() => handleAddDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
             <Button onClick={handleAddBook} className="text-lg py-6 px-8">إضافة كتاب</Button>

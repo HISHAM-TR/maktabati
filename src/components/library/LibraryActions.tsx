@@ -2,7 +2,6 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/ui/SearchBar";
-import { BookType } from "@/components/ui/BookCard";
 
 interface LibraryActionsProps {
   onSearch: (query: string) => void;

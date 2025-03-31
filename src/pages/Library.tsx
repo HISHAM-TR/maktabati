@@ -178,6 +178,8 @@ const Library = () => {
         setBookCategories={setBookCategories}
         libraryId={id || ""}
         ref={bookDialogsRef}
+        isAddDialogOpen={isAddDialogOpen}
+        setIsAddDialogOpen={setIsAddDialogOpen}
       />
     </div>
   );
