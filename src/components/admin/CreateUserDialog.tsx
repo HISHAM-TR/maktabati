@@ -51,7 +51,14 @@ const CreateUserDialog = ({
   });
 
   const onSubmit = (values: FormValues) => {
-    handleCreateUser(values);
+    // Make sure all required fields are present
+    const formData: CreateUserFormValues = {
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role: values.role
+    };
+    handleCreateUser(formData);
   };
 
   return (

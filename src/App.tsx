@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -29,6 +28,8 @@ export type User = {
   country?: string;
   phoneNumber?: string;
   profileImage?: string;
+  lastLogin?: string;
+  libraryCount?: number;
 };
 
 type AuthContextType = {
@@ -55,13 +56,6 @@ export const useAuth = () => {
   return context;
 };
 
-export type LibraryType = {
-  id: string;
-  name: string;
-  description: string;
-  books?: any[];
-};
-
 type LibraryContextType = {
   libraries: Record<string, LibraryType>;
   addLibrary: (library: LibraryType) => void;
@@ -80,7 +74,6 @@ export const useLibrary = () => {
   return context;
 };
 
-// إضافة سياق جديد لإعدادات الصيانة
 type MaintenanceContextType = {
   maintenanceSettings: MaintenanceSettings;
   updateMaintenanceSettings: (settings: MaintenanceSettings) => void;
@@ -96,7 +89,6 @@ export const useMaintenance = () => {
   return context;
 };
 
-// إضافة سياق لتذاكر الدعم الفني
 type TicketContextType = {
   tickets: Ticket[];
   addTicket: (ticket: Ticket) => void;
@@ -116,7 +108,6 @@ export const useTickets = () => {
   return context;
 };
 
-// إضافة سياق عام للتطبيق
 type AppContextType = {
   socialLinks: SocialMedia[];
   updateSocialLinks: (links: SocialMedia[]) => void;
@@ -134,7 +125,6 @@ export const useApp = () => {
 
 const queryClient = new QueryClient();
 
-// وسائل التواصل الاجتماعي الافتراضية
 const initialSocialLinks: SocialMedia[] = [
   {
     id: "1",
@@ -201,7 +191,6 @@ const App = () => {
       }
     }
 
-    // استرجاع إعدادات الصيانة من التخزين المحلي
     const savedMaintenanceSettings = localStorage.getItem("maintenanceSettings");
     if (savedMaintenanceSettings) {
       try {
@@ -212,7 +201,6 @@ const App = () => {
       }
     }
 
-    // استرجاع وسائل التواصل الاجتماعي
     const savedSocialLinks = localStorage.getItem("socialLinks");
     if (savedSocialLinks) {
       try {
@@ -223,7 +211,6 @@ const App = () => {
       }
     }
 
-    // استرجاع تذاكر الدعم الفني
     const savedTickets = localStorage.getItem("tickets");
     if (savedTickets) {
       try {
@@ -285,7 +272,6 @@ const App = () => {
     setSocialLinks(links);
   };
 
-  // تذاكر الدعم الفني
   const addTicket = (ticket: Ticket) => {
     setTickets(prevTickets => [ticket, ...prevTickets]);
   };
@@ -418,9 +404,7 @@ const App = () => {
     localStorage.removeItem("user");
   };
 
-  // مكون للتحقق من حالة الصيانة
   const RequireAuth = ({ children }: { children: JSX.Element }) => {
-    // إذا كان وضع الصيانة مفعل والمستخدم ليس مشرفًا، توجيه إلى صفحة الصيانة
     if (maintenanceSettings.enabled && (!user || (user.role !== "owner" && user.role !== "admin"))) {
       return <Navigate to="/maintenance" />;
     }
@@ -432,7 +416,6 @@ const App = () => {
     return children;
   };
 
-  // مكون للتحقق من صلاحية المشرف
   const RequireAdmin = ({ children }: { children: JSX.Element }) => {
     if (!user) {
       return <Navigate to="/login" />;
@@ -455,7 +438,6 @@ const App = () => {
                 <BrowserRouter>
                   <TooltipProvider>
                     <Routes>
-                      {/* صفحات عامة متاحة دائماً */}
                       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
                       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
                       <Route path="/maintenance" element={<Maintenance message={maintenanceSettings.message} />} />
@@ -463,20 +445,17 @@ const App = () => {
                       <Route path="/privacy" element={<Privacy />} />
                       <Route path="/contact" element={<Contact />} />
                       
-                      {/* الصفحات التي تتطلب تحقق من وضع الصيانة */}
                       <Route path="/" element={
                         maintenanceSettings.enabled && (!user || (user.role !== "owner" && user.role !== "admin")) 
                           ? <Navigate to="/maintenance" /> 
                           : <Index />
                       } />
                       
-                      {/* الصفحات المحمية */}
                       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
                       <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                       <Route path="/library/:id" element={<RequireAuth><Library /></RequireAuth>} />
                       <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
                       
-                      {/* صفحة غير موجودة */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                     <Toaster />

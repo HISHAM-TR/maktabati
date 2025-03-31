@@ -56,6 +56,14 @@ const Profile = () => {
     }
   };
 
+  // Helper function to format last login date
+  const getLastLoginText = () => {
+    if (user && 'lastLogin' in user) {
+      return (user as any).lastLogin || new Date().toLocaleDateString();
+    }
+    return new Date().toLocaleDateString();
+  };
+
   return (
     <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
@@ -109,7 +117,7 @@ const Profile = () => {
               <CardFooter className="border-t bg-gray-50 flex justify-between">
                 <p className="text-sm text-muted-foreground">
                   آخر تسجيل دخول:{" "}
-                  {user.lastLogin || new Date().toLocaleDateString()}
+                  {getLastLoginText()}
                 </p>
                 <Button
                   variant="ghost"
