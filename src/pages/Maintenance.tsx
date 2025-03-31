@@ -8,7 +8,9 @@ interface MaintenanceProps {
   message?: string;
 }
 
-const Maintenance = ({ message = "الموقع تحت الصيانة حاليًا. يرجى العودة لاحقًا." }: MaintenanceProps) => {
+const Maintenance: React.FC<MaintenanceProps> = ({ 
+  message = "الموقع تحت الصيانة حاليًا. يرجى العودة لاحقًا." 
+}) => {
   const navigate = useNavigate();
   
   return (
