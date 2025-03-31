@@ -1,0 +1,11 @@
+
+project_id = "ehbvwophyqzgiabkuxlr"
+
+[api]
+enabled = true
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true

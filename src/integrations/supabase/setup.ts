@@ -1,5 +1,6 @@
 
 import { supabase } from './client';
+import { toast } from 'sonner';
 
 /**
  * Helper function for Supabase setup. Not for production use.
@@ -9,60 +10,34 @@ export const setupSupabaseDb = async () => {
   console.log('Setting up Supabase database...');
   
   try {
-    // Create the profiles table if it doesn't exist
-    const { error: profilesError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'profiles' }
+    // Invoke the edge function to set up database tables
+    const { data: tablesData, error: tablesError } = await supabase.functions.invoke('setup-db-tables', {
+      body: {}
     });
-    if (profilesError) {
-      console.error('Error creating profiles table:', profilesError);
+    
+    if (tablesError) {
+      console.error('Error setting up database tables:', tablesError);
+      return false;
     }
     
-    // Create user_roles table if it doesn't exist
-    const { error: rolesError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'user_roles' }
-    });
-    if (rolesError) {
-      console.error('Error creating user_roles table:', rolesError);
-    }
+    console.log('Database tables setup response:', tablesData);
     
-    // Create libraries table if it doesn't exist
-    const { error: librariesError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'libraries' }
-    });
-    if (librariesError) {
-      console.error('Error creating libraries table:', librariesError);
-    }
-    
-    // Create books table if it doesn't exist
-    const { error: booksError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'books' }
-    });
-    if (booksError) {
-      console.error('Error creating books table:', booksError);
-    }
-    
-    // Create site_settings table if it doesn't exist
-    const { error: settingsError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'site_settings' }
-    });
-    if (settingsError) {
-      console.error('Error creating site_settings table:', settingsError);
-    }
-    
-    // Create social_links table if it doesn't exist
-    const { error: linksError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'social_links' }
-    });
-    if (linksError) {
-      console.error('Error creating social_links table:', linksError);
-    }
-    
-    // Create tickets and ticket_responses tables if they don't exist
-    const { error: ticketsError } = await supabase.functions.invoke('setup-db-tables', {
-      body: { table: 'tickets' }
-    });
-    if (ticketsError) {
-      console.error('Error creating tickets table:', ticketsError);
+    // Create default owner account if needed
+    try {
+      const { data: ownerData, error: ownerError } = await supabase.functions.invoke('create-owner-account', {
+        body: {}
+      });
+      
+      if (ownerError) {
+        console.error('Error creating owner account:', ownerError);
+      } else {
+        console.log('Owner account setup response:', ownerData);
+        if (!ownerData.exists) {
+          toast.success('تم إنشاء حساب المالك بنجاح. البريد الإلكتروني: admin@admin.com، كلمة المرور: 123456');
+        }
+      }
+    } catch (ownerSetupError) {
+      console.error('Exception during owner setup:', ownerSetupError);
     }
     
     console.log('Supabase database setup completed.');

@@ -1,341 +1,300 @@
+
 import { supabase } from "@/integrations/supabase/client";
+import { User } from "@/App";
+import { UserRole } from "@/components/admin/RoleTypes";
+import { LibraryType, BookType } from "@/types/LibraryTypes";
 import { toast } from "sonner";
-import { CreateUserFormValues, User, UserFormData } from "@/components/admin/types";
+import { ProfileRow, UserRoleRow } from "@/integrations/supabase/typings";
 
-// دوال المستخدمين
-export const signUp = async (email: string, password: string, userData: { name: string }) => {
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name: userData.name,
-        },
-      },
-    });
+// Authentication functions
+export const signIn = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    if (error) throw error;
-    return data;
-  } catch (error: any) {
-    console.error("Error signing up:", error.message);
+  if (error) {
+    console.error("Login error:", error);
     throw error;
   }
+
+  return data;
 };
 
-export const signIn = async (email: string, password: string) => {
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+export const signUp = async (email: string, password: string, metadata?: Record<string, any>) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: metadata,
+    },
+  });
 
-    if (error) throw error;
-    
-    // تحديث آخر تسجيل دخول
-    if (data.user) {
-      // Using custom SQL query instead of update for type safety
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', data.user.id);
-        
-      if (updateError) {
-        console.error("Error updating last login:", updateError);
-      }
-    }
-    
-    return data;
-  } catch (error: any) {
-    console.error("Error signing in:", error.message);
+  if (error) {
+    console.error("Signup error:", error);
     throw error;
   }
+
+  return data;
 };
 
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut();
   if (error) {
-    console.error("Error signing out:", error.message);
+    console.error("Signout error:", error);
     throw error;
   }
 };
 
 export const resetPassword = async (email: string) => {
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `https://maktabati.cc/reset-password`,
-    });
-    if (error) throw error;
-    return true;
-  } catch (error: any) {
-    console.error("Error resetting password:", error.message);
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + "/reset-password",
+  });
+  
+  if (error) {
+    console.error("Reset password error:", error);
     throw error;
   }
 };
 
-export const fetchCurrentUser = async () => {
+// User management functions
+export const updateLastLogin = async (userId: string) => {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) return null;
+    await supabase
+      .from("profiles")
+      .update({ last_login: new Date().toISOString() })
+      .eq("id", userId);
+  } catch (error) {
+    console.error("Error updating last login:", error);
+  }
+};
 
-    // جلب بيانات الملف الشخصي
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
+// Fetch current user with profile and role
+export const fetchCurrentUser = async (): Promise<User | null> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
+
+    const authUser = session.user;
+    if (!authUser) return null;
+
+    // Fetch user profile
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authUser.id)
       .single();
 
-    // جلب بيانات دور المستخدم
-    const { data: userRoles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id);
-
-    // تحديد أعلى دور (owner > admin > moderator > user)
-    let highestRole = 'user';
-    if (userRoles && userRoles.length > 0) {
-      if (userRoles.some((r: any) => r.role === 'owner')) highestRole = 'owner';
-      else if (userRoles.some((r: any) => r.role === 'admin')) highestRole = 'admin';
-      else if (userRoles.some((r: any) => r.role === 'moderator')) highestRole = 'moderator';
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      return null;
     }
 
-    // جلب عدد المكتبات
-    const { count: libraryCount } = await supabase
-      .from('libraries')
-      .select('*', { count: 'exact', head: true })
-      .eq('owner_id', user.id);
+    // Fetch user role
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("*")
+      .eq("user_id", authUser.id)
+      .single();
 
-    return {
-      id: user.id,
-      email: user.email || '',
-      name: profile?.name || user.email?.split('@')[0] || '',
-      role: highestRole as 'owner' | 'admin' | 'moderator' | 'user',
-      profileImage: profile?.avatar_url || '',
-      libraryCount: libraryCount || 0
+    if (roleError) {
+      console.error("Error fetching user role:", roleError);
+      return null;
+    }
+
+    // Check role type and assign default if needed
+    let userRole: UserRole;
+    if (roleData.role === "owner") userRole = "owner";
+    else if (roleData.role === "admin") userRole = "admin";
+    else if (roleData.role === "moderator") userRole = "moderator";
+    else userRole = "user";
+
+    // Create user with profile info and role
+    const user: User = {
+      id: authUser.id,
+      email: authUser.email || "",
+      name: profileData.name || authUser.email?.split('@')[0] || "",
+      role: userRole,
+      country: "",
+      phoneNumber: "",
+      profileImage: profileData.avatar_url || "",
+      lastLogin: profileData.last_login ? new Date(profileData.last_login).toLocaleDateString() : undefined,
+      libraryCount: 0 // Will be updated later if needed
     };
+
+    return user;
   } catch (error) {
     console.error("Error fetching current user:", error);
     return null;
   }
 };
 
-// إنشاء مستخدم من واجهة الإدارة
-export const createUser = async (userData: CreateUserFormValues) => {
+// User roles management
+export const createUserWithRole = async (
+  email: string,
+  password: string,
+  name: string,
+  role: UserRole
+) => {
   try {
-    // 1. إنشاء المستخدم في نظام المصادقة
+    // Create user in Auth
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email: userData.email,
-      password: userData.password,
+      email,
+      password,
       email_confirm: true,
-      user_metadata: {
-        name: userData.name,
-      }
+      user_metadata: { name },
     });
 
     if (authError) throw authError;
+    if (!authData.user) throw new Error("Failed to create user");
 
-    if (!authData.user) throw new Error("فشل إنشاء المستخدم");
-    
-    // 2. إضافة دور المستخدم
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .insert([
-        { user_id: authData.user.id, role: userData.role }
-      ]);
+    // Update role if not the default "user"
+    if (role !== "user") {
+      const { error: roleError } = await supabase
+        .from("user_roles")
+        .update({ role })
+        .eq("user_id", authData.user.id);
 
-    if (roleError) throw roleError;
-    
-    return authData.user;
-  } catch (error: any) {
-    console.error("Error creating user:", error.message);
-    throw error;
-  }
-};
-
-// تحديث بيانات المستخدم
-export const updateUser = async (userId: string, userData: UserFormData) => {
-  try {
-    // تحديث بيانات الملف الشخصي
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ name: userData.name })
-      .eq('id', userId);
-
-    if (profileError) throw profileError;
-
-    // تحديث دور المستخدم
-    const { error: deleteRoleError } = await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', userId);
-
-    if (deleteRoleError) throw deleteRoleError;
-
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .insert([
-        { user_id: userId, role: userData.role }
-      ]);
-
-    if (roleError) throw roleError;
-
-    // تحديث البريد الإلكتروني إذا كان مختلفًا
-    // ملاحظة: هذا يتطلب صلاحيات الإدارة
-    // ولن يكون متاحًا إلا للمشرف
-
-    return true;
-  } catch (error: any) {
-    console.error("Error updating user:", error.message);
-    throw error;
-  }
-};
-
-// تفعيل/تعطيل المستخدم
-export const toggleUserStatus = async (userId: string, status: string) => {
-  try {
-    const newStatus = status === 'active' ? 'inactive' : 'active';
-    
-    // في التطبيق الحقيقي، ستقوم بتحديث حالة المستخدم في قاعدة البيانات
-    
-    return newStatus;
-  } catch (error: any) {
-    console.error("Error toggling user status:", error.message);
-    throw error;
-  }
-};
-
-// استدعاء وظيفة الحافة (Edge Function) لإنشاء مستخدم مشرف
-export const createOwnerAccount = async (email: string, password: string, name: string) => {
-  try {
-    const { data, error } = await supabase.functions.invoke('create-owner', {
-      body: { email, password, name }
-    });
-
-    if (error) throw error;
-    return data;
-  } catch (error: any) {
-    console.error("Error creating owner account:", error.message);
-    throw error;
-  }
-};
-
-// استرجاع قائمة المستخدمين
-export const fetchUsers = async (): Promise<User[]> => {
-  try {
-    // جلب جميع المستخدمين من جدول profiles
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('*');
-
-    if (profilesError) throw profilesError;
-
-    // جلب أدوار المستخدمين
-    const { data: roles, error: rolesError } = await supabase
-      .from('user_roles')
-      .select('*');
-
-    if (rolesError) throw rolesError;
-
-    // جلب عدد المكتبات لكل مستخدم
-    const { data: libraries, error: librariesError } = await supabase
-      .from('libraries')
-      .select('owner_id');
-
-    if (librariesError) throw librariesError;
-
-    // تحضير بيانات المستخدمين
-    const userMap: { [key: string]: number } = {};
-    libraries?.forEach((lib: any) => {
-      userMap[lib.owner_id] = (userMap[lib.owner_id] || 0) + 1;
-    });
-
-    // دمج البيانات
-    const users: User[] = profiles?.map((profile: any) => {
-      // ابحث عن أعلى دور للمستخدم
-      const userRoles = roles?.filter((r: any) => r.user_id === profile.id) || [];
-      let highestRole = 'user';
-      if (userRoles.some((r: any) => r.role === 'owner')) highestRole = 'owner';
-      else if (userRoles.some((r: any) => r.role === 'admin')) highestRole = 'admin';
-      else if (userRoles.some((r: any) => r.role === 'moderator')) highestRole = 'moderator';
-
-      return {
-        id: profile.id,
-        name: profile.name || '',
-        email: profile.id.split('-')[0] + '@example.com', // بديل مؤقت
-        status: 'active', // افتراضي
-        registrationDate: new Date(profile.created_at).toLocaleDateString('ar-SA'),
-        lastLogin: profile.last_login ? new Date(profile.last_login).toLocaleDateString('ar-SA') : '-',
-        libraryCount: userMap[profile.id] || 0,
-        role: highestRole as 'owner' | 'admin' | 'moderator' | 'user'
-      };
-    }) || [];
-
-    return users;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return [];
-  }
-};
-
-// دوال المكتبات
-export const fetchLibraries = async (userId?: string) => {
-  try {
-    let query = supabase.from('libraries').select('*');
-
-    if (userId) {
-      query = query.eq('owner_id', userId);
+      if (roleError) throw roleError;
     }
 
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    return data.map((lib: any) => ({
-      id: lib.id,
-      name: lib.name,
-      description: lib.description,
-      ownerId: lib.owner_id,
-      owner: 'غير معروف', // We'll fix this in the UI code instead
-      isPublic: lib.is_public,
-      createdAt: new Date(lib.created_at).toLocaleDateString('ar-SA')
-    }));
-  } catch (error: any) {
-    console.error("Error fetching libraries:", error.message);
-    return [];
-  }
-};
-
-export const createLibrary = async (name: string, description: string, isPublic: boolean, userId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from('libraries')
-      .insert([
-        { name, description, is_public: isPublic, owner_id: userId }
-      ])
-      .select();
-
-    if (error) throw error;
-    
-    return data[0];
-  } catch (error: any) {
-    console.error("Error creating library:", error.message);
+    return authData.user;
+  } catch (error) {
+    console.error("Error creating user with role:", error);
     throw error;
   }
 };
 
-export const updateLibrary = async (id: string, name: string, description: string, isPublic: boolean) => {
+export const updateUserRole = async (userId: string, newRole: UserRole) => {
   try {
     const { error } = await supabase
-      .from('libraries')
-      .update({ name, description, is_public: isPublic, updated_at: new Date().toISOString() })
-      .eq('id', id);
+      .from("user_roles")
+      .update({ role: newRole })
+      .eq("user_id", userId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (userId: string, name: string) => {
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ name })
+      .eq("id", userId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    throw error;
+  }
+};
+
+// Library management
+export const fetchUserLibraries = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("libraries")
+      .select(`
+        *,
+        books (count)
+      `)
+      .eq("owner_id", userId);
 
     if (error) throw error;
     
-    return true;
-  } catch (error: any) {
-    console.error("Error updating library:", error.message);
+    // Transform to LibraryType format
+    const libraries = data.map(library => ({
+      id: library.id,
+      name: library.name,
+      description: library.description || "",
+      owner_id: library.owner_id,
+      is_public: library.is_public || false,
+      created_at: library.created_at,
+      updated_at: library.updated_at,
+      books: []
+    } as LibraryType));
+    
+    return libraries;
+  } catch (error) {
+    console.error("Error fetching libraries:", error);
+    throw error;
+  }
+};
+
+export const createLibrary = async (
+  name: string,
+  description: string,
+  is_public: boolean,
+  owner_id: string
+) => {
+  try {
+    const { data, error } = await supabase
+      .from("libraries")
+      .insert([
+        { name, description, is_public, owner_id }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    // Transform to LibraryType
+    const library: LibraryType = {
+      id: data.id,
+      name: data.name,
+      description: data.description || "",
+      owner_id: data.owner_id,
+      is_public: data.is_public || false,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+      books: []
+    };
+    
+    return library;
+  } catch (error) {
+    console.error("Error creating library:", error);
+    throw error;
+  }
+};
+
+export const updateLibrary = async (
+  id: string,
+  name: string,
+  description: string,
+  is_public: boolean
+) => {
+  try {
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("libraries")
+      .update({ name, description, is_public, updated_at: now })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    // Transform to LibraryType
+    const library: LibraryType = {
+      id: data.id,
+      name: data.name,
+      description: data.description || "",
+      owner_id: data.owner_id,
+      is_public: data.is_public || false,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+      books: []
+    };
+    
+    return library;
+  } catch (error) {
+    console.error("Error updating library:", error);
     throw error;
   }
 };
@@ -343,90 +302,147 @@ export const updateLibrary = async (id: string, name: string, description: strin
 export const deleteLibrary = async (id: string) => {
   try {
     const { error } = await supabase
-      .from('libraries')
+      .from("libraries")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
-    
     return true;
-  } catch (error: any) {
-    console.error("Error deleting library:", error.message);
+  } catch (error) {
+    console.error("Error deleting library:", error);
     throw error;
   }
 };
 
-// دوال الكتب
-export const fetchBooks = async (libraryId: string) => {
+// Books management
+export const fetchLibraryBooks = async (libraryId: string) => {
   try {
     const { data, error } = await supabase
-      .from('books')
-      .select('*')
-      .eq('library_id', libraryId);
+      .from("books")
+      .select("*")
+      .eq("library_id", libraryId);
 
     if (error) throw error;
     
-    return data;
-  } catch (error: any) {
-    console.error("Error fetching books:", error.message);
-    return [];
+    // Transform to BookType
+    const books = data.map(book => ({
+      id: book.id,
+      title: book.title,
+      author: book.author || "",
+      description: book.description || "",
+      cover_url: book.cover_url || "",
+      category: book.category || "general",
+      isbn: book.isbn || "",
+      publication_year: book.publication_year || undefined,
+      publisher: book.publisher || "",
+      pages: book.pages || undefined,
+      language: book.language || "",
+      status: book.status || "available",
+      library_id: book.library_id,
+      volumes: 1  // Default value, add to database if needed
+    } as BookType));
+    
+    return books;
+  } catch (error) {
+    console.error("Error fetching books:", error);
+    throw error;
   }
 };
 
-export const createBook = async (libraryId: string, bookData: any) => {
+export const createBook = async (libraryId: string, bookData: Partial<BookType>) => {
   try {
     const { data, error } = await supabase
-      .from('books')
+      .from("books")
       .insert([
         { 
           library_id: libraryId,
           title: bookData.title,
           author: bookData.author,
           description: bookData.description,
-          cover_url: bookData.coverUrl,
+          cover_url: bookData.cover_url,
           isbn: bookData.isbn,
-          publication_year: bookData.publicationYear,
+          publication_year: bookData.publication_year,
           publisher: bookData.publisher,
           pages: bookData.pages,
           language: bookData.language,
-          status: bookData.status || 'available'
+          status: bookData.status || "available"
         }
       ])
-      .select();
+      .select()
+      .single();
 
     if (error) throw error;
     
-    return data[0];
-  } catch (error: any) {
-    console.error("Error creating book:", error.message);
+    // Transform to BookType
+    const book: BookType = {
+      id: data.id,
+      title: data.title,
+      author: data.author || "",
+      description: data.description || "",
+      cover_url: data.cover_url || "",
+      category: data.category || "general",
+      isbn: data.isbn || "",
+      publication_year: data.publication_year || undefined,
+      publisher: data.publisher || "",
+      pages: data.pages || undefined,
+      language: data.language || "",
+      status: data.status || "available",
+      library_id: data.library_id,
+      volumes: 1  // Default value
+    };
+    
+    return book;
+  } catch (error) {
+    console.error("Error creating book:", error);
     throw error;
   }
 };
 
-export const updateBook = async (id: string, bookData: any) => {
+export const updateBook = async (id: string, bookData: Partial<BookType>) => {
   try {
-    const { error } = await supabase
-      .from('books')
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("books")
       .update({ 
         title: bookData.title,
         author: bookData.author,
         description: bookData.description,
-        cover_url: bookData.coverUrl,
+        cover_url: bookData.cover_url,
         isbn: bookData.isbn,
-        publication_year: bookData.publicationYear,
+        publication_year: bookData.publication_year,
         publisher: bookData.publisher,
         pages: bookData.pages,
         language: bookData.language,
         status: bookData.status,
-        updated_at: new Date().toISOString()
+        updated_at: now 
       })
-      .eq('id', id);
+      .eq("id", id)
+      .select()
+      .single();
 
     if (error) throw error;
     
-    return true;
-  } catch (error: any) {
-    console.error("Error updating book:", error.message);
+    // Transform to BookType
+    const book: BookType = {
+      id: data.id,
+      title: data.title,
+      author: data.author || "",
+      description: data.description || "",
+      cover_url: data.cover_url || "",
+      category: data.category || "general",
+      isbn: data.isbn || "",
+      publication_year: data.publication_year || undefined,
+      publisher: data.publisher || "",
+      pages: data.pages || undefined,
+      language: data.language || "",
+      status: data.status || "available",
+      library_id: data.library_id,
+      volumes: 1  // Default value
+    };
+    
+    return book;
+  } catch (error) {
+    console.error("Error updating book:", error);
     throw error;
   }
 };
@@ -434,99 +450,105 @@ export const updateBook = async (id: string, bookData: any) => {
 export const deleteBook = async (id: string) => {
   try {
     const { error } = await supabase
-      .from('books')
+      .from("books")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
-    
     return true;
-  } catch (error: any) {
-    console.error("Error deleting book:", error.message);
+  } catch (error) {
+    console.error("Error deleting book:", error);
     throw error;
   }
 };
 
-// دوال إعدادات الموقع
+// Site settings
 export const fetchSiteSettings = async () => {
   try {
     const { data, error } = await supabase
-      .from('site_settings')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .from("site_settings")
+      .select("*")
       .limit(1)
       .single();
 
-    if (error && error.code !== 'PGRST116') throw error;
-    
-    return data || { maintenance_enabled: false, maintenance_message: 'الموقع قيد الصيانة حالياً، يرجى المحاولة لاحقاً' };
-  } catch (error: any) {
-    console.error("Error fetching site settings:", error.message);
-    return { maintenance_enabled: false, maintenance_message: 'الموقع قيد الصيانة حالياً، يرجى المحاولة لاحقاً' };
+    if (error && error.code !== "PGRST116") { // PGRST116 is "no rows returned"
+      throw error;
+    }
+
+    // If no settings exist, create default settings
+    if (!data) {
+      return createDefaultSiteSettings();
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching site settings:", error);
+    return createDefaultSiteSettings();
+  }
+};
+
+export const createDefaultSiteSettings = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .insert([
+        { 
+          maintenance_enabled: false,
+          maintenance_message: "الموقع قيد الصيانة حالياً، يرجى المحاولة لاحقاً"
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error creating default site settings:", error);
+    throw error;
   }
 };
 
 export const updateSiteSettings = async (settings: { maintenance_enabled: boolean, maintenance_message: string }) => {
   try {
-    const { data: existingData, error: fetchError } = await supabase
-      .from('site_settings')
-      .select('id')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("site_settings")
+      .update({ 
+        maintenance_enabled: settings.maintenance_enabled, 
+        maintenance_message: settings.maintenance_message,
+        updated_at: now
+      })
+      .eq("id", (await fetchSiteSettings()).id);
 
-    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
-
-    if (existingData) {
-      // تحديث الإعدادات الموجودة
-      const { error } = await supabase
-        .from('site_settings')
-        .update({ 
-          maintenance_enabled: settings.maintenance_enabled, 
-          maintenance_message: settings.maintenance_message,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', existingData.id);
-
-      if (error) throw error;
-    } else {
-      // إنشاء إعدادات جديدة
-      const { error } = await supabase
-        .from('site_settings')
-        .insert([{ 
-          maintenance_enabled: settings.maintenance_enabled, 
-          maintenance_message: settings.maintenance_message
-        }]);
-
-      if (error) throw error;
-    }
-    
+    if (error) throw error;
     return true;
-  } catch (error: any) {
-    console.error("Error updating site settings:", error.message);
+  } catch (error) {
+    console.error("Error updating site settings:", error);
     throw error;
   }
 };
 
-// دوال التذاكر
-export const createTicket = async (userId: string, ticketData: { subject: string, description: string, priority: string }) => {
+// Tickets system
+export const createTicket = async (userId: string, subject: string, description: string, priority = "medium") => {
   try {
     const { data, error } = await supabase
-      .from('tickets')
-      .insert([{
-        user_id: userId,
-        subject: ticketData.subject,
-        description: ticketData.description,
-        priority: ticketData.priority,
-        status: 'open'
-      }])
-      .select();
+      .from("tickets")
+      .insert([
+        { 
+          user_id: userId, 
+          subject, 
+          description, 
+          priority,
+          status: "open" 
+        }
+      ])
+      .select()
+      .single();
 
     if (error) throw error;
-    
-    return data[0];
-  } catch (error: any) {
-    console.error("Error creating ticket:", error.message);
+    return data;
+  } catch (error) {
+    console.error("Error creating ticket:", error);
     throw error;
   }
 };
@@ -534,162 +556,183 @@ export const createTicket = async (userId: string, ticketData: { subject: string
 export const fetchUserTickets = async (userId: string) => {
   try {
     const { data, error } = await supabase
-      .from('tickets')
-      .select(`
-        *,
-        ticket_responses(*)
-      `)
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("tickets")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
-    
     return data;
-  } catch (error: any) {
-    console.error("Error fetching user tickets:", error.message);
-    return [];
+  } catch (error) {
+    console.error("Error fetching user tickets:", error);
+    throw error;
   }
 };
 
 export const fetchAllTickets = async () => {
   try {
     const { data, error } = await supabase
-      .from('tickets')
-      .select('*');
+      .from("tickets")
+      .select(`
+        *,
+        profiles (name, id),
+        ticket_responses (count)
+      `)
+      .order("created_at", { ascending: false });
 
     if (error) throw error;
-    
-    return data.map((ticket: any) => ({
+
+    // Transform the data to match expected format
+    const tickets = data.map(ticket => ({
       id: ticket.id,
       subject: ticket.subject,
       description: ticket.description,
       status: ticket.status,
       priority: ticket.priority,
-      userId: ticket.user_id,
-      userName: 'مستخدم', // We'll get username from elsewhere or fix it in UI
-      userEmail: ticket.user_id, // بديل مؤقت، يجب تحديثه لاحقًا
-      createdAt: new Date(ticket.created_at).toLocaleDateString('ar-SA'),
-      updatedAt: new Date(ticket.updated_at).toLocaleDateString('ar-SA'),
-      responses: [] // We'll fetch responses separately
+      user_id: ticket.user_id,
+      userName: ticket.profiles?.name || "Unknown",
+      responses: ticket.ticket_responses || [],
+      created_at: new Date(ticket.created_at).toISOString().split('T')[0],
+      updated_at: new Date(ticket.updated_at).toISOString().split('T')[0]
     }));
-  } catch (error: any) {
-    console.error("Error fetching all tickets:", error.message);
-    return [];
-  }
-};
-
-export const updateTicketStatus = async (ticketId: string, status: 'open' | 'in-progress' | 'closed') => {
-  try {
-    const { error } = await supabase
-      .from('tickets')
-      .update({ 
-        status,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', ticketId);
-
-    if (error) throw error;
     
-    return true;
-  } catch (error: any) {
-    console.error("Error updating ticket status:", error.message);
+    return tickets;
+  } catch (error) {
+    console.error("Error fetching all tickets:", error);
     throw error;
   }
 };
 
-export const replyToTicket = async (ticketId: string, userId: string, message: string, isAdmin: boolean) => {
+export const updateTicketStatus = async (ticketId: string, status: "open" | "in-progress" | "closed") => {
   try {
+    const now = new Date().toISOString();
     const { error } = await supabase
-      .from('ticket_responses')
-      .insert([{
-        ticket_id: ticketId,
-        user_id: userId,
-        message,
-        is_admin: isAdmin
-      }]);
+      .from("tickets")
+      .update({ status, updated_at: now })
+      .eq("id", ticketId);
 
     if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error updating ticket status:", error);
+    throw error;
+  }
+};
 
-    // تحديث وقت تحديث التذكرة
+export const replyToTicket = async (ticketId: string, userId: string, message: string, isAdmin = false) => {
+  try {
+    const { data, error } = await supabase
+      .from("ticket_responses")
+      .insert([
+        { 
+          ticket_id: ticketId, 
+          user_id: userId, 
+          message, 
+          is_admin: isAdmin 
+        }
+      ])
+      .select();
+
+    if (error) throw error;
+    
+    // Also update the ticket's updated_at
+    const now = new Date().toISOString();
     await supabase
-      .from('tickets')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', ticketId);
-    
-    return true;
-  } catch (error: any) {
-    console.error("Error replying to ticket:", error.message);
+      .from("tickets")
+      .update({ updated_at: now })
+      .eq("id", ticketId);
+      
+    return data[0];
+  } catch (error) {
+    console.error("Error replying to ticket:", error);
     throw error;
   }
 };
 
-// دوال روابط التواصل الاجتماعي
+export const fetchTicketResponses = async (ticketId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("ticket_responses")
+      .select(`
+        *,
+        profiles (name)
+      `)
+      .eq("ticket_id", ticketId)
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching ticket responses:", error);
+    throw error;
+  }
+};
+
+// Social media links
 export const fetchSocialLinks = async () => {
   try {
     const { data, error } = await supabase
-      .from('social_links')
-      .select('*');
+      .from("social_links")
+      .select("*");
 
     if (error) throw error;
-    
     return data;
-  } catch (error: any) {
-    console.error("Error fetching social links:", error.message);
-    return [];
-  }
-};
-
-export const updateSocialLinks = async (links: any[]) => {
-  try {
-    // حذف الروابط الحالية
-    const { error: deleteError } = await supabase
-      .from('social_links')
-      .delete()
-      .gte('id', '0'); // حذف جميع الصفوف
-
-    if (deleteError) throw deleteError;
-
-    // إضافة الروابط الجديدة
-    if (links.length > 0) {
-      const { error: insertError } = await supabase
-        .from('social_links')
-        .insert(links.map(link => ({
-          platform: link.name,
-          url: link.url,
-          icon: link.icon,
-        })));
-
-      if (insertError) throw insertError;
-    }
-    
-    return true;
-  } catch (error: any) {
-    console.error("Error updating social links:", error.message);
+  } catch (error) {
+    console.error("Error fetching social links:", error);
     throw error;
   }
 };
 
-// دوال تحميل الملفات
-export const uploadImage = async (file: File, bucket: string, folder: string = '') => {
+export const updateSocialLinks = async (links: { platform: string, url: string, icon: string }[]) => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${folder ? folder + '/' : ''}${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
-
-    const { error } = await supabase
-      .storage
-      .from(bucket)
-      .upload(fileName, file);
+    // First, delete all existing links
+    await supabase
+      .from("social_links")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000"); // This is just to make sure we have a valid filter
+    
+    // Then, insert the new links
+    const { data, error } = await supabase
+      .from("social_links")
+      .insert(links);
 
     if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error updating social links:", error);
+    throw error;
+  }
+};
 
-    const { data } = supabase
-      .storage
-      .from(bucket)
-      .getPublicUrl(fileName);
+// Create default owner
+export const createDefaultOwner = async () => {
+  try {
+    const response = await fetch(`${window.location.origin}/api/create-owner-account`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    });
 
-    return data.publicUrl;
-  } catch (error: any) {
-    console.error("Error uploading image:", error.message);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create owner account');
+    }
+
+    const result = await response.json();
+    
+    if (result.exists) {
+      console.log("Owner account already exists");
+    } else {
+      toast.success("تم إنشاء حساب المالك بنجاح");
+      console.log("Owner created with email: admin@admin.com and password: 123456");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error creating default owner:", error);
+    toast.error("فشل إنشاء حساب المالك: " + error.message);
     throw error;
   }
 };

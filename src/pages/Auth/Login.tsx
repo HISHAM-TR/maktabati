@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import ForgotPasswordDialog from "@/components/auth/ForgotPasswordDialog";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { signIn, fetchCurrentUser } from "@/lib/supabase-utils";
+import { signIn, fetchCurrentUser, createDefaultOwner } from "@/lib/supabase-utils";
 import { useAuth } from "@/App";
 
 const formSchema = z.object({
@@ -37,13 +37,28 @@ const Login = () => {
   // التحقق من تسجيل الدخول عند تحميل الصفحة
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await fetchCurrentUser();
-      if (user) {
-        navigate("/dashboard");
+      try {
+        const user = await fetchCurrentUser();
+        if (user) {
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
       }
     };
     
     checkAuth();
+    
+    // Try to create the default owner account
+    const setupDefaultOwner = async () => {
+      try {
+        await createDefaultOwner();
+      } catch (error) {
+        console.error("Error creating default owner:", error);
+      }
+    };
+    
+    setupDefaultOwner();
   }, [navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,15 +74,19 @@ const Login = () => {
     setError(null);
 
     try {
-      const { user } = await signIn(values.email, values.password);
-      
-      if (user) {
-        await login(values.email, values.password);
-        toast.success("تم تسجيل الدخول بنجاح");
-        navigate("/dashboard");
-      } else {
-        throw new Error("فشل تسجيل الدخول، يرجى التحقق من البريد الإلكتروني وكلمة المرور");
+      // Show a tip for the default admin account
+      if (values.email.toLowerCase() !== "admin@admin.com") {
+        toast.info("يمكنك استخدام حساب المدير الافتراضي: admin@admin.com / 123456");
       }
+      
+      // Try to sign in with Supabase
+      await signIn(values.email, values.password);
+      
+      // Update login state 
+      await login(values.email, values.password);
+      
+      toast.success("تم تسجيل الدخول بنجاح");
+      navigate("/dashboard");
     } catch (error: any) {
       const errorMessage = error.message || "فشل تسجيل الدخول";
       setError(errorMessage);
@@ -169,6 +188,16 @@ const Login = () => {
                   </Button>
                 </form>
               </Form>
+              
+              <div className="mt-4 p-4 bg-blue-50 rounded-md">
+                <p className="text-sm text-blue-700">
+                  للدخول كمشرف، استخدم الحساب التالي:
+                  <br />
+                  البريد الإلكتروني: <strong>admin@admin.com</strong>
+                  <br />
+                  كلمة المرور: <strong>123456</strong>
+                </p>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">

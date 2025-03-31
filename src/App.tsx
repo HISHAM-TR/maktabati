@@ -1,3 +1,4 @@
+
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,13 +20,15 @@ import Maintenance from "./pages/Maintenance";
 import { MaintenanceSettings } from "./components/admin/types";
 import { SocialMedia } from "./components/admin/SocialMediaTab";
 import { Ticket } from "./components/tickets/TicketTypes";
-import { LibraryType } from "./types/LibraryTypes";
+import { LibraryType, BookType } from "./types/LibraryTypes";
+import { UserRole } from "./components/admin/RoleTypes";
+import { fetchCurrentUser, signOut } from "./lib/supabase-utils";
 
 export type User = {
   id: string;
   email: string;
   name: string;
-  role: "owner" | "admin" | "moderator" | "user";
+  role: UserRole;
   country?: string;
   phoneNumber?: string;
   profileImage?: string;
@@ -221,6 +224,20 @@ const App = () => {
         localStorage.removeItem("tickets");
       }
     }
+    
+    // Check for authenticated user
+    const checkForUser = async () => {
+      try {
+        const currentUser = await fetchCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+        }
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+    
+    checkForUser();
   }, []);
 
   useEffect(() => {
@@ -328,36 +345,19 @@ const App = () => {
   };
 
   const login = async (email: string, password: string) => {
-    console.log("تسجيل الدخول باستخدام:", email, password);
-    
-    if (email === "admin@admin.com" && password === "123456") {
-      const mockUser = {
-        id: "admin",
-        email,
-        name: "مدير النظام",
-        role: "owner" as const,
-        country: "السعودية",
-        phoneNumber: "+966 5XXXXXXXX",
-        profileImage: "" // Default empty profile image
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem("user", JSON.stringify(mockUser));
-    } else if (email && password && password.length >= 6) {
-      const mockUser = {
-        id: "123",
-        email,
-        name: email.split("@")[0],
-        role: "user" as const,
-        country: "السعودية",
-        phoneNumber: "+966 5XXXXXXXX",
-        profileImage: "" // Default empty profile image
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem("user", JSON.stringify(mockUser));
-    } else {
-      throw new Error("بيانات اعتماد غير صالحة");
+    try {
+      // Actual login is handled by supabase-utils 
+      // Get the authenticated user after successful login
+      const currentUser = await fetchCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+        localStorage.setItem("user", JSON.stringify(currentUser));
+      } else {
+        throw new Error("Failed to retrieve user data");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     }
   };
 
@@ -367,6 +367,7 @@ const App = () => {
     password: string, 
     additionalData?: { country?: string; phoneNumber?: string; profileImage?: string }
   ) => {
+    // Note: This function is stub until full DB implementation
     console.log("التسجيل:", name, email, password, additionalData);
     
     if (name && email && password) {
@@ -389,9 +390,8 @@ const App = () => {
 
   const resetPassword = async (email: string) => {
     console.log("إعادة تعيين كلمة المرور لـ:", email);
-    // محاكاة لإرسال بريد إعادة تعيين كلمة المرور
+    // Implementation will be handled by Supabase
     await new Promise(resolve => setTimeout(resolve, 1000));
-    // في تطبيق حقيقي، سيتم استدعاء واجهة برمجة التطبيقات لإرسال بريد إعادة تعيين كلمة المرور
     return;
   };
 
@@ -400,9 +400,14 @@ const App = () => {
     localStorage.setItem("user", JSON.stringify(updatedUser));
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  const logout = async () => {
+    try {
+      await signOut();
+      setUser(null);
+      localStorage.removeItem("user");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const RequireAuth = ({ children }: { children: JSX.Element }) => {

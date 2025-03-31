@@ -9,7 +9,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CreateOwnerForm from "@/components/admin/CreateOwnerForm";
 import { useAuth } from "@/App";
-import { fetchCurrentUser } from "@/lib/supabase-utils";
+import { createDefaultOwner, fetchCurrentUser, updateUserProfile } from "@/lib/supabase-utils";
 
 const Profile = () => {
   const { user, updateUserInfo, logout } = useAuth();
@@ -28,10 +28,12 @@ const Profile = () => {
     // التحقق من وجود مستخدم مالك
     const checkOwner = async () => {
       try {
-        // افترض أن المستخدم المالك غير موجود
-        setShowOwnerForm(true);
+        // Try to create default owner (this will do nothing if owner already exists)
+        await createDefaultOwner();
+        setShowOwnerForm(false);
       } catch (error) {
         console.error("Error checking for owner:", error);
+        setShowOwnerForm(true);
       }
     };
 
@@ -45,6 +47,7 @@ const Profile = () => {
     setLoading(true);
     try {
       if (name !== user.name) {
+        await updateUserProfile(user.id, name);
         const updatedUser = { ...user, name };
         updateUserInfo(updatedUser);
         toast.success("تم تحديث الملف الشخصي بنجاح");
@@ -58,8 +61,8 @@ const Profile = () => {
 
   // Helper function to format last login date
   const getLastLoginText = () => {
-    if (user && 'lastLogin' in user) {
-      return (user as any).lastLogin || new Date().toLocaleDateString();
+    if (user && user.lastLogin) {
+      return user.lastLogin;
     }
     return new Date().toLocaleDateString();
   };
