@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Library, User, Calendar } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,12 @@ const LibrariesTab = ({
   filteredLibraries,
   handleLibrarySearch,
 }: LibrariesTabProps) => {
+  const navigate = useNavigate();
+
+  const handleViewLibrary = (libraryId: string) => {
+    navigate(`/library/${libraryId}`);
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="mb-6">
@@ -74,7 +81,7 @@ const LibrariesTab = ({
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" onClick={() => handleViewLibrary(library.id)}>
                       عرض
                     </Button>
                   </TableCell>

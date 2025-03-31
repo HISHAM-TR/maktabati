@@ -10,11 +10,15 @@ interface LibraryActionsProps {
 }
 
 const LibraryActions = ({ onSearch, onAddBookClick }: LibraryActionsProps) => {
+  const handleSearch = (query: string) => {
+    onSearch(query);
+  };
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div className="mb-4 md:mb-0 md:w-1/2">
         <SearchBar
-          onSearch={onSearch}
+          onSearch={handleSearch}
           placeholder="ابحث عن الكتب حسب العنوان أو المؤلف أو التصنيف..."
           label="البحث في المكتبة:"
         />

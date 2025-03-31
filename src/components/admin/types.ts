@@ -32,3 +32,8 @@ export type CreateUserFormValues = {
   password: string;
   role: "user" | "admin";
 };
+
+export interface MaintenanceSettings {
+  enabled: boolean;
+  message: string;
+}

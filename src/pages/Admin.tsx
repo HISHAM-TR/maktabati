@@ -9,11 +9,13 @@ import { toast } from "sonner";
 import DashboardTab from "@/components/admin/DashboardTab";
 import UsersTab from "@/components/admin/UsersTab";
 import LibrariesTab from "@/components/admin/LibrariesTab";
+import MaintenanceTab from "@/components/admin/MaintenanceTab";
 import EditUserDialog from "@/components/admin/EditUserDialog";
 import CreateUserDialog from "@/components/admin/CreateUserDialog";
 
-// Import types
-import { User, Library, UserFormData, CreateUserFormValues } from "@/components/admin/types";
+// Import context and types
+import { useMaintenance } from "@/App";
+import { User, Library, UserFormData, CreateUserFormValues, MaintenanceSettings } from "@/components/admin/types";
 
 const initialUsers: User[] = [
   {
@@ -166,6 +168,8 @@ const Admin = () => {
     status: "",
     role: "user"
   });
+  
+  const { maintenanceSettings, updateMaintenanceSettings } = useMaintenance();
 
   useEffect(() => {
     document.title = "لوحة المشرف | نظام إدارة المكتبات";
@@ -266,6 +270,10 @@ const Admin = () => {
     toast.success(`تم تغيير حالة المستخدم إلى ${newStatus === "active" ? "نشط" : "غير نشط"}`);
   };
 
+  const handleSaveMaintenanceSettings = (settings: MaintenanceSettings) => {
+    updateMaintenanceSettings(settings);
+  };
+
   return (
     <div className="flex flex-col min-h-screen" dir="rtl">
       <Header />
@@ -275,10 +283,11 @@ const Admin = () => {
           <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
               <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
               <TabsTrigger value="users">المستخدمون</TabsTrigger>
               <TabsTrigger value="libraries">المكتبات</TabsTrigger>
+              <TabsTrigger value="maintenance">إعدادات الصيانة</TabsTrigger>
             </TabsList>
 
             <TabsContent value="dashboard">
@@ -300,6 +309,13 @@ const Admin = () => {
               <LibrariesTab
                 filteredLibraries={filteredLibraries}
                 handleLibrarySearch={handleLibrarySearch}
+              />
+            </TabsContent>
+
+            <TabsContent value="maintenance">
+              <MaintenanceTab
+                settings={maintenanceSettings}
+                onSaveSettings={handleSaveMaintenanceSettings}
               />
             </TabsContent>
           </Tabs>
