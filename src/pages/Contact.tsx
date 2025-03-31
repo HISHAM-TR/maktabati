@@ -6,10 +6,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import CreateTicketDialog from "@/components/tickets/CreateTicketDialog";
+import { useTickets } from "@/App";
+import { Ticket, TicketFormData } from "@/components/tickets/TicketTypes";
+import { useAuth } from "@/App";
 
 const Contact = () => {
+  const { user } = useAuth();
+  const { addTicket } = useTickets();
+  
   useEffect(() => {
     document.title = "اتصل بنا | نظام إدارة المكتبات";
   }, []);
@@ -20,6 +27,8 @@ const Contact = () => {
     subject: "",
     message: ""
   });
+
+  const [isTicketDialogOpen, setIsTicketDialogOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -35,8 +44,20 @@ const Contact = () => {
       return;
     }
     
-    // عادة، هنا سيتم إرسال البيانات إلى الخادم
-    // لكن في هذه الحالة سنظهر رسالة نجاح فقط
+    // إنشاء رسالة اتصال جديدة
+    const newContactMessage = {
+      id: `message-${Date.now()}`,
+      name: formData.name,
+      email: formData.email,
+      subject: formData.subject || "رسالة اتصال جديدة",
+      message: formData.message,
+      date: new Date().toISOString().split('T')[0],
+      status: "new"
+    };
+    
+    // هنا يمكننا إرسال الرسالة إلى الخادم أو حفظها محليًا
+    console.log("تم إرسال رسالة اتصال:", newContactMessage);
+    
     toast.success("تم إرسال رسالتك بنجاح! سنرد عليك قريبًا.");
     
     // إعادة تعيين النموذج
@@ -46,6 +67,31 @@ const Contact = () => {
       subject: "",
       message: ""
     });
+  };
+
+  const handleCreateTicket = (values: TicketFormData) => {
+    if (!user) {
+      toast.error("يجب تسجيل الدخول لإنشاء تذكرة دعم");
+      return;
+    }
+    
+    const newTicket: Ticket = {
+      id: `ticket-${Date.now()}`,
+      subject: values.subject,
+      description: values.description,
+      status: "open",
+      priority: values.priority,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      createdAt: new Date().toISOString().split('T')[0],
+      updatedAt: new Date().toISOString().split('T')[0],
+      responses: []
+    };
+    
+    addTicket(newTicket);
+    setIsTicketDialogOpen(false);
+    toast.success("تم إنشاء تذكرة الدعم بنجاح! سنرد عليك في أقرب وقت ممكن.");
   };
 
   return (
@@ -60,6 +106,15 @@ const Contact = () => {
               لديك سؤال أو اقتراح؟ يسعدنا أن نسمع منك. املأ النموذج أدناه وسنرد في أقرب وقت ممكن.
             </p>
           </div>
+
+          {user && (
+            <div className="flex justify-center mb-8">
+              <Button onClick={() => setIsTicketDialogOpen(true)} variant="outline" className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                <span>إنشاء تذكرة دعم فني</span>
+              </Button>
+            </div>
+          )}
 
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1 space-y-6">
@@ -201,6 +256,12 @@ const Contact = () => {
       </main>
 
       <Footer />
+
+      <CreateTicketDialog
+        isOpen={isTicketDialogOpen}
+        setIsOpen={setIsTicketDialogOpen}
+        handleCreateTicket={handleCreateTicket}
+      />
     </div>
   );
 };

@@ -18,15 +18,17 @@ import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import Maintenance from "./pages/Maintenance";
 import { MaintenanceSettings } from "./components/admin/types";
+import { SocialMedia } from "./components/admin/SocialMediaTab";
+import { Ticket } from "./components/tickets/TicketTypes";
 
 export type User = {
   id: string;
   email: string;
   name: string;
-  role: "user" | "admin";
+  role: "owner" | "admin" | "moderator" | "user";
   country?: string;
   phoneNumber?: string;
-  profileImage?: string; // Added profile image field
+  profileImage?: string;
 };
 
 type AuthContextType = {
@@ -40,6 +42,7 @@ type AuthContextType = {
   ) => Promise<void>;
   logout: () => void;
   updateUserInfo: (updatedUser: User) => void;
+  resetPassword: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -93,7 +96,89 @@ export const useMaintenance = () => {
   return context;
 };
 
+// إضافة سياق لتذاكر الدعم الفني
+type TicketContextType = {
+  tickets: Ticket[];
+  addTicket: (ticket: Ticket) => void;
+  updateTicket: (ticket: Ticket) => void;
+  getTicket: (id: string) => Ticket | undefined;
+  updateTicketStatus: (ticketId: string, status: "open" | "in-progress" | "closed") => void;
+  replyToTicket: (ticketId: string, message: string) => void;
+};
+
+export const TicketContext = createContext<TicketContextType | undefined>(undefined);
+
+export const useTickets = () => {
+  const context = useContext(TicketContext);
+  if (context === undefined) {
+    throw new Error("يجب استخدام useTickets داخل TicketProvider");
+  }
+  return context;
+};
+
+// إضافة سياق عام للتطبيق
+type AppContextType = {
+  socialLinks: SocialMedia[];
+  updateSocialLinks: (links: SocialMedia[]) => void;
+};
+
+export const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (context === undefined) {
+    throw new Error("يجب استخدام useApp داخل AppProvider");
+  }
+  return context;
+};
+
 const queryClient = new QueryClient();
+
+// وسائل التواصل الاجتماعي الافتراضية
+const initialSocialLinks: SocialMedia[] = [
+  {
+    id: "1",
+    name: "فيسبوك",
+    url: "https://www.facebook.com/",
+    icon: "facebook",
+    isActive: true
+  },
+  {
+    id: "2",
+    name: "تويتر",
+    url: "https://twitter.com/",
+    icon: "twitter",
+    isActive: true
+  },
+  {
+    id: "3",
+    name: "انستغرام",
+    url: "https://www.instagram.com/",
+    icon: "instagram",
+    isActive: true
+  },
+  {
+    id: "4",
+    name: "يوتيوب",
+    url: "https://www.youtube.com/",
+    icon: "youtube",
+    isActive: false
+  },
+  {
+    id: "5",
+    name: "لينكد إن",
+    url: "https://www.linkedin.com/",
+    icon: "linkedin",
+    isActive: false
+  },
+  {
+    id: "6",
+    name: "جيتهب",
+    url: "https://github.com/",
+    icon: "github",
+    isActive: false
+  }
+];
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -102,6 +187,8 @@ const App = () => {
     enabled: false,
     message: "الموقع تحت الصيانة حاليًا. يرجى العودة لاحقًا."
   });
+  const [socialLinks, setSocialLinks] = useState<SocialMedia[]>(initialSocialLinks);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
   useEffect(() => {
     const savedLibraries = localStorage.getItem("libraries");
@@ -124,6 +211,28 @@ const App = () => {
         localStorage.removeItem("maintenanceSettings");
       }
     }
+
+    // استرجاع وسائل التواصل الاجتماعي
+    const savedSocialLinks = localStorage.getItem("socialLinks");
+    if (savedSocialLinks) {
+      try {
+        setSocialLinks(JSON.parse(savedSocialLinks));
+      } catch (error) {
+        console.error("Error parsing social links:", error);
+        localStorage.removeItem("socialLinks");
+      }
+    }
+
+    // استرجاع تذاكر الدعم الفني
+    const savedTickets = localStorage.getItem("tickets");
+    if (savedTickets) {
+      try {
+        setTickets(JSON.parse(savedTickets));
+      } catch (error) {
+        console.error("Error parsing tickets:", error);
+        localStorage.removeItem("tickets");
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -133,6 +242,14 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem("maintenanceSettings", JSON.stringify(maintenanceSettings));
   }, [maintenanceSettings]);
+
+  useEffect(() => {
+    localStorage.setItem("socialLinks", JSON.stringify(socialLinks));
+  }, [socialLinks]);
+
+  useEffect(() => {
+    localStorage.setItem("tickets", JSON.stringify(tickets));
+  }, [tickets]);
 
   const addLibrary = (library: LibraryType) => {
     setLibraries(prevLibraries => {
@@ -164,6 +281,65 @@ const App = () => {
     setMaintenanceSettings(settings);
   };
 
+  const updateSocialLinks = (links: SocialMedia[]) => {
+    setSocialLinks(links);
+  };
+
+  // تذاكر الدعم الفني
+  const addTicket = (ticket: Ticket) => {
+    setTickets(prevTickets => [ticket, ...prevTickets]);
+  };
+
+  const updateTicket = (ticket: Ticket) => {
+    setTickets(prevTickets => 
+      prevTickets.map(t => t.id === ticket.id ? ticket : t)
+    );
+  };
+
+  const getTicket = (id: string) => {
+    return tickets.find(ticket => ticket.id === id);
+  };
+
+  const updateTicketStatus = (ticketId: string, status: "open" | "in-progress" | "closed") => {
+    setTickets(prevTickets => 
+      prevTickets.map(ticket => 
+        ticket.id === ticketId 
+          ? { 
+              ...ticket, 
+              status, 
+              updatedAt: new Date().toISOString().split('T')[0] 
+            } 
+          : ticket
+      )
+    );
+  };
+
+  const replyToTicket = (ticketId: string, message: string) => {
+    setTickets(prevTickets => 
+      prevTickets.map(ticket => {
+        if (ticket.id === ticketId) {
+          const now = new Date().toISOString().split('T')[0];
+          const newResponse = {
+            id: `response-${Date.now()}`,
+            ticketId,
+            message,
+            userId: "admin",
+            userName: "فريق الدعم",
+            isAdmin: true,
+            createdAt: now
+          };
+          
+          return {
+            ...ticket,
+            responses: [...(ticket.responses || []), newResponse],
+            updatedAt: now
+          };
+        }
+        return ticket;
+      })
+    );
+  };
+
   const login = async (email: string, password: string) => {
     console.log("تسجيل الدخول باستخدام:", email, password);
     
@@ -172,7 +348,7 @@ const App = () => {
         id: "admin",
         email,
         name: "مدير النظام",
-        role: "admin" as const,
+        role: "owner" as const,
         country: "السعودية",
         phoneNumber: "+966 5XXXXXXXX",
         profileImage: "" // Default empty profile image
@@ -224,6 +400,14 @@ const App = () => {
     }
   };
 
+  const resetPassword = async (email: string) => {
+    console.log("إعادة تعيين كلمة المرور لـ:", email);
+    // محاكاة لإرسال بريد إعادة تعيين كلمة المرور
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // في تطبيق حقيقي، سيتم استدعاء واجهة برمجة التطبيقات لإرسال بريد إعادة تعيين كلمة المرور
+    return;
+  };
+
   const updateUserInfo = (updatedUser: User) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -237,7 +421,7 @@ const App = () => {
   // مكون للتحقق من حالة الصيانة
   const RequireAuth = ({ children }: { children: JSX.Element }) => {
     // إذا كان وضع الصيانة مفعل والمستخدم ليس مشرفًا، توجيه إلى صفحة الصيانة
-    if (maintenanceSettings.enabled && (!user || user.role !== "admin")) {
+    if (maintenanceSettings.enabled && (!user || (user.role !== "owner" && user.role !== "admin"))) {
       return <Navigate to="/maintenance" />;
     }
 
@@ -254,7 +438,7 @@ const App = () => {
       return <Navigate to="/login" />;
     }
 
-    if (user.role !== "admin") {
+    if (user.role !== "owner" && user.role !== "admin" && user.role !== "moderator") {
       return <Navigate to="/dashboard" />;
     }
 
@@ -263,40 +447,44 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo }}>
+      <AuthContext.Provider value={{ user, login, register, logout, updateUserInfo, resetPassword }}>
         <LibraryContext.Provider value={{ libraries, addLibrary, updateLibrary, deleteLibrary, getLibrary }}>
           <MaintenanceContext.Provider value={{ maintenanceSettings, updateMaintenanceSettings }}>
-            <BrowserRouter>
-              <TooltipProvider>
-                <Routes>
-                  {/* صفحات عامة متاحة دائماً */}
-                  <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-                  <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
-                  <Route path="/maintenance" element={<Maintenance message={maintenanceSettings.message} />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/contact" element={<Contact />} />
-                  
-                  {/* الصفحات التي تتطلب تحقق من وضع الصيانة */}
-                  <Route path="/" element={
-                    maintenanceSettings.enabled && (!user || user.role !== "admin") 
-                      ? <Navigate to="/maintenance" /> 
-                      : <Index />
-                  } />
-                  
-                  {/* الصفحات المحمية */}
-                  <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                  <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-                  <Route path="/library/:id" element={<RequireAuth><Library /></RequireAuth>} />
-                  <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
-                  
-                  {/* صفحة غير موجودة */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <Toaster />
-                <Sonner />
-              </TooltipProvider>
-            </BrowserRouter>
+            <TicketContext.Provider value={{ tickets, addTicket, updateTicket, getTicket, updateTicketStatus, replyToTicket }}>
+              <AppContext.Provider value={{ socialLinks, updateSocialLinks }}>
+                <BrowserRouter>
+                  <TooltipProvider>
+                    <Routes>
+                      {/* صفحات عامة متاحة دائماً */}
+                      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+                      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+                      <Route path="/maintenance" element={<Maintenance message={maintenanceSettings.message} />} />
+                      <Route path="/terms" element={<Terms />} />
+                      <Route path="/privacy" element={<Privacy />} />
+                      <Route path="/contact" element={<Contact />} />
+                      
+                      {/* الصفحات التي تتطلب تحقق من وضع الصيانة */}
+                      <Route path="/" element={
+                        maintenanceSettings.enabled && (!user || (user.role !== "owner" && user.role !== "admin")) 
+                          ? <Navigate to="/maintenance" /> 
+                          : <Index />
+                      } />
+                      
+                      {/* الصفحات المحمية */}
+                      <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                      <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                      <Route path="/library/:id" element={<RequireAuth><Library /></RequireAuth>} />
+                      <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+                      
+                      {/* صفحة غير موجودة */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                    <Toaster />
+                    <Sonner />
+                  </TooltipProvider>
+                </BrowserRouter>
+              </AppContext.Provider>
+            </TicketContext.Provider>
           </MaintenanceContext.Provider>
         </LibraryContext.Provider>
       </AuthContext.Provider>

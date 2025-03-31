@@ -12,10 +12,15 @@ import LibrariesTab from "@/components/admin/LibrariesTab";
 import MaintenanceTab from "@/components/admin/MaintenanceTab";
 import EditUserDialog from "@/components/admin/EditUserDialog";
 import CreateUserDialog from "@/components/admin/CreateUserDialog";
+import TicketsTab from "@/components/admin/TicketsTab";
+import RolesTab from "@/components/admin/RolesTab";
+import SocialMediaTab from "@/components/admin/SocialMediaTab";
 
 // Import context and types
-import { useMaintenance } from "@/App";
+import { useMaintenance, useTickets, useApp } from "@/App";
 import { User, Library, UserFormData, CreateUserFormValues, MaintenanceSettings } from "@/components/admin/types";
+import { SocialMedia } from "@/components/admin/SocialMediaTab";
+import { Ticket } from "@/components/tickets/TicketTypes";
 
 const initialUsers: User[] = [
   {
@@ -153,6 +158,87 @@ const initialLibrariesData = [
   },
 ];
 
+// بيانات تذاكر الدعم الفني المبدئية
+const initialTickets: Ticket[] = [
+  {
+    id: "ticket-1",
+    subject: "مشكلة في تسجيل الدخول",
+    description: "لا أستطيع تسجيل الدخول إلى حسابي. يظهر خطأ عند إدخال كلمة المرور الصحيحة.",
+    status: "open",
+    priority: "high",
+    userId: "1",
+    userName: "أحمد محمد",
+    userEmail: "ahmed@example.com",
+    createdAt: "2023-06-10",
+    updatedAt: "2023-06-10",
+    responses: []
+  },
+  {
+    id: "ticket-2",
+    subject: "استفسار عن إضافة كتب",
+    description: "كيف يمكنني إضافة كتب متعددة دفعة واحدة إلى مكتبتي؟",
+    status: "in-progress",
+    priority: "medium",
+    userId: "2",
+    userName: "سارة علي",
+    userEmail: "sara@example.com",
+    createdAt: "2023-06-12",
+    updatedAt: "2023-06-13",
+    responses: [
+      {
+        id: "response-1",
+        ticketId: "ticket-2",
+        message: "شكراً لتواصلك معنا. حالياً لا توجد ميزة لإضافة كتب متعددة دفعة واحدة، لكننا نعمل على تطويرها.",
+        userId: "admin",
+        userName: "فريق الدعم",
+        isAdmin: true,
+        createdAt: "2023-06-13"
+      }
+    ]
+  },
+  {
+    id: "ticket-3",
+    subject: "طلب ميزة جديدة",
+    description: "أقترح إضافة ميزة لمشاركة المكتبات مع الأصدقاء.",
+    status: "closed",
+    priority: "low",
+    userId: "4",
+    userName: "نورا سالم",
+    userEmail: "noura@example.com",
+    createdAt: "2023-06-05",
+    updatedAt: "2023-06-07",
+    responses: [
+      {
+        id: "response-2",
+        ticketId: "ticket-3",
+        message: "شكراً لاقتراحك! سنضع هذه الميزة في خطة التطوير المستقبلية.",
+        userId: "admin",
+        userName: "فريق الدعم",
+        isAdmin: true,
+        createdAt: "2023-06-06"
+      },
+      {
+        id: "response-3",
+        ticketId: "ticket-3",
+        message: "شكراً لكم! أتطلع لرؤية هذه الميزة قريباً.",
+        userId: "4",
+        userName: "نورا سالم",
+        isAdmin: false,
+        createdAt: "2023-06-06"
+      },
+      {
+        id: "response-4",
+        ticketId: "ticket-3",
+        message: "تم إغلاق التذكرة. سنعلمك عند إضافة هذه الميزة.",
+        userId: "admin",
+        userName: "فريق الدعم",
+        isAdmin: true,
+        createdAt: "2023-06-07"
+      }
+    ]
+  }
+];
+
 const Admin = () => {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [libraries, setLibraries] = useState<Library[]>(initialLibrariesData);
@@ -170,6 +256,8 @@ const Admin = () => {
   });
   
   const { maintenanceSettings, updateMaintenanceSettings } = useMaintenance();
+  const { tickets = initialTickets, updateTicketStatus, replyToTicket } = useTickets();
+  const { socialLinks, updateSocialLinks } = useApp();
 
   useEffect(() => {
     document.title = "لوحة المشرف | نظام إدارة المكتبات";
@@ -270,6 +358,21 @@ const Admin = () => {
     toast.success(`تم تغيير حالة المستخدم إلى ${newStatus === "active" ? "نشط" : "غير نشط"}`);
   };
 
+  const updateUserRole = (userId: string, newRole: "owner" | "admin" | "moderator" | "user") => {
+    const updatedUsers = users.map((user) =>
+      user.id === userId ? { ...user, role: newRole } : user
+    );
+
+    setUsers(updatedUsers);
+    setFilteredUsers(updatedUsers);
+    toast.success(`تم تغيير دور المستخدم إلى ${
+      newRole === "owner" ? "مالك النظام" : 
+      newRole === "admin" ? "مشرف" : 
+      newRole === "moderator" ? "مشرف محدود" : 
+      "مستخدم"
+    }`);
+  };
+
   const handleSaveMaintenanceSettings = (settings: MaintenanceSettings) => {
     updateMaintenanceSettings(settings);
   };
@@ -283,10 +386,13 @@ const Admin = () => {
           <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-            <TabsList className="grid w-full grid-cols-4 mb-8">
+            <TabsList className="grid w-full grid-cols-7 mb-8">
               <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
               <TabsTrigger value="users">المستخدمون</TabsTrigger>
+              <TabsTrigger value="roles">الأدوار والصلاحيات</TabsTrigger>
+              <TabsTrigger value="tickets">تذاكر الدعم</TabsTrigger>
               <TabsTrigger value="libraries">المكتبات</TabsTrigger>
+              <TabsTrigger value="social">التواصل الاجتماعي</TabsTrigger>
               <TabsTrigger value="maintenance">إعدادات الصيانة</TabsTrigger>
             </TabsList>
 
@@ -305,10 +411,33 @@ const Admin = () => {
               />
             </TabsContent>
 
+            <TabsContent value="roles">
+              <RolesTab
+                users={users}
+                updateUserRole={updateUserRole}
+                currentUserRole="owner"
+              />
+            </TabsContent>
+
+            <TabsContent value="tickets">
+              <TicketsTab
+                tickets={tickets}
+                updateTicketStatus={updateTicketStatus}
+                replyToTicket={replyToTicket}
+              />
+            </TabsContent>
+
             <TabsContent value="libraries">
               <LibrariesTab
                 filteredLibraries={filteredLibraries}
                 handleLibrarySearch={handleLibrarySearch}
+              />
+            </TabsContent>
+
+            <TabsContent value="social">
+              <SocialMediaTab
+                socialLinks={socialLinks}
+                updateSocialLinks={updateSocialLinks}
               />
             </TabsContent>
 

@@ -7,7 +7,7 @@ export interface User {
   registrationDate: string;
   lastLogin: string;
   libraryCount: number;
-  role?: "user" | "admin";
+  role?: "owner" | "admin" | "moderator" | "user";
 }
 
 export interface Library {
@@ -23,17 +23,27 @@ export interface UserFormData {
   name: string;
   email: string;
   status: string;
-  role: "user" | "admin";
+  role: "owner" | "admin" | "moderator" | "user";
 }
 
 export type CreateUserFormValues = {
   name: string;
   email: string;
   password: string;
-  role: "user" | "admin";
+  role: "owner" | "admin" | "moderator" | "user";
 };
 
 export interface MaintenanceSettings {
   enabled: boolean;
   message: string;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  date: string;
+  status: "new" | "read" | "replied";
 }
