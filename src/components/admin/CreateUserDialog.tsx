@@ -16,17 +16,18 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { CreateUserFormValues } from "@/components/admin/types";
 
 const createUserSchema = z.object({
   name: z.string().min(2, { message: "الاسم يجب أن يحتوي على حرفين على الأقل" }),
   email: z.string().email({ message: "البريد الإلكتروني غير صالح" }),
   password: z.string().min(6, { message: "كلمة المرور يجب أن تكون 6 أحرف على الأقل" }),
-  role: z.enum(["user", "admin"], {
+  role: z.enum(["owner", "admin", "moderator", "user"], {
     required_error: "يرجى اختيار دور المستخدم",
   }),
 });
 
-type CreateUserFormValues = z.infer<typeof createUserSchema>;
+type FormValues = z.infer<typeof createUserSchema>;
 
 interface CreateUserDialogProps {
   isOpen: boolean;
@@ -39,7 +40,7 @@ const CreateUserDialog = ({
   setIsOpen,
   handleCreateUser,
 }: CreateUserDialogProps) => {
-  const form = useForm<CreateUserFormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
       name: "",
@@ -48,6 +49,10 @@ const CreateUserDialog = ({
       role: "user",
     },
   });
+
+  const onSubmit = (values: FormValues) => {
+    handleCreateUser(values);
+  };
 
   return (
     <Dialog
@@ -66,7 +71,7 @@ const CreateUserDialog = ({
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleCreateUser)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="name"
@@ -146,11 +151,29 @@ const CreateUserDialog = ({
                       </FormItem>
                       <FormItem className="flex items-center space-x-reverse space-x-3 space-y-0">
                         <FormControl>
+                          <RadioGroupItem value="moderator" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          مشرف محدود
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-reverse space-x-3 space-y-0">
+                        <FormControl>
                           <RadioGroupItem value="admin" />
                         </FormControl>
                         <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
                           <Shield className="h-4 w-4" />
                           مشرف
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-reverse space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="owner" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          مالك النظام
                         </FormLabel>
                       </FormItem>
                     </RadioGroup>

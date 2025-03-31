@@ -6,23 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import SearchBar from "@/components/ui/SearchBar";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  registrationDate: string;
-  lastLogin: string;
-  libraryCount: number;
-  role?: "user" | "admin";
-}
+import { User as UserType } from "@/components/admin/types";
 
 interface UsersTabProps {
-  users: User[];
-  filteredUsers: User[];
+  users: UserType[];
+  filteredUsers: UserType[];
   handleUserSearch: (query: string) => void;
-  openEditUserDialog: (user: User) => void;
+  openEditUserDialog: (user: UserType) => void;
   toggleUserStatus: (id: string, currentStatus: string) => void;
   setIsCreateUserDialogOpen: (open: boolean) => void;
 }
@@ -82,7 +72,9 @@ const UsersTab = ({
                   <TableCell className="text-right">{user.email}</TableCell>
                   <TableCell className="text-right">
                     <Badge variant={user.role === "admin" ? "secondary" : "outline"}>
-                      {user.role === "admin" ? "مشرف" : "مستخدم"}
+                      {user.role === "owner" ? "مالك النظام" : 
+                       user.role === "admin" ? "مشرف" : 
+                       user.role === "moderator" ? "مشرف محدود" : "مستخدم"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
