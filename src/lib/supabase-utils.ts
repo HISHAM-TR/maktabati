@@ -1,4 +1,20 @@
 import { supabase } from "@/integrations/supabase/client";
+import { BookStatus } from "@/types/LibraryTypes";
+import { LibraryType, BookType } from "@/types/LibraryTypes";
+import { UserRole } from "@/components/admin/RoleTypes";
+import { toast } from "sonner";
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  country?: string;
+  phoneNumber?: string;
+  profileImage?: string;
+  lastLogin?: string;
+  libraryCount?: number;
+};
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
