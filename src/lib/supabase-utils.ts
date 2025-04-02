@@ -571,7 +571,7 @@ export const fetchUserTickets = async () => {
       .from('tickets')
       .select(`
         *,
-        profiles:user_id(name)
+        profiles(name)
       `);
 
     if (error) {
@@ -579,9 +579,10 @@ export const fetchUserTickets = async () => {
       return [];
     }
 
+    // Fix the type error by checking if profiles is present and not an error
     return data.map(ticket => ({
       ...ticket,
-      userName: ticket.profiles?.name || 'Unknown',
+      userName: typeof ticket.profiles === 'object' && ticket.profiles ? ticket.profiles.name : 'Unknown',
     }));
   } catch (error) {
     console.error('Error fetching tickets:', error);
@@ -595,14 +596,14 @@ export const fetchAllTickets = async () => {
       .from("tickets")
       .select(`
         *,
-        profiles!inner (name, id),
+        profiles(name, id),
         ticket_responses (count)
       `)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    // Transform the data to match expected format
+    // Transform the data to match expected format and handle potential type issues
     const tickets = data.map(ticket => ({
       id: ticket.id,
       subject: ticket.subject,
@@ -610,7 +611,7 @@ export const fetchAllTickets = async () => {
       status: ticket.status,
       priority: ticket.priority,
       user_id: ticket.user_id,
-      userName: ticket.profiles?.name || "Unknown",
+      userName: typeof ticket.profiles === 'object' && ticket.profiles ? ticket.profiles.name : "Unknown",
       responses: ticket.ticket_responses || [],
       created_at: new Date(ticket.created_at).toISOString().split('T')[0],
       updated_at: new Date(ticket.updated_at).toISOString().split('T')[0]

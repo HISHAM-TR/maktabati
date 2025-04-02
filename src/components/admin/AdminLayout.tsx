@@ -19,6 +19,7 @@ import StatisticsTab from "@/components/admin/StatisticsTab";
 
 // استيراد Hooks الخاصة بالتطبيق
 import { useMaintenance, useApp, useTickets } from "@/App";
+import { UserRole } from "@/components/admin/RoleTypes";
 
 interface AdminLayoutProps {
   children?: React.ReactNode;

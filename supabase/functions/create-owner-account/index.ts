@@ -85,6 +85,28 @@ serve(async (req) => {
       throw roleError;
     }
 
+    // Ensure the user profile is created if not already exists
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userData.user.id)
+      .single();
+      
+    if (profileError) {
+      // Create the profile if it doesn't exist
+      const { error: insertProfileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: userData.user.id,
+          name: name,
+          avatar_url: null
+        });
+        
+      if (insertProfileError) {
+        throw insertProfileError;
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
