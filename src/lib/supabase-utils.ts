@@ -1,9 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "@/App";
-import { UserRole } from "@/components/admin/RoleTypes";
-import { LibraryType, BookType } from "@/types/LibraryTypes";
-import { toast } from "sonner";
-import { ProfileRow, UserRoleRow } from "@/integrations/supabase/typings";
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
@@ -554,19 +549,27 @@ export const createTicket = async (userId: string, subject: string, description:
   }
 };
 
-export const fetchUserTickets = async (userId: string) => {
+export const fetchUserTickets = async () => {
   try {
     const { data, error } = await supabase
-      .from("tickets")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+      .from('tickets')
+      .select(`
+        *,
+        profiles:user_id(name)
+      `);
 
-    if (error) throw error;
-    return data;
+    if (error) {
+      console.error('Error fetching tickets:', error);
+      return [];
+    }
+
+    return data.map(ticket => ({
+      ...ticket,
+      userName: ticket.profiles?.name || 'Unknown',
+    }));
   } catch (error) {
-    console.error("Error fetching user tickets:", error);
-    throw error;
+    console.error('Error fetching tickets:', error);
+    return [];
   }
 };
 
