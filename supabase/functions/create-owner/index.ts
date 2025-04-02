@@ -8,8 +8,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-console.log("Hello from create-owner function!");
-
 serve(async (req) => {
   // إذا كان طلب OPTIONS، ارجع استجابة CORS فقط
   if (req.method === "OPTIONS") {
@@ -88,7 +86,8 @@ serve(async (req) => {
     // إضافة دور المالك للمستخدم
     const { error: roleError } = await supabase
       .from("user_roles")
-      .insert([{ user_id: user.user.id, role: "owner" }]);
+      .update([{ role: "owner" }])
+      .eq("user_id", user.user.id);
 
     if (roleError) {
       // محاولة حذف المستخدم الذي تم إنشاؤه حديثًا إذا فشلت إضافة الدور

@@ -1,28 +1,30 @@
 
-export interface LibraryType {
-  id: string;
-  name: string;
-  description?: string;
-  owner_id?: string;
-  is_public?: boolean;
-  books?: BookType[];
-  created_at?: string;
-  updated_at?: string;
-}
+export type BookStatus = "available" | "borrowed" | "lost" | "damaged";
 
 export interface BookType {
   id: string;
   title: string;
   author: string;
-  description?: string;
-  cover_url?: string;
-  category?: string;
-  isbn?: string;
+  description: string;
+  cover_url: string;
+  category: string;
+  isbn: string;
   publication_year?: number;
-  publisher?: string;
+  publisher: string;
   pages?: number;
-  language?: string;
-  status?: "available" | "borrowed" | "lost" | "damaged";
-  volumes?: number;
-  library_id?: string;
+  language: string;
+  status: BookStatus;
+  library_id: string;
+  volumes: number;
+}
+
+export interface LibraryType {
+  id: string;
+  name: string;
+  description: string;
+  owner_id: string;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+  books: BookType[];
 }

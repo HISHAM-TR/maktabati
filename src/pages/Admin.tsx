@@ -18,7 +18,8 @@ import SocialMediaTab from "@/components/admin/SocialMediaTab";
 
 // Import context and types
 import { useMaintenance, useTickets, useApp } from "@/App";
-import { User, Library, UserFormData, CreateUserFormValues, MaintenanceSettings } from "@/components/admin/types";
+import { UserFormData, CreateUserFormValues, MaintenanceSettings } from "@/components/admin/types";
+import { User, Library } from "@/components/admin/types";
 import { SocialMedia } from "@/components/admin/SocialMediaTab";
 import { Ticket } from "@/components/tickets/TicketTypes";
 

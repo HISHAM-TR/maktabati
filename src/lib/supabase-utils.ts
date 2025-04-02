@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@/App";
 import { UserRole } from "@/components/admin/RoleTypes";
@@ -360,6 +359,7 @@ export const createBook = async (libraryId: string, bookData: Partial<BookType>)
           author: bookData.author,
           description: bookData.description,
           cover_url: bookData.cover_url,
+          category: bookData.category || "general",
           isbn: bookData.isbn,
           publication_year: bookData.publication_year,
           publisher: bookData.publisher,
@@ -386,7 +386,7 @@ export const createBook = async (libraryId: string, bookData: Partial<BookType>)
       publisher: data.publisher || "",
       pages: data.pages || undefined,
       language: data.language || "",
-      status: data.status || "available",
+      status: data.status as "available" | "borrowed" | "lost" | "damaged",
       library_id: data.library_id,
       volumes: 1  // Default value
     };
@@ -408,6 +408,7 @@ export const updateBook = async (id: string, bookData: Partial<BookType>) => {
         author: bookData.author,
         description: bookData.description,
         cover_url: bookData.cover_url,
+        category: bookData.category || "general",
         isbn: bookData.isbn,
         publication_year: bookData.publication_year,
         publisher: bookData.publisher,
@@ -435,7 +436,7 @@ export const updateBook = async (id: string, bookData: Partial<BookType>) => {
       publisher: data.publisher || "",
       pages: data.pages || undefined,
       language: data.language || "",
-      status: data.status || "available",
+      status: data.status as "available" | "borrowed" | "lost" | "damaged",
       library_id: data.library_id,
       volumes: 1  // Default value
     };
@@ -575,7 +576,7 @@ export const fetchAllTickets = async () => {
       .from("tickets")
       .select(`
         *,
-        profiles (name, id),
+        profiles!inner (name, id),
         ticket_responses (count)
       `)
       .order("created_at", { ascending: false });
@@ -707,32 +708,50 @@ export const updateSocialLinks = async (links: { platform: string, url: string, 
 // Create default owner
 export const createDefaultOwner = async () => {
   try {
-    const response = await fetch(`${window.location.origin}/api/create-owner-account`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({})
+    const { data, error } = await supabase.functions.invoke('create-owner-account', {
+      body: {}
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to create owner account');
+    if (error) {
+      console.error("Error invoking create-owner-account function:", error);
+      throw new Error(error.message || 'Failed to create owner account');
     }
-
-    const result = await response.json();
     
-    if (result.exists) {
+    if (data.exists) {
       console.log("Owner account already exists");
     } else {
       toast.success("تم إنشاء حساب المالك بنجاح");
       console.log("Owner created with email: admin@admin.com and password: 123456");
     }
     
-    return result;
-  } catch (error) {
+    return data;
+  } catch (error: any) {
     console.error("Error creating default owner:", error);
     toast.error("فشل إنشاء حساب المالك: " + error.message);
+    throw error;
+  }
+};
+
+export const createOwnerAccount = async (email: string, password: string, name: string) => {
+  try {
+    // Use the edge function to create the owner account
+    const { data, error } = await supabase.functions.invoke('create-owner', {
+      body: { email, password, name },
+    });
+
+    if (error) {
+      console.error("Error creating owner account:", error);
+      throw new Error(error.message || "Failed to create owner account");
+    }
+
+    if (!data || !data.success) {
+      throw new Error(data?.error || "Failed to create owner account");
+    }
+
+    toast.success("تم إنشاء حساب المالك بنجاح");
+    return data;
+  } catch (error: any) {
+    console.error("Error creating owner account:", error);
     throw error;
   }
 };
