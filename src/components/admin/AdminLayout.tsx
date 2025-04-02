@@ -16,10 +16,10 @@ import TicketsTab from "@/components/admin/TicketsTab";
 import RolesTab from "@/components/admin/RolesTab";
 import SocialMediaTab from "@/components/admin/SocialMediaTab";
 import StatisticsTab from "@/components/admin/StatisticsTab";
+import { UserRole } from "@/components/admin/RoleTypes";
 
 // استيراد Hooks الخاصة بالتطبيق
 import { useMaintenance, useApp, useTickets } from "@/App";
-import { UserRole } from "@/components/admin/RoleTypes";
 
 interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -53,6 +53,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { maintenanceSettings, updateMaintenanceSettings } = useMaintenance();
   const { socialLinks, updateSocialLinks } = useApp();
   const { updateTicketStatus, replyToTicket } = useTickets();
+
+  // التحقق من وجود المستخدم النشط قبل محاولة عرض البيانات
+  React.useEffect(() => {
+    // يمكننا هنا استدعاء دالة createDefaultOwner إذا لزم الأمر
+    try {
+      const setupDatabase = async () => {
+        const { setupDatabase: setupDatabaseFunc } = await import("@/lib/supabase-utils");
+        await setupDatabaseFunc();
+      };
+      setupDatabase();
+    } catch (error) {
+      console.error("Error setting up database:", error);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen" dir="rtl">
@@ -93,7 +107,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <RolesTab
                 users={users}
                 updateUserRole={updateUserRole}
-                currentUserRole="owner"
+                currentUserRole={"owner" as UserRole}
               />
             </TabsContent>
 

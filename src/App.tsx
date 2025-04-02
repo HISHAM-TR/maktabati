@@ -1,4 +1,3 @@
-
 import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,6 +22,7 @@ import { Ticket } from "./components/tickets/TicketTypes";
 import { LibraryType, BookType } from "./types/LibraryTypes";
 import { UserRole } from "./components/admin/RoleTypes";
 import { fetchCurrentUser, signOut } from "./lib/supabase-utils";
+import { setupSupabaseDb } from "./integrations/supabase/setup";
 
 export type User = {
   id: string;
@@ -255,6 +255,18 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem("tickets", JSON.stringify(tickets));
   }, [tickets]);
+
+  useEffect(() => {
+    const setupDb = async () => {
+      try {
+        await setupSupabaseDb();
+      } catch (error) {
+        console.error("Failed to setup database:", error);
+      }
+    };
+    
+    setupDb();
+  }, []);
 
   const addLibrary = (library: LibraryType) => {
     setLibraries(prevLibraries => {

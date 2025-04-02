@@ -582,7 +582,8 @@ export const fetchUserTickets = async () => {
     // Fix the type error by checking if profiles is present and not an error
     return data.map(ticket => ({
       ...ticket,
-      userName: typeof ticket.profiles === 'object' && ticket.profiles ? ticket.profiles.name : 'Unknown',
+      userName: typeof ticket.profiles === 'object' && ticket.profiles ? 
+        (ticket.profiles as { name: string }).name : 'Unknown',
     }));
   } catch (error) {
     console.error('Error fetching tickets:', error);
@@ -611,7 +612,8 @@ export const fetchAllTickets = async () => {
       status: ticket.status,
       priority: ticket.priority,
       user_id: ticket.user_id,
-      userName: typeof ticket.profiles === 'object' && ticket.profiles ? ticket.profiles.name : "Unknown",
+      userName: typeof ticket.profiles === 'object' && ticket.profiles ? 
+        (ticket.profiles as { name: string }).name : "Unknown",
       responses: ticket.ticket_responses || [],
       created_at: new Date(ticket.created_at).toISOString().split('T')[0],
       updated_at: new Date(ticket.updated_at).toISOString().split('T')[0]
@@ -747,31 +749,36 @@ export const createDefaultOwner = async () => {
     return data;
   } catch (error: any) {
     console.error("Error creating default owner:", error);
-    toast.error("فشل إنشاء حساب المالك: " + error.message);
+    toast.error("فش�� إنشاء حساب المالك: " + error.message);
     throw error;
   }
 };
 
-export const createOwnerAccount = async (email: string, password: string, name: string) => {
+// Function to setup the database initially
+export const setupDatabase = async () => {
   try {
-    // Use the edge function to create the owner account
-    const { data, error } = await supabase.functions.invoke('create-owner', {
-      body: { email, password, name },
+    // First, check if tables are set up correctly
+    const { data: setupData, error: setupError } = await supabase.functions.invoke('setup-db-tables', {
+      body: {}
     });
-
-    if (error) {
-      console.error("Error creating owner account:", error);
-      throw new Error(error.message || "Failed to create owner account");
+    
+    if (setupError) {
+      console.error("Error setting up database tables:", setupError);
+      throw setupError;
     }
-
-    if (!data || !data.success) {
-      throw new Error(data?.error || "Failed to create owner account");
-    }
-
-    toast.success("تم إنشاء حساب المالك بنجاح");
-    return data;
-  } catch (error: any) {
-    console.error("Error creating owner account:", error);
+    
+    console.log("Database setup check:", setupData);
+    
+    // Then create the owner account if it doesn't exist
+    const ownerData = await createDefaultOwner();
+    
+    return {
+      success: true,
+      tables: setupData?.tables || {},
+      owner: ownerData
+    };
+  } catch (error) {
+    console.error("Error setting up database:", error);
     throw error;
   }
 };
