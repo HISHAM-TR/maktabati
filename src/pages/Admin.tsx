@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -15,6 +14,7 @@ import CreateUserDialog from "@/components/admin/CreateUserDialog";
 import TicketsTab from "@/components/admin/TicketsTab";
 import RolesTab from "@/components/admin/RolesTab";
 import SocialMediaTab from "@/components/admin/SocialMediaTab";
+import StatisticsTab from "@/components/admin/StatisticsTab";
 
 // Import context and types
 import { useMaintenance, useTickets, useApp } from "@/App";
@@ -159,7 +159,6 @@ const initialLibrariesData = [
   },
 ];
 
-// بيانات تذاكر الدعم الفني المبدئية
 const initialTickets: Ticket[] = [
   {
     id: "ticket-1",
@@ -387,12 +386,13 @@ const Admin = () => {
           <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-            <TabsList className="grid w-full grid-cols-7 mb-8">
+            <TabsList className="grid w-full grid-cols-8 mb-8">
               <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
               <TabsTrigger value="users">المستخدمون</TabsTrigger>
               <TabsTrigger value="roles">الأدوار والصلاحيات</TabsTrigger>
               <TabsTrigger value="tickets">تذاكر الدعم</TabsTrigger>
               <TabsTrigger value="libraries">المكتبات</TabsTrigger>
+              <TabsTrigger value="statistics">الإحصائيات</TabsTrigger>
               <TabsTrigger value="social">التواصل الاجتماعي</TabsTrigger>
               <TabsTrigger value="maintenance">إعدادات الصيانة</TabsTrigger>
             </TabsList>
@@ -432,6 +432,13 @@ const Admin = () => {
               <LibrariesTab
                 filteredLibraries={filteredLibraries}
                 handleLibrarySearch={handleLibrarySearch}
+              />
+            </TabsContent>
+
+            <TabsContent value="statistics">
+              <StatisticsTab 
+                users={users}
+                libraries={libraries}
               />
             </TabsContent>
 

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { createOwnerAccount } from "@/lib/supabase-utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const CreateOwnerForm = () => {
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,18 @@ const CreateOwnerForm = () => {
     setSuccess(null);
 
     try {
-      await createOwnerAccount(formData.email, formData.password, formData.name);
+      // استخدام دالة invoke لاستدعاء Edge Function مباشرة
+      const { data, error } = await supabase.functions.invoke('create-owner', {
+        body: { 
+          email: formData.email, 
+          password: formData.password, 
+          name: formData.name 
+        }
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error || "فشل إنشاء حساب المالك");
+
       setSuccess("تم إنشاء حساب المالك بنجاح!");
       toast.success("تم إنشاء حساب المالك بنجاح!");
     } catch (err: any) {
