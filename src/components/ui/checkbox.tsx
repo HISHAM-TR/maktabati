@@ -94,17 +94,8 @@ const StyledWrapper = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    transform: translate3d(0, 0, 0);
+    transform: trasnlate3d(0, 0, 0);
     pointer-events: none;
-  }
-
-  [dir="rtl"] .checkbox-wrapper-12 .cbx {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  [dir="rtl"] .checkbox-wrapper-12 {
-    direction: rtl;
   }
 
   .checkbox-wrapper-12 .cbx svg {

@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import BorrowDateField from "./BorrowDateField";
+import { CustomCheckbox } from "@/components/ui/custom-checkbox";
 
 export type BookFormData = {
   title: string;
@@ -215,8 +216,7 @@ const BookFormFields = ({
             <Label htmlFor="isRare" className="text-lg cursor-pointer mr-2">
               كتاب نادر
             </Label>
-            <input
-              type="checkbox"
+            <CustomCheckbox
               id="isRare" 
               checked={(formData as BookFormData & { isRare?: boolean }).isRare ?? false}
               onChange={(e) => {
@@ -230,8 +230,7 @@ const BookFormFields = ({
             <Label htmlFor="isReference" className="text-lg cursor-pointer mr-2">
               مرجع (غير قابل للإعارة)
             </Label>
-            <input
-              type="checkbox"
+            <CustomCheckbox
               id="isReference" 
               checked={(formData as BookFormData & { isReference?: boolean }).isReference ?? false}
               onChange={(e) => {
@@ -245,7 +244,7 @@ const BookFormFields = ({
             <Label htmlFor="needsRepair" className="text-lg cursor-pointer mr-2">
               يحتاج إلى صيانة
             </Label>
-            <input
+            <CustomCheckbox
               id="needsRepair" 
               checked={(formData as BookFormData & { needsRepair?: boolean }).needsRepair ?? false}
               onChange={(e) => {
