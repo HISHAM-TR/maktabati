@@ -30,14 +30,14 @@ const DesktopNav = ({ user }: DesktopNavProps) => {
           </NavLink>
         )}
         
-        {user?.role === "admin" && (
+        {user && (user.role === "admin" || user.role === "owner" || user.role === "moderator") && (
           <NavLink 
             to="/admin" 
             className={({ isActive }) => 
               `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
             }
           >
-            المشرف
+            لوحة المشرفين
           </NavLink>
         )}
       </div>

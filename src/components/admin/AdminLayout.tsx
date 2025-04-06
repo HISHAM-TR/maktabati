@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAdmin } from "@/contexts/AdminContext";
+// Remove unused imports
 
 // تستورد مكونات علامات التبويب المختلفة
 import DashboardTab from "@/components/admin/DashboardTab";
@@ -17,6 +18,7 @@ import RolesTab from "@/components/admin/RolesTab";
 import SocialMediaTab from "@/components/admin/SocialMediaTab";
 import StatisticsTab from "@/components/admin/StatisticsTab";
 import { UserRole } from "@/components/admin/RoleTypes";
+import { User } from "@/components/admin/types";
 
 // استيراد Hooks الخاصة بالتطبيق
 import { useMaintenance, useApp, useTickets } from "@/App";
@@ -89,7 +91,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </TabsList>
 
             <TabsContent value="dashboard">
-              <DashboardTab users={users} libraries={libraries} />
+              <DashboardTab 
+                users={users || []}
+                libraries={libraries || []}
+              />
             </TabsContent>
 
             <TabsContent value="users">
