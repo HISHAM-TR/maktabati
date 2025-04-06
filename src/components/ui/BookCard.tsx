@@ -20,6 +20,9 @@ export type BookType = {
   description?: string;
   status?: "available" | "borrowed" | "lost" | "damaged";
   borrowDate?: Date;
+  isRare?: boolean;
+  isReference?: boolean;
+  needsRepair?: boolean;
 };
 
 interface BookCardProps {
@@ -79,9 +82,12 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
         </div>
         <h3 className="text-xl font-bold mb-1 line-clamp-1 text-right">{book.title}</h3>
         <p className="text-muted-foreground mb-2 line-clamp-1 text-right">{book.author}</p>
-        <div className="flex space-x-reverse space-x-2 mb-3 justify-end">
+        <div className="flex flex-wrap space-x-reverse space-x-2 mb-3 justify-end gap-y-2">
           <Badge variant="outline">{book.category}</Badge>
           {getStatusBadge()}
+          {book.isRare && <Badge className="bg-amber-500 hover:bg-amber-600">نادر</Badge>}
+          {book.isReference && <Badge className="bg-indigo-500 hover:bg-indigo-600">مرجع</Badge>}
+          {book.needsRepair && <Badge className="bg-orange-500 hover:bg-orange-600">صيانة</Badge>}
         </div>
         <p className="text-muted-foreground text-sm line-clamp-3 text-right">
           {book.description || "لا يوجد وصف متاح"}

@@ -24,6 +24,9 @@ export type BookFormData = {
   volumes: number;
   status: "available" | "borrowed" | "lost" | "damaged";
   borrowDate: Date | null;
+  isRare: boolean;
+  isReference: boolean;
+  needsRepair: boolean;
 };
 
 interface BookFormFieldsProps {
@@ -174,22 +177,23 @@ const BookFormFields = ({
               setFormData({ ...formData, status: value })
             }
             className="grid grid-cols-2 gap-4"
+            dir="rtl"
           >
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <RadioGroupItem value="available" id="available" />
-              <Label htmlFor="available" className="text-lg cursor-pointer">متاح</Label>
+            <div className="flex items-center justify-end space-x-2 space-x-reverse">
+              <Label htmlFor="available" className="text-lg cursor-pointer order-1">متاح</Label>
+              <RadioGroupItem value="available" id="available" className="order-2" />
             </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <RadioGroupItem value="borrowed" id="borrowed" />
-              <Label htmlFor="borrowed" className="text-lg cursor-pointer">مستعار</Label>
+            <div className="flex items-center justify-end space-x-2 space-x-reverse">
+              <Label htmlFor="borrowed" className="text-lg cursor-pointer order-1">مستعار</Label>
+              <RadioGroupItem value="borrowed" id="borrowed" className="order-2" />
             </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <RadioGroupItem value="lost" id="lost" />
-              <Label htmlFor="lost" className="text-lg cursor-pointer">مفقود</Label>
+            <div className="flex items-center justify-end space-x-2 space-x-reverse">
+              <Label htmlFor="lost" className="text-lg cursor-pointer order-1">مفقود</Label>
+              <RadioGroupItem value="lost" id="lost" className="order-2" />
             </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <RadioGroupItem value="damaged" id="damaged" />
-              <Label htmlFor="damaged" className="text-lg cursor-pointer">تالف</Label>
+            <div className="flex items-center justify-end space-x-2 space-x-reverse">
+              <Label htmlFor="damaged" className="text-lg cursor-pointer order-1">تالف</Label>
+              <RadioGroupItem value="damaged" id="damaged" className="order-2" />
             </div>
           </RadioGroup>
         </div>
@@ -201,6 +205,58 @@ const BookFormFields = ({
           onDateChange={(date) => setFormData({ ...formData, borrowDate: date })}
         />
       )}
+      
+      <div className="grid grid-cols-4 items-start gap-4">
+        <Label className="text-right text-lg pt-2">
+          خيارات إضافية
+        </Label>
+        <div className="col-span-3 grid gap-3">
+          <div className="flex items-center justify-end space-x-2 space-x-reverse">
+            <Label htmlFor="isRare" className="text-lg cursor-pointer mr-2">
+              كتاب نادر
+            </Label>
+            <input
+              type="checkbox"
+              id="isRare" 
+              checked={(formData as BookFormData & { isRare?: boolean }).isRare ?? false}
+              onChange={(e) => {
+                const updatedData = { ...formData } as BookFormData & { isRare?: boolean };
+                updatedData.isRare = e.target.checked;
+                setFormData(updatedData as BookFormData);
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-end space-x-2 space-x-reverse">
+            <Label htmlFor="isReference" className="text-lg cursor-pointer mr-2">
+              مرجع (غير قابل للإعارة)
+            </Label>
+            <input
+              type="checkbox"
+              id="isReference" 
+              checked={(formData as BookFormData & { isReference?: boolean }).isReference ?? false}
+              onChange={(e) => {
+                const updatedData = { ...formData } as BookFormData & { isReference?: boolean };
+                updatedData.isReference = e.target.checked;
+                setFormData(updatedData as BookFormData);
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-end space-x-2 space-x-reverse">
+            <Label htmlFor="needsRepair" className="text-lg cursor-pointer mr-2">
+              يحتاج إلى صيانة
+            </Label>
+            <input
+              id="needsRepair" 
+              checked={(formData as BookFormData & { needsRepair?: boolean }).needsRepair ?? false}
+              onChange={(e) => {
+                const updatedData = { ...formData } as BookFormData & { needsRepair?: boolean };
+                updatedData.needsRepair = e.target.checked;
+                setFormData(updatedData as BookFormData);
+              }}
+            />
+          </div>
+        </div>
+      </div>
       
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="description" className="text-right text-lg">

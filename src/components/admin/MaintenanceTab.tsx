@@ -49,10 +49,71 @@ const MaintenanceTab = ({ settings, onSaveSettings }: MaintenanceTabProps) => {
                 عند التفعيل، سيتم توجيه جميع المستخدمين العاديين إلى صفحة الصيانة
               </p>
             </div>
-            <Switch
-              checked={maintenanceEnabled}
-              onCheckedChange={setMaintenanceEnabled}
-            />
+            <div className="flex items-center">
+              <label className="switch">
+                <input 
+                  type="checkbox" 
+                  className="ch" 
+                  checked={maintenanceEnabled}
+                  onChange={(e) => setMaintenanceEnabled(e.target.checked)}
+                />
+                <span className="slider" />
+              </label>
+              <style>{`
+                .switch {
+                  font-size: 17px;
+                  position: relative;
+                  display: inline-block;
+                  width: 3.5em;
+                  height: 1.5em;
+                }
+                .switch input {
+                  opacity: 0;
+                  width: 0;
+                  height: 0;
+                }
+                .slider {
+                  position: absolute;
+                  cursor: pointer;
+                  inset: 0;
+                  background-color: #ccc;
+                  transition: 0.4s;
+                  border-radius: 1rem 0rem 1rem;
+                }
+                .slider:before {
+                  position: absolute;
+                  content: "";
+                  height: 1.5em;
+                  width: 1.4em;
+                  left: 0em;
+                  bottom: 0em;
+                  background-color: white;
+                  transition: 0.4s;
+                  border-radius: 1rem 0rem 1rem;
+                  border: 3px solid white;
+                }
+                .ch:checked + .slider {
+                  background-color: #72eb67;
+                }
+                .ch:focus + .slider {
+                  box-shadow: 0 0 1px #2196f3;
+                }
+                .ch:checked + .slider:before {
+                  transform: translateX(2.2em);
+                  background-color: green;
+                  box-shadow: 0px 0px 40px 5px #72eb67;
+                  border: 3px solid white;
+                }
+                .ch:checked + .slider::after {
+                  content: "|";
+                  color: white;
+                  position: absolute;
+                  right: 0.3rem;
+                  top: -3.3px;
+                  transform: rotate(45deg);
+                }
+              `}</style>
+            </div>
           </div>
           
           <div className="space-y-2">

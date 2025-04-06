@@ -36,7 +36,7 @@ const EditUserDialog = ({
 }: EditUserDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="rtl:text-right ltr:text-left">
+      <DialogContent className="rtl:text-right ltr:text-left bg-background">
         <DialogHeader>
           <DialogTitle>تعديل المستخدم</DialogTitle>
           <DialogDescription>

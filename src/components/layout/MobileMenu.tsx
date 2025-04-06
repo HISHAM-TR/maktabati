@@ -58,7 +58,7 @@ const MobileMenu = ({ isOpen, user, handleLogout }: MobileMenuProps) => {
               </div>
             </NavLink>
             
-            {user.role === "admin" && (
+            {(user.role === "admin" || user.role === "owner" || user.role === "moderator") && (
               <NavLink 
                 to="/admin" 
                 className={({ isActive }) => 
@@ -67,7 +67,7 @@ const MobileMenu = ({ isOpen, user, handleLogout }: MobileMenuProps) => {
                   }`
                 }
               >
-                المشرف
+                لوحة المشرفين
               </NavLink>
             )}
             

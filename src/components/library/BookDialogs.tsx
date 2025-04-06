@@ -35,6 +35,9 @@ const defaultFormData: BookFormData = {
   volumes: 1,
   status: "available",
   borrowDate: null,
+  isRare: false,
+  isReference: false,
+  needsRepair: false,
 };
 
 const BookDialogs = forwardRef<
@@ -70,7 +73,7 @@ const BookDialogs = forwardRef<
   };
 
   // Use either the prop value or local state value
-  const actualIsAddDialogOpen = setIsAddDialogOpen ? isAddDialogOpen : localIsAddDialogOpen;
+  const actualIsAddDialogOpen = setIsAddDialogOpen !== undefined ? isAddDialogOpen : localIsAddDialogOpen;
 
   const resetFormData = () => {
     setFormData(defaultFormData);
@@ -131,6 +134,9 @@ const BookDialogs = forwardRef<
       volumes: (book as any).volumes || 1,
       status: book.status || "available",
       borrowDate: book.borrowDate || null,
+      isRare: (book as any).isRare || false,
+      isReference: (book as any).isReference || false,
+      needsRepair: (book as any).needsRepair || false,
     });
     setIsEditDialogOpen(true);
   };
@@ -241,6 +247,27 @@ const BookDialogs = forwardRef<
                     <Calendar className="h-5 w-5 text-blue-500" />
                     <span className="font-medium text-lg">تاريخ الإعارة:</span>
                     <span className="text-lg">{format(new Date(activeBook.borrowDate), "yyyy-MM-dd")}</span>
+                  </div>
+                )}
+                
+                {(activeBook as any).isRare && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <BookIcon className="h-5 w-5 text-amber-500" />
+                    <span className="font-medium text-lg">كتاب نادر</span>
+                  </div>
+                )}
+                
+                {(activeBook as any).isReference && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <BookIcon className="h-5 w-5 text-indigo-500" />
+                    <span className="font-medium text-lg">مرجع (غير قابل للإعارة)</span>
+                  </div>
+                )}
+                
+                {(activeBook as any).needsRepair && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <AlertCircle className="h-5 w-5 text-orange-500" />
+                    <span className="font-medium text-lg">يحتاج إلى صيانة</span>
                   </div>
                 )}
                 

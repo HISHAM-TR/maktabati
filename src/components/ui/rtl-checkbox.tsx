@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Checkbox = React.forwardRef<
+const RTLCheckbox = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
 >(({ className, id, ...props }, ref) => {
   // إنشاء معرف فريد إذا لم يتم توفيره
-  const uniqueId = id || `cbx-${Math.random().toString(36).substring(2, 9)}`;
+  const uniqueId = id || `rtl-cbx-${Math.random().toString(36).substring(2, 9)}`;
   
   return (
-    <StyledWrapper className={className}>
+    <StyledWrapper className={className} dir="rtl">
       <div className="checkbox-wrapper-12">
         <div className="cbx">
           <input 
@@ -37,17 +37,20 @@ const Checkbox = React.forwardRef<
   );
 });
 
-Checkbox.displayName = "Checkbox";
+RTLCheckbox.displayName = "RTLCheckbox";
 
 const StyledWrapper = styled.div`
   .checkbox-wrapper-12 {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   .checkbox-wrapper-12 > svg {
     position: absolute;
     top: -130%;
-    left: -170%;
+    right: -170%;
     width: 110px;
     pointer-events: none;
   }
@@ -56,66 +59,57 @@ const StyledWrapper = styled.div`
     box-sizing: border-box;
   }
 
-  .checkbox-wrapper-12 input[type="checkbox"] {
+  .cbx {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cbx input[type="checkbox"] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: transparent;
     cursor: pointer;
     margin: 0;
-  }
-
-  .checkbox-wrapper-12 input[type="checkbox"]:focus {
-    outline: 0;
-  }
-
-  .checkbox-wrapper-12 .cbx {
-    width: 24px;
-    height: 24px;
-    top: calc(100px - 12px);
-    left: calc(100px - 12px);
-  }
-
-  .checkbox-wrapper-12 .cbx input {
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     width: 24px;
     height: 24px;
     border: 2px solid #bfbfc0;
     border-radius: 50%;
+    background-color: transparent;
   }
 
-  .checkbox-wrapper-12 .cbx label {
+  .cbx input[type="checkbox"]:focus {
+    outline: 0;
+  }
+
+  .cbx label {
     width: 24px;
     height: 24px;
     background: none;
     border-radius: 50%;
     position: absolute;
     top: 0;
-    left: 0;
-    transform: translate3d(0, 0, 0);
+    right: 0;
+    transform: trasnlate3d(0, 0, 0);
     pointer-events: none;
   }
 
-  [dir="rtl"] .checkbox-wrapper-12 .cbx {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  [dir="rtl"] .checkbox-wrapper-12 {
-    direction: rtl;
-  }
-
-  .checkbox-wrapper-12 .cbx svg {
+  .cbx svg {
     position: absolute;
     top: 5px;
-    left: 4px;
+    right: 4px;
     z-index: 1;
     pointer-events: none;
   }
 
-  .checkbox-wrapper-12 .cbx svg path {
+  .cbx svg path {
     stroke: #fff;
     stroke-width: 3;
     stroke-linecap: round;
@@ -126,11 +120,11 @@ const StyledWrapper = styled.div`
     transition-delay: 0.2s;
   }
 
-  .checkbox-wrapper-12 .cbx input:checked + label {
+  .cbx input:checked + label {
     animation: splash-12 0.6s ease forwards;
   }
 
-  .checkbox-wrapper-12 .cbx input:checked + label + svg path {
+  .cbx input:checked + label + svg path {
     stroke-dashoffset: 0;
   }
 
@@ -181,22 +175,6 @@ const StyledWrapper = styled.div`
       box-shadow: 0 -36px 0 -10px transparent, 32px -16px 0 -10px transparent, 32px 16px 0 -10px transparent, 0 36px 0 -10px transparent, -32px 16px 0 -10px transparent, -32px -16px 0 -10px transparent;
     }
   }
-  
-  /* إضافة دعم RTL */
-  [dir="rtl"] .checkbox-wrapper-12 .cbx svg {
-    left: auto;
-    right: 4px;
-  }
-  
-  [dir="rtl"] .checkbox-wrapper-12 .cbx input {
-    left: auto;
-    right: 0;
-  }
-  
-  [dir="rtl"] .checkbox-wrapper-12 .cbx label {
-    left: auto;
-    right: 0;
-  }
 `;
 
-export { Checkbox };
+export { RTLCheckbox };
