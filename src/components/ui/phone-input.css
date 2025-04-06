@@ -1,0 +1,73 @@
+/* تخصيص مكون إدخال رقم الهاتف ليتناسب مع اللغة العربية والتصميم العام */
+
+.PhoneInput {
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  border-radius: 0.375rem;
+}
+
+.PhoneInputCountry {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.PhoneInputCountryIcon {
+  width: 1.5rem;
+  height: 1rem;
+  border-radius: 2px;
+}
+
+.PhoneInputCountrySelectArrow {
+  margin-left: 0.25rem;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-style: solid;
+  border-color: currentColor;
+  border-top-width: 0;
+  border-bottom-width: 1px;
+  border-left-width: 0;
+  border-right-width: 1px;
+  transform: rotate(45deg);
+  opacity: 0.45;
+}
+
+.PhoneInputCountrySelect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  height: 2.5rem;
+  border-radius: 0.375rem;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  background-color: transparent;
+}
+
+/* تخصيص لوضع RTL */
+[dir="rtl"] .PhoneInput {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .PhoneInputCountry {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .PhoneInputCountrySelectArrow {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}

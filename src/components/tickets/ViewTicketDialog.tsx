@@ -31,6 +31,10 @@ const ViewTicketDialog = ({
   const handleStatusChange = (status: string) => {
     setCurrentStatus(status as "open" | "in-progress" | "closed");
     updateTicketStatus(ticket.id, status as "open" | "in-progress" | "closed");
+    // Keep the dialog open after status change
+    if (status !== "closed") {
+      setIsOpen(true);
+    }
   };
 
   const handleReply = () => {
@@ -42,6 +46,9 @@ const ViewTicketDialog = ({
       if (currentStatus === "open") {
         handleStatusChange("in-progress");
       }
+      
+      // Keep the dialog open after reply
+      setIsOpen(true);
     }
   };
 
@@ -112,6 +119,15 @@ const ViewTicketDialog = ({
                   {ticket.priority === "high" ? "عالية" :
                    ticket.priority === "medium" ? "متوسطة" :
                    "منخفضة"}
+                </Badge>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-1">النوع</h4>
+                <Badge variant="outline">
+                  {ticket.type === "technical" ? "فنية" :
+                   ticket.type === "account" ? "حساب" :
+                   ticket.type === "payment" ? "دفع" : "أخرى"}
                 </Badge>
               </div>
               
@@ -194,17 +210,17 @@ const ViewTicketDialog = ({
         
         {currentStatus !== "closed" ? (
           <>
-            <div className="space-y-2">
+            <div className="space-y-2 mb-4">
               <h4 className="text-sm font-medium">الرد على التذكرة</h4>
               <Textarea
                 placeholder="اكتب ردك هنا..."
-                className="min-h-[100px]"
+                className="min-h-[100px] max-h-[200px] text-base w-full"
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
               />
             </div>
             
-            <DialogFooter className="flex-row-reverse sm:justify-start gap-2 mt-2">
+            <DialogFooter className="flex-row-reverse sm:justify-start gap-4 mt-4">
               <Button
                 variant="outline"
                 onClick={() => setIsOpen(false)}

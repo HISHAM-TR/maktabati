@@ -21,8 +21,7 @@ import { SocialMedia } from "./components/admin/SocialMediaTab";
 import { Ticket } from "./components/tickets/TicketTypes";
 import { LibraryType, BookType } from "./types/LibraryTypes";
 import { UserRole } from "./components/admin/RoleTypes";
-import { fetchCurrentUser, signOut } from "./lib/supabase-utils";
-import { setupSupabaseDb } from "./integrations/supabase/setup";
+import { fetchCurrentUser, signOut } from "./lib/local-auth-utils";
 
 export type User = {
   id: string;
@@ -259,7 +258,7 @@ const App = () => {
   useEffect(() => {
     const setupDb = async () => {
       try {
-        await setupSupabaseDb();
+        // No need for database setup with local storage
       } catch (error) {
         console.error("Failed to setup database:", error);
       }
@@ -358,7 +357,7 @@ const App = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      // Actual login is handled by supabase-utils 
+      // Login is now handled by local storage
       // Get the authenticated user after successful login
       const currentUser = await fetchCurrentUser();
       if (currentUser) {
@@ -402,7 +401,7 @@ const App = () => {
 
   const resetPassword = async (email: string) => {
     console.log("إعادة تعيين كلمة المرور لـ:", email);
-    // Implementation will be handled by Supabase
+    // Implementation will be handled by local storage
     await new Promise(resolve => setTimeout(resolve, 1000));
     return;
   };
