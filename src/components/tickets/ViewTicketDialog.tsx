@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/App";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +31,7 @@ const ViewTicketDialog = ({
   updateTicketStatus,
   replyToTicket,
 }: ViewTicketDialogProps) => {
+  const { user } = useAuth();
   const [replyMessage, setReplyMessage] = useState("");
   const [currentStatus, setCurrentStatus] = useState(ticket.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,20 +42,20 @@ const ViewTicketDialog = ({
     setCurrentStatus(ticket.status);
   }, [ticket.status]);
   
-  // التمرير التلقائي إلى قسم الرد عند فتح النافذة
+  // التمرير التلقائي إلى آخر رسالة عند فتح النافذة أو تحديث الرسائل
   useEffect(() => {
     if (isOpen) {
-      // تأخير أطول للتأكد من أن النافذة قد تم تحميلها بالكامل
+      // تأخير للتأكد من أن النافذة قد تم تحميلها بالكامل
       const timer = setTimeout(() => {
-        const replySection = document.getElementById('reply-section');
-        if (replySection) {
-          replySection.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        const responsesArea = document.getElementById('ticket-responses-area');
+        if (responsesArea) {
+          responsesArea.scrollTop = responsesArea.scrollHeight;
         }
       }, 500);
       
       return () => clearTimeout(timer);
     }
-  }, [isOpen]);
+  }, [isOpen, ticket.responses]);
 
   const handleStatusChange = (status: string) => {
     setCurrentStatus(status as "open" | "in-progress" | "closed");
@@ -67,14 +69,21 @@ const ViewTicketDialog = ({
       replyToTicket(ticket.id, replyMessage);
       setReplyMessage("");
       
-      // If the ticket is open and we're replying, automatically set to in-progress
-      if (currentStatus === "open") {
+      // If the ticket is open and we're replying as admin, automatically set to in-progress
+      if (currentStatus === "open" && ticket.userId !== user?.id) {
         handleStatusChange("in-progress");
       }
       
       // Keep the dialog open after reply
       setIsOpen(true);
-      setTimeout(() => setIsSubmitting(false), 500);
+      setTimeout(() => {
+        setIsSubmitting(false);
+        // التمرير التلقائي إلى آخر رسالة بعد الرد
+        const responsesArea = document.getElementById('ticket-responses-area');
+        if (responsesArea) {
+          responsesArea.scrollTop = responsesArea.scrollHeight;
+        }
+      }, 500);
     }
   };
 
@@ -181,21 +190,7 @@ const ViewTicketDialog = ({
           </DialogHeader>
           
           <div className="flex-1 overflow-auto p-4 relative">
-            {/* زر التمرير السريع إلى الأسفل */}
-            <motion.button
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                const replySection = document.getElementById('reply-section');
-                if (replySection) replySection.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="fixed bottom-24 left-6 rtl:left-auto rtl:right-6 z-20 bg-primary text-primary-foreground shadow-lg rounded-full p-3"
-              title="التمرير إلى قسم الرد"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </motion.button>
+            {/* تم إزالة زر التمرير السريع إلى الأسفل */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
               {/* معلومات التذكرة - الجانب */}
               <div className="col-span-1 lg:order-2">
@@ -314,20 +309,41 @@ const ViewTicketDialog = ({
                               <RefreshCw className="h-3 w-3" />
                               الحالة:
                             </div>
-                            <Select
-                              value={currentStatus}
-                              onValueChange={handleStatusChange}
-                              disabled={currentStatus === "closed"}
-                            >
-                              <SelectTrigger className="w-full h-7 text-xs">
-                                <SelectValue placeholder="الحالة" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="open">جديدة</SelectItem>
-                                <SelectItem value="in-progress">قيد المعالجة</SelectItem>
-                                <SelectItem value="closed">مغلقة</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            {ticket.userId === user?.id ? (
+                              <div className="w-full justify-center py-1 px-2 rounded-md border border-muted/50 bg-muted/10 flex items-center gap-1 text-xs">
+                                {currentStatus === "open" ? (
+                                  <>
+                                    <AlertCircle className="h-3 w-3" />
+                                    <span>جديدة</span>
+                                  </>
+                                ) : currentStatus === "in-progress" ? (
+                                  <>
+                                    <RefreshCw className="h-3 w-3" />
+                                    <span>قيد المعالجة</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-3 w-3" />
+                                    <span>مغلقة</span>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <Select
+                                value={currentStatus}
+                                onValueChange={handleStatusChange}
+                                disabled={currentStatus === "closed"}
+                              >
+                                <SelectTrigger className="w-full h-7 text-xs">
+                                  <SelectValue placeholder="الحالة" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="open">جديدة</SelectItem>
+                                  <SelectItem value="in-progress">قيد المعالجة</SelectItem>
+                                  <SelectItem value="closed">مغلقة</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -366,7 +382,7 @@ const ViewTicketDialog = ({
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-0 flex-1 overflow-hidden">
-                      <ScrollArea className="h-full max-h-[30vh] w-full p-4" id="ticket-responses-area">
+                      <ScrollArea className="h-full max-h-[40vh] w-full p-4" id="ticket-responses-area">
                         <div className="space-y-4">
                           {ticket.responses && ticket.responses.length > 0 ? (
                             ticket.responses.map((response, index) => (

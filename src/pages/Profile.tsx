@@ -7,24 +7,28 @@ import { toast } from "sonner";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CreateOwnerForm from "@/components/admin/CreateOwnerForm";
-import { useAuth } from "@/App";
+import { useAuth, useTickets } from "@/App";
 import { createDefaultOwner, fetchCurrentUser, updateUserProfile, signIn } from "@/lib/supabase-utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import { InfoIcon, Edit, User, Mail, Key, Shield, Phone, MapPin, LogOut, Save, AlertTriangle, Upload, Lock, UserCog } from "lucide-react";
+import { InfoIcon, Edit, User, Mail, Key, Shield, Phone, MapPin, LogOut, Save, AlertTriangle, Upload, Lock, UserCog, MessageSquare, Plus } from "lucide-react";
 import CountrySelect from "@/components/ui/CountrySelect";
 import PhoneInput from "@/components/ui/PhoneInput";
 import "@/components/ui/phone-input.css";
 import { E164Number } from "libphonenumber-js";
 import { Controller } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Ticket, TicketFormData } from "@/components/tickets/TicketTypes";
+import CreateTicketDialog from "@/components/tickets/CreateTicketDialog";
+import ViewTicketDialog from "@/components/tickets/ViewTicketDialog";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -38,6 +42,7 @@ const profileSchema = z.object({
 
 const Profile = () => {
   const { user, updateUserInfo, logout } = useAuth();
+  const { tickets, addTicket, updateTicketStatus, replyToTicket } = useTickets();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -46,6 +51,9 @@ const Profile = () => {
   const [emailLoading, setEmailLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [showOwnerForm, setShowOwnerForm] = useState(false);
+  const [isCreateTicketDialogOpen, setIsCreateTicketDialogOpen] = useState(false);
+  const [isViewTicketDialogOpen, setIsViewTicketDialogOpen] = useState(false);
+  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
   
   // استخدام React Hook Form للتحكم في نموذج الملف الشخصي
   const form = useForm<z.infer<typeof profileSchema>>({
@@ -172,6 +180,70 @@ const Profile = () => {
     return new Date().toLocaleDateString();
   };
 
+  // دالة لإنشاء تذكرة جديدة
+  const handleCreateTicket = (values: TicketFormData) => {
+    if (!user) {
+      toast.error("يجب تسجيل الدخول لإنشاء تذكرة دعم");
+      return;
+    }
+
+    const newTicket: Ticket = {
+      id: `ticket-${Date.now()}`,
+      subject: values.subject,
+      description: values.description,
+      status: "open",
+      priority: values.priority,
+      type: "technical", // يمكن تعديلها لاحقاً لتكون قابلة للاختيار
+      userId: user.id,
+      userName: user.name || "مستخدم",
+      userEmail: user.email,
+      createdAt: new Date().toISOString().split('T')[0],
+      updatedAt: new Date().toISOString().split('T')[0],
+      responses: []
+    };
+
+    addTicket(newTicket);
+    setIsCreateTicketDialogOpen(false);
+    toast.success("تم إنشاء تذكرة الدعم بنجاح! سنرد عليك في أقرب وقت ممكن.");
+  };
+
+  // دالة لفتح نافذة عرض التذكرة
+  const openViewTicketDialog = (ticket: Ticket) => {
+    setActiveTicket(ticket);
+    setIsViewTicketDialogOpen(true);
+  };
+
+  // دالة لعرض حالة التذكرة
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "open":
+        return <Badge variant="secondary" className="flex items-center gap-1">جديدة</Badge>;
+      case "in-progress":
+        return <Badge variant="default" className="flex items-center gap-1">قيد المعالجة</Badge>;
+      case "closed":
+        return <Badge variant="outline" className="flex items-center gap-1">مغلقة</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  // دالة لعرض أولوية التذكرة
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return <Badge variant="destructive">عالية</Badge>;
+      case "medium":
+        return <Badge variant="default">متوسطة</Badge>;
+      case "low":
+        return <Badge variant="outline">منخفضة</Badge>;
+      default:
+        return <Badge variant="outline">{priority}</Badge>;
+    }
+  };
+
+  // تصفية التذاكر الخاصة بالمستخدم الحالي
+  const userTickets = user ? tickets.filter(ticket => ticket.userId === user.id) : [];
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted/20" dir="rtl">
       <Header />
@@ -201,8 +273,8 @@ const Profile = () => {
           </motion.h1>
 
           {user && (
-            <Tabs defaultValue="account" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8 bg-background/80 p-1 rounded-lg shadow-sm border border-border">
+            <Tabs defaultValue={window.location.search.includes('tab=tickets') ? 'tickets' : 'account'} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-8 bg-background/80 p-1 rounded-lg shadow-sm border border-border">
                 <TabsTrigger value="account" className="text-base font-medium data-[state=active]:bg-muted data-[state=active]:text-primary">
                   <UserCog className="h-4 w-4 ml-2" />
                   معلومات الحساب
@@ -210,6 +282,10 @@ const Profile = () => {
                 <TabsTrigger value="security" className="text-base font-medium data-[state=active]:bg-muted data-[state=active]:text-primary">
                   <Lock className="h-4 w-4 ml-2" />
                   الأمان والخصوصية
+                </TabsTrigger>
+                <TabsTrigger value="tickets" className="text-base font-medium data-[state=active]:bg-muted data-[state=active]:text-primary">
+                  <MessageSquare className="h-4 w-4 ml-2" />
+                  تذاكر الدعم
                 </TabsTrigger>
               </TabsList>
 
@@ -479,6 +555,86 @@ const Profile = () => {
                   </Card>
                 </motion.div>
               </TabsContent>
+
+              <TabsContent value="tickets" className="space-y-6">
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="space-y-6"
+                >
+                  <Card className="shadow-lg border border-muted/30 overflow-hidden rounded-xl bg-background">
+                    <CardHeader className="bg-muted/10 border-b border-muted/20 flex flex-row justify-between items-center">
+                      <div>
+                        <CardTitle className="text-xl font-bold">تذاكر الدعم الفني</CardTitle>
+                        <CardDescription className="text-muted-foreground mt-1">يمكنك عرض تذاكرك السابقة وإنشاء تذاكر جديدة</CardDescription>
+                      </div>
+                      <Button 
+                        onClick={() => setIsCreateTicketDialogOpen(true)} 
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        إنشاء تذكرة جديدة
+                      </Button>
+                    </CardHeader>
+                    <CardContent className="p-0 overflow-x-auto">
+                      <Table className="w-full">
+                        <TableCaption>قائمة تذاكر الدعم الفني الخاصة بك</TableCaption>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-right">الموضوع</TableHead>
+                            <TableHead className="text-right">تاريخ الإنشاء</TableHead>
+                            <TableHead className="text-right">الحالة</TableHead>
+                            <TableHead className="text-right">الأولوية</TableHead>
+                            <TableHead className="text-right">الإجراءات</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {userTickets.length > 0 ? (
+                            userTickets.map((ticket) => (
+                              <TableRow key={ticket.id}>
+                                <TableCell className="font-medium text-right">
+                                  <div className="flex items-center space-x-reverse space-x-2">
+                                    <MessageSquare className="h-4 w-4 text-primary" />
+                                    <span>{ticket.subject}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="text-sm">{ticket.createdAt}</div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {ticket.updatedAt !== ticket.createdAt && `تحديث: ${ticket.updatedAt}`}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {getStatusBadge(ticket.status)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {getPriorityBadge(ticket.priority)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openViewTicketDialog(ticket)}
+                                  >
+                                    عرض التفاصيل
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          ) : (
+                            <TableRow>
+                              <TableCell colSpan={5} className="h-24 text-center">
+                                لا توجد تذاكر دعم فني حالياً
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </TabsContent>
             </Tabs>
           )}
 
@@ -491,6 +647,24 @@ const Profile = () => {
       </main>
 
       <Footer />
+
+      {/* حوار إنشاء تذكرة جديدة */}
+      <CreateTicketDialog
+        isOpen={isCreateTicketDialogOpen}
+        setIsOpen={setIsCreateTicketDialogOpen}
+        handleCreateTicket={handleCreateTicket}
+      />
+
+      {/* حوار عرض تفاصيل التذكرة */}
+      {activeTicket && (
+        <ViewTicketDialog
+          isOpen={isViewTicketDialogOpen}
+          setIsOpen={setIsViewTicketDialogOpen}
+          ticket={activeTicket}
+          updateTicketStatus={updateTicketStatus}
+          replyToTicket={replyToTicket}
+        />
+      )}
     </div>
   );
 };

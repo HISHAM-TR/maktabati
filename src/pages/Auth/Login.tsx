@@ -151,14 +151,23 @@ const Login = () => {
                       <FormItem>
                         <div className="flex items-center justify-between">
                           <FormLabel>كلمة المرور</FormLabel>
-                          <Button
-                            variant="link"
-                            className="p-0 h-auto text-sm"
-                            type="button"
-                            onClick={() => setIsForgotPasswordOpen(true)}
-                          >
-                            نسيت كلمة المرور؟
-                          </Button>
+                          <div className="flex flex-col items-end gap-1">
+                            <Button
+                              variant="link"
+                              className="p-0 h-auto text-sm"
+                              type="button"
+                              onClick={() => setIsForgotPasswordOpen(true)}
+                            >
+                              نسيت كلمة المرور؟
+                            </Button>
+                            <Button
+                              variant="link"
+                              className="p-0 h-auto text-sm"
+                              asChild
+                            >
+                              <Link to="/demo-account">استخدام حساب تجريبي</Link>
+                            </Button>
+                          </div>
                         </div>
                         <FormControl>
                           <div className="relative">

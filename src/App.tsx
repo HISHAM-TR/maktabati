@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext, useEffect } from "react";
+import React, { useState, createContext, useContext, useEffect, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,7 +15,9 @@ import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import Tickets from "./pages/Tickets";
 import Maintenance from "./pages/Maintenance";
+import DemoAccount from "./pages/Auth/DemoAccount";
 import { MaintenanceSettings } from "./components/admin/types";
 import { SocialMedia } from "./components/admin/SocialMediaTab";
 import { Ticket } from "./components/tickets/TicketTypes";
@@ -457,6 +459,7 @@ const App = () => {
                     <Routes>
                       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
                       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+                      <Route path="/demo-account" element={user ? <Navigate to="/dashboard" /> : <Suspense fallback={<div className="flex justify-center items-center h-screen">جاري التحميل...</div>}><DemoAccount /></Suspense>} />
                       <Route path="/maintenance" element={<Maintenance message={maintenanceSettings.message} />} />
                       <Route path="/terms" element={<Terms />} />
                       <Route path="/privacy" element={<Privacy />} />
@@ -470,6 +473,7 @@ const App = () => {
                       
                       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
                       <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                      <Route path="/tickets" element={<RequireAuth><Tickets /></RequireAuth>} />
                       <Route path="/library/:id" element={<RequireAuth><Library /></RequireAuth>} />
                       <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
                       

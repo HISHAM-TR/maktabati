@@ -1,7 +1,7 @@
 
 import { User as UserType } from "@/App";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Pencil } from "lucide-react";
+import { LogOut, User, Pencil, MessageSquare } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import ThemeSwitch from "@/components/ui/ThemeSwitch";
 
@@ -39,6 +39,22 @@ const MobileMenu = ({ isOpen, user, handleLogout }: MobileMenuProps) => {
               }
             >
               لوحة التحكم
+            </NavLink>
+            
+            <NavLink 
+              to="/tickets" 
+              className={({ isActive }) => 
+                `py-2 px-4 rounded-lg transition-colors ${
+                  isActive ? "bg-primary/10 text-primary" : "hover:bg-primary/5"
+                }`
+              }
+            >
+              <div className="flex items-center space-x-reverse space-x-2">
+                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                  <MessageSquare className="h-3 w-3 text-primary" />
+                </div>
+                <span>تذاكر الدعم</span>
+              </div>
             </NavLink>
             
             <NavLink 

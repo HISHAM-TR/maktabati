@@ -64,6 +64,11 @@ const Index = () => {
                         دخول إلى حسابك
                       </Button>
                     </Link>
+                    <Link to="/demo-account">
+                      <Button variant="secondary" size="lg" className="gap-2 transition-transform hover:scale-105 duration-300">
+                        استخدام حساب تجريبي
+                      </Button>
+                    </Link>
                   </>
                 )}
               </div>

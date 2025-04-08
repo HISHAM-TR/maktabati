@@ -2,6 +2,7 @@
 import { User } from "@/App";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
   user: User | null;
@@ -9,6 +10,7 @@ interface DashboardHeaderProps {
 }
 
 const DashboardHeader = ({ user, onCreateLibraryClick }: DashboardHeaderProps) => {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
       <div>
@@ -17,13 +19,15 @@ const DashboardHeader = ({ user, onCreateLibraryClick }: DashboardHeaderProps) =
           مرحبًا{user?.name ? ` ${user.name}` : ""}، قم بإدارة المكتبات والكتب الخاصة بك
         </p>
       </div>
-      <Button
-        onClick={onCreateLibraryClick}
-        className="mt-4 md:mt-0 text-base py-5 px-6"
-      >
-        <Plus className="h-5 w-5 ml-2" />
-        إنشاء مكتبة
-      </Button>
+      <div className="flex gap-3 mt-4 md:mt-0">
+        <Button
+          onClick={onCreateLibraryClick}
+          className="text-base py-5 px-6"
+        >
+          <Plus className="h-5 w-5 ml-2" />
+          إنشاء مكتبة
+        </Button>
+      </div>
     </div>
   );
 };
