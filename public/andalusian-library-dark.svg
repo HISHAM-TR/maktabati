@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <pattern id="andalusian-library-dark" patternUnits="userSpaceOnUse" width="800" height="600">
+      <rect width="800" height="600" fill="#1a1814"/>
+      <!-- أعمدة وأقواس مكتبة الأندلس -->
+      <path d="M0 100 Q 100 0, 200 100 Q 300 200, 400 100 Q 500 0, 600 100 Q 700 200, 800 100" stroke="#a08c5a" fill="none" stroke-width="2" opacity="0.3"/>
+      <path d="M0 300 Q 100 200, 200 300 Q 300 400, 400 300 Q 500 200, 600 300 Q 700 400, 800 300" stroke="#a08c5a" fill="none" stroke-width="2" opacity="0.3"/>
+      <path d="M0 500 Q 100 400, 200 500 Q 300 600, 400 500 Q 500 400, 600 500 Q 700 600, 800 500" stroke="#a08c5a" fill="none" stroke-width="2" opacity="0.3"/>
+      
+      <!-- رفوف الكتب -->
+      <rect x="50" y="150" width="700" height="2" fill="#a08c5a" opacity="0.4"/>
+      <rect x="50" y="250" width="700" height="2" fill="#a08c5a" opacity="0.4"/>
+      <rect x="50" y="350" width="700" height="2" fill="#a08c5a" opacity="0.4"/>
+      <rect x="50" y="450" width="700" height="2" fill="#a08c5a" opacity="0.4"/>
+      <rect x="50" y="550" width="700" height="2" fill="#a08c5a" opacity="0.4"/>
+      
+      <!-- أعمدة عمودية -->
+      <rect x="100" y="100" width="2" height="450" fill="#a08c5a" opacity="0.3"/>
+      <rect x="300" y="100" width="2" height="450" fill="#a08c5a" opacity="0.3"/>
+      <rect x="500" y="100" width="2" height="450" fill="#a08c5a" opacity="0.3"/>
+      <rect x="700" y="100" width="2" height="450" fill="#a08c5a" opacity="0.3"/>
+      
+      <!-- زخارف إسلامية -->
+      <circle cx="100" cy="100" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="300" cy="100" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="500" cy="100" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="700" cy="100" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      
+      <circle cx="200" cy="200" r="15" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="400" cy="200" r="15" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="600" cy="200" r="15" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      
+      <circle cx="100" cy="300" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="300" cy="300" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="500" cy="300" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="700" cy="300" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      
+      <circle cx="200" cy="400" r="15" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="400" cy="400" r="15" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="600" cy="400" r="15" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      
+      <circle cx="100" cy="500" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="300" cy="500" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="500" cy="500" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      <circle cx="700" cy="500" r="20" fill="none" stroke="#a08c5a" stroke-width="1" opacity="0.2"/>
+      
+      <!-- كتب على الرفوف (مجرد مستطيلات) -->
+      <rect x="110" y="120" width="10" height="30" fill="#a08c5a" opacity="0.4"/>
+      <rect x="125" y="125" width="15" height="25" fill="#c0a978" opacity="0.4"/>
+      <rect x="145" y="115" width="12" height="35" fill="#a08c5a" opacity="0.4"/>
+      <rect x="160" y="120" width="20" height="30" fill="#c0a978" opacity="0.4"/>
+      <rect x="185" y="125" width="8" height="25" fill="#a08c5a" opacity="0.4"/>
+      
+      <rect x="310" y="120" width="10" height="30" fill="#a08c5a" opacity="0.4"/>
+      <rect x="325" y="125" width="15" height="25" fill="#c0a978" opacity="0.4"/>
+      <rect x="345" y="115" width="12" height="35" fill="#a08c5a" opacity="0.4"/>
+      <rect x="360" y="120" width="20" height="30" fill="#c0a978" opacity="0.4"/>
+      <rect x="385" y="125" width="8" height="25" fill="#a08c5a" opacity="0.4"/>
+      
+      <rect x="510" y="120" width="10" height="30" fill="#a08c5a" opacity="0.4"/>
+      <rect x="525" y="125" width="15" height="25" fill="#c0a978" opacity="0.4"/>
+      <rect x="545" y="115" width="12" height="35" fill="#a08c5a" opacity="0.4"/>
+      <rect x="560" y="120" width="20" height="30" fill="#c0a978" opacity="0.4"/>
+      <rect x="585" y="125" width="8" height="25" fill="#a08c5a" opacity="0.4"/>
+      
+      <rect x="110" y="220" width="10" height="30" fill="#a08c5a" opacity="0.4"/>
+      <rect x="125" y="225" width="15" height="25" fill="#c0a978" opacity="0.4"/>
+      <rect x="145" y="215" width="12" height="35" fill="#a08c5a" opacity="0.4"/>
+      <rect x="160" y="220" width="20" height="30" fill="#c0a978" opacity="0.4"/>
+      <rect x="185" y="225" width="8" height="25" fill="#a08c5a" opacity="0.4"/>
+    </pattern>
+  </defs>
+  
+  <rect width="800" height="600" fill="url(#andalusian-library-dark)"/>
+</svg>

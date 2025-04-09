@@ -74,8 +74,7 @@ const ViewTicketDialog = ({
         handleStatusChange("in-progress");
       }
       
-      // Keep the dialog open after reply
-      setIsOpen(true);
+      // Keep the dialog open after reply - إبقاء النافذة مفتوحة بعد الرد
       setTimeout(() => {
         setIsSubmitting(false);
         // التمرير التلقائي إلى آخر رسالة بعد الرد
@@ -141,7 +140,7 @@ const ViewTicketDialog = ({
       setShowConfirmClose(false);
       setIsOpen(open);
     }}>
-      <DialogContent className="rtl:text-right ltr:text-left max-w-full max-h-[90vh] flex flex-col overflow-hidden rounded-xl shadow-lg border-0 p-0 relative fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-50 w-[95%] sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[65%] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
+      <DialogContent dir="rtl" className="rtl:text-right ltr:text-left max-w-full max-h-[90vh] flex flex-col overflow-hidden rounded-2xl shadow-xl border-0 p-0 relative fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-50 w-[95%] sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[65%] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 bg-gradient-to-b from-background to-muted/20">
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -149,18 +148,18 @@ const ViewTicketDialog = ({
           className="flex flex-col h-full"
         >
           {/* رأس التذكرة */}
-          <DialogHeader className="p-6 border-b bg-muted/30 sticky top-0 z-10">
+          <DialogHeader className="p-6 border-b bg-gradient-to-r from-muted/40 to-muted/10 sticky top-0 z-10 shadow-sm">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <DialogTitle className="flex items-center gap-3">
                 <motion.div 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={cn("p-2 rounded-full", getStatusColor(currentStatus))}
+                  className={cn("p-3 rounded-full shadow-md", getStatusColor(currentStatus))}
                 >
                   {getStatusIcon(currentStatus)}
                 </motion.div>
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold">تذكرة #{ticket.id.slice(0, 6)}</span>
+                  <span className="text-2xl font-bold">تذكرة #{ticket.id.slice(0, 6)}</span>
                   <span className="text-sm text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" /> {ticket.createdAt}
                   </span>
@@ -176,7 +175,7 @@ const ViewTicketDialog = ({
                     currentStatus === "in-progress" ? "default" :
                     "outline"
                   }
-                  className="px-3 py-1.5 text-sm rounded-full"
+                  className="px-4 py-2 text-sm rounded-full shadow-sm font-medium"
                 >
                   {currentStatus === "open" ? "جديدة" :
                   currentStatus === "in-progress" ? "قيد المعالجة" :
@@ -184,25 +183,24 @@ const ViewTicketDialog = ({
                 </Badge>
               </motion.div>
             </div>
-            <DialogDescription className="mt-3 text-lg font-semibold">
+            <DialogDescription className="mt-4 text-xl font-semibold bg-muted/20 p-3 rounded-lg border border-muted/30 shadow-sm">
               {ticket.subject}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex-1 overflow-auto p-4 relative">
-            {/* تم إزالة زر التمرير السريع إلى الأسفل */}
+          <div className="flex-1 overflow-auto p-4 md:p-6 relative">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
               {/* معلومات التذكرة - الجانب */}
-              <div className="col-span-1 lg:order-2">
+              <div className="col-span-1 lg:order-2 sticky top-0 lg:top-6 self-start" dir="rtl">
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.1 }}
                 >
-                  <Card className="shadow-sm h-full overflow-hidden border border-muted/50">
-                    <CardHeader className="bg-muted/20 p-2 space-y-0">
-                      <CardTitle className="text-sm font-medium flex items-center gap-1">
-                        <Info className="h-3 w-3" />
+                  <Card className="shadow-md h-full overflow-hidden border border-primary/20 rounded-xl">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-muted/10 p-3 space-y-0">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Info className="h-4 w-4" />
                         معلومات التذكرة
                       </CardTitle>
                     </CardHeader>
@@ -361,47 +359,62 @@ const ViewTicketDialog = ({
                   className="space-y-6 flex-1 overflow-hidden flex flex-col"
                 >
                   <Card className="border border-muted/50 shadow-sm overflow-hidden">
-                    <CardHeader className="bg-muted/20 p-4 space-y-0">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-muted/10 p-4 space-y-0">
                       <CardTitle className="text-base font-medium flex items-center gap-2">
                         <MessageSquare className="h-4 w-4" />
                         تفاصيل المشكلة
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-4">
-                      <div className="bg-muted/10 p-4 rounded-lg whitespace-pre-wrap border border-muted/30">
+                      <div className="bg-gradient-to-br from-muted/20 to-muted/5 p-5 rounded-xl whitespace-pre-wrap border border-muted/30 shadow-inner text-base">
                         {ticket.description}
                       </div>
                     </CardContent>
                   </Card>
                   
                   <Card className="border border-muted/50 shadow-sm flex-1 overflow-hidden flex flex-col">
-                    <CardHeader className="bg-muted/20 p-4 space-y-0">
+                    <CardHeader className="bg-gradient-to-r from-primary/10 to-muted/10 p-4 space-y-0">
                       <CardTitle className="text-base font-medium flex items-center gap-2">
                         <MessageSquare className="h-4 w-4" />
                         المحادثة
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="p-0 flex-1 overflow-hidden">
-                      <ScrollArea className="h-full max-h-[40vh] w-full p-4" id="ticket-responses-area">
+                    <CardContent className="p-0 flex-1 overflow-hidden flex flex-col">
+                      <ScrollArea className="flex-1 w-full p-4 max-h-[350px]" id="ticket-responses-area">
                         <div className="space-y-4">
                           {ticket.responses && ticket.responses.length > 0 ? (
-                            ticket.responses.map((response, index) => (
+                            // تجميع الرسائل حسب المرسل (المستخدم أو الدعم الفني)
+                            ticket.responses.reduce((groups, response, index) => {
+                              const lastGroup = groups[groups.length - 1];
+                              
+                              // إذا كانت المجموعة الأخيرة من نفس نوع المرسل، أضف الرسالة إليها
+                              if (lastGroup && lastGroup.isAdmin === response.isAdmin) {
+                                lastGroup.messages.push(response);
+                              } else {
+                                // إنشاء مجموعة جديدة
+                                groups.push({
+                                  isAdmin: response.isAdmin,
+                                  messages: [response]
+                                });
+                              }
+                              return groups;
+                            }, [] as {isAdmin: boolean, messages: typeof ticket.responses}[]).map((group, groupIndex) => (
                               <motion.div 
-                                key={response.id}
+                                key={groupIndex}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.3, delay: index * 0.1 }}
-                                className={`flex ${response.isAdmin ? "justify-start" : "justify-end"}`}
+                                transition={{ duration: 0.3, delay: groupIndex * 0.1 }}
+                                className={`flex ${group.isAdmin ? "justify-start" : "justify-end"}`}
                               >
                                 <div 
-                                  className={`max-w-[85%] rounded-lg p-4 shadow-sm ${
-                                    response.isAdmin 
-                                      ? "bg-primary/10 border border-primary/20 text-primary-foreground" 
-                                      : "bg-muted/30 border border-muted/50"
+                                  className={`max-w-[85%] rounded-xl p-4 shadow-md ${
+                                    group.isAdmin 
+                                      ? "bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 text-primary-foreground" 
+                                      : "bg-gradient-to-br from-muted/40 to-muted/20 border border-muted/50"
                                   }`}
                                 >
                                   <div className="flex items-center gap-2 mb-2">
-                                    {response.isAdmin ? (
+                                    {group.isAdmin ? (
                                       <div className="flex items-center gap-2">
                                         <Avatar className="h-6 w-6">
                                           <AvatarFallback className="bg-primary text-primary-foreground text-xs">
@@ -414,16 +427,25 @@ const ViewTicketDialog = ({
                                       <div className="flex items-center gap-2">
                                         <Avatar className="h-6 w-6">
                                           <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                                            {response.userName.charAt(0)}
+                                            {group.messages[0].userName.charAt(0)}
                                           </AvatarFallback>
                                         </Avatar>
-                                        <span className="font-medium text-sm">{response.userName}</span>
+                                        <span className="font-medium text-sm">{group.messages[0].userName}</span>
                                       </div>
                                     )}
-                                    <span className="text-xs opacity-70 mr-auto">{response.createdAt}</span>
+                                    <span className="text-xs opacity-70 mr-auto">{group.messages[0].createdAt}</span>
                                   </div>
-                                  <div className="whitespace-pre-wrap text-sm">
-                                    {response.message}
+                                  <div className="space-y-2">
+                                    {group.messages.map((message, msgIndex) => (
+                                      <div key={message.id} className="whitespace-pre-wrap text-sm border-b last:border-0 pb-2 last:pb-0 border-muted/20">
+                                        {message.message}
+                                        {msgIndex < group.messages.length - 1 && (
+                                          <div className="text-xs text-muted-foreground mt-1 text-left">
+                                            {message.createdAt}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
                               </motion.div>
@@ -441,6 +463,91 @@ const ViewTicketDialog = ({
                           )}
                         </div>
                       </ScrollArea>
+                      
+                      {/* صندوق الرد - تم تحسينه ليكون أكثر وضوحاً وبروزاً */}
+                      {currentStatus !== "closed" && (
+                        <motion.div
+                          id="reply-section"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.2 }}
+                          className="p-5 bg-gradient-to-b from-background to-muted/20 border-t border-primary/20 shadow-inner"
+                        >
+                          <div className="space-y-3">
+                            <h4 className="text-base font-medium flex items-center gap-2 text-primary">
+                              <MessageSquare className="h-5 w-5" />
+                              <span className="animate-pulse">الرد على التذكرة</span>
+                            </h4>
+                            <div className="relative group">
+                              <Textarea
+                                placeholder="اكتب ردك هنا..."
+                                className="min-h-[80px] text-base w-full resize-none focus-visible:ring-primary focus-visible:ring-offset-2 transition-all duration-300 border-primary/30 rounded-xl shadow-sm group-hover:border-primary/50 p-4"
+                                value={replyMessage}
+                                onChange={(e) => setReplyMessage(e.target.value)}
+                              />
+                              <div className="absolute bottom-3 left-3 opacity-70 text-xs">
+                                {replyMessage.length > 0 ? `${replyMessage.length} حرف` : ""}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-wrap justify-between items-center gap-3 mt-4">
+                            <div className="flex items-center gap-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => setShowConfirmClose(true)}
+                                        className="flex items-center gap-2 rounded-full px-4 shadow-sm"
+                                      >
+                                        <XCircle className="h-4 w-4" />
+                                        إغلاق التذكرة
+                                      </Button>
+                                    </motion.div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>إغلاق التذكرة نهائياً</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setIsOpen(false)}
+                                  className="rounded-full px-4 shadow-sm"
+                                >
+                                  إغلاق النافذة
+                                </Button>
+                              </motion.div>
+                              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Button 
+                                  onClick={handleReply}
+                                  disabled={!replyMessage.trim() || isSubmitting}
+                                  className="flex items-center gap-2 min-w-[140px] rounded-full px-5 py-6 bg-primary hover:bg-primary/90 shadow-md transition-all duration-300 text-base font-medium"
+                                >
+                                  {isSubmitting ? (
+                                    <>
+                                      <RefreshCw className="h-5 w-5 animate-spin" />
+                                      جاري الإرسال...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Send className="h-5 w-5" />
+                                      إرسال الرد
+                                    </>
+                                  )}
+                                </Button>
+                              </motion.div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -449,102 +556,7 @@ const ViewTicketDialog = ({
           </div>
           
           <Separator className="my-0" />
-          
-          {currentStatus !== "closed" ? (
-            <motion.div
-              id="reply-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-              className="p-4 bg-muted/10 border-t sticky bottom-0 z-10"
-            >
-              <div className="space-y-3 mb-4">
-                <h4 className="text-sm font-medium flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  الرد على التذكرة
-                </h4>
-                <Textarea
-                  placeholder="اكتب ردك هنا..."
-                  className="min-h-[80px] text-base w-full resize-none focus-visible:ring-primary focus-visible:ring-offset-1 transition-all duration-200 border-muted/50"
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                />
-              </div>
-              
-              <DialogFooter className="flex flex-wrap justify-between items-center gap-2 mt-3 pt-0 border-t-0">
-                <div className="flex items-center gap-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setShowConfirmClose(true)}
-                            className="flex items-center gap-2 rounded-full px-4"
-                          >
-                            <XCircle className="h-4 w-4" />
-                            إغلاق التذكرة
-                          </Button>
-                        </motion.div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>إغلاق التذكرة نهائياً</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsOpen(false)}
-                      className="rounded-full px-4"
-                    >
-                      إلغاء
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                    <Button 
-                      onClick={handleReply}
-                      disabled={!replyMessage.trim() || isSubmitting}
-                      className="flex items-center gap-2 min-w-[120px] rounded-full px-4"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <RefreshCw className="h-4 w-4 animate-spin" />
-                          جاري الإرسال...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="h-4 w-4" />
-                          إرسال الرد
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                </div>
-              </DialogFooter>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="p-6 border-t flex justify-end"
-            >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsOpen(false)}
-                  className="min-w-[100px] rounded-full"
-                >
-                  إغلاق
-                </Button>
-              </motion.div>
-            </motion.div>
-          )}
+        
         </motion.div>
         
         {/* نافذة تأكيد إغلاق التذكرة */}

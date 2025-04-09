@@ -16,6 +16,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import Tickets from "./pages/Tickets";
+import TicketDetails from "./pages/TicketDetails";
 import Maintenance from "./pages/Maintenance";
 import DemoAccount from "./pages/Auth/DemoAccount";
 import { MaintenanceSettings } from "./components/admin/types";
@@ -336,13 +337,15 @@ const App = () => {
       prevTickets.map(ticket => {
         if (ticket.id === ticketId) {
           const now = new Date().toISOString().split('T')[0];
+          // تحديد ما إذا كان الرد من المستخدم أو من فريق الدعم
+          const isUserReply = user && user.id === ticket.userId;
           const newResponse = {
             id: `response-${Date.now()}`,
             ticketId,
             message,
-            userId: "admin",
-            userName: "فريق الدعم",
-            isAdmin: true,
+            userId: isUserReply ? user!.id : "admin",
+            userName: isUserReply ? user!.name : "فريق الدعم",
+            isAdmin: !isUserReply,
             createdAt: now
           };
           
@@ -474,6 +477,7 @@ const App = () => {
                       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
                       <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                       <Route path="/tickets" element={<RequireAuth><Tickets /></RequireAuth>} />
+                      <Route path="/tickets/:ticketId" element={<RequireAuth><Suspense fallback={<div className="flex justify-center items-center h-screen">جاري التحميل...</div>}><TicketDetails /></Suspense></RequireAuth>} />
                       <Route path="/library/:id" element={<RequireAuth><Library /></RequireAuth>} />
                       <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
                       

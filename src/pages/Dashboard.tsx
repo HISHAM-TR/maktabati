@@ -149,7 +149,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen bg-[#f8f4e8] dark:bg-[#1a1814]" dir="rtl">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">
