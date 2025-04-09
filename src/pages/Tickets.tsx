@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth, useTickets } from "@/App";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -21,12 +22,15 @@ const Tickets = () => {
   }, []);
 
   const [isCreateTicketDialogOpen, setIsCreateTicketDialogOpen] = useState(false);
-  const [isViewTicketDialogOpen, setIsViewTicketDialogOpen] = useState(false);
-  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
+  // تم إزالة حالة النافذة المنبثقة لأننا سنستخدم صفحة منفصلة لعرض التفاصيل
 
   const handleCreateTicket = (values: TicketFormData) => {
     if (!user) {
-      toast.error("يجب تسجيل الدخول لإنشاء تذكرة دعم");
+      toast({
+        variant: "destructive",
+        title: "خطأ",
+        description: "يجب تسجيل الدخول لإنشاء تذكرة دعم"
+      });
       return;
     }
     
@@ -47,12 +51,16 @@ const Tickets = () => {
     
     addTicket(newTicket);
     setIsCreateTicketDialogOpen(false);
-    toast.success("تم إنشاء تذكرة الدعم بنجاح! سنرد عليك في أقرب وقت ممكن.");
+    toast({
+      title: "تم إنشاء تذكرة الدعم بنجاح!",
+      description: "سنرد عليك في أقرب وقت ممكن."
+    });
   };
 
-  const openViewTicketDialog = (ticket: Ticket) => {
-    setActiveTicket(ticket);
-    setIsViewTicketDialogOpen(true);
+  const navigate = useNavigate();
+
+  const navigateToTicketDetails = (ticket: Ticket) => {
+    navigate(`/tickets/${ticket.id}`);
   };
 
   const getStatusBadge = (status: string) => {
@@ -151,7 +159,7 @@ const Tickets = () => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => openViewTicketDialog(ticket)}
+                                onClick={() => navigateToTicketDetails(ticket)}
                               >
                                 عرض التفاصيل
                               </Button>
@@ -202,15 +210,7 @@ const Tickets = () => {
         handleCreateTicket={handleCreateTicket}
       />
 
-      {activeTicket && (
-        <ViewTicketDialog
-          isOpen={isViewTicketDialogOpen}
-          setIsOpen={setIsViewTicketDialogOpen}
-          ticket={activeTicket}
-          updateTicketStatus={updateTicketStatus}
-          replyToTicket={replyToTicket}
-        />
-      )}
+      {/* تم إزالة ViewTicketDialog واستبداله بصفحة منفصلة */}
     </div>
   );
 };

@@ -25,7 +25,7 @@ const DashboardHeader = ({ user, onCreateLibraryClick }: DashboardHeaderProps) =
           className="text-base py-5 px-6"
         >
           <Plus className="h-5 w-5 ml-2" />
-          إنشاء مكتبة
+          إنشاء تصنيف
         </Button>
       </div>
     </div>

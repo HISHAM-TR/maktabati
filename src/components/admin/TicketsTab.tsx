@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MessageSquare, AlertCircle, Filter, CheckCircle, Clock } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -17,13 +18,13 @@ interface TicketsTabProps {
 }
 
 const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabProps) => {
+  const navigate = useNavigate();
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>(tickets);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
+  // تم إزالة حالة النافذة المنبثقة لأننا سنستخدم صفحة منفصلة لعرض التفاصيل
 
   const applyFilters = () => {
     let filtered = [...tickets];
@@ -73,9 +74,8 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
     setTimeout(applyFilters, 0);
   };
 
-  const openViewTicketDialog = (ticket: Ticket) => {
-    setActiveTicket(ticket);
-    setIsViewDialogOpen(true);
+  const navigateToTicketDetails = (ticket: Ticket) => {
+    navigate(`/tickets/${ticket.id}`);
   };
 
   const getStatusBadge = (status: string) => {
@@ -233,7 +233,7 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => openViewTicketDialog(ticket)}
+                          onClick={() => navigateToTicketDetails(ticket)}
                         >
                           عرض وإجابة
                         </Button>
@@ -262,15 +262,7 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
         </CardContent>
       </Card>
 
-      {activeTicket && (
-        <ViewTicketDialog
-          isOpen={isViewDialogOpen}
-          setIsOpen={setIsViewDialogOpen}
-          ticket={activeTicket}
-          updateTicketStatus={updateTicketStatus}
-          replyToTicket={replyToTicket}
-        />
-      )}
+      {/* تم إزالة ViewTicketDialog واستبداله بصفحة منفصلة */}
     </div>
   );
 };
