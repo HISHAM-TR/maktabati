@@ -37,7 +37,7 @@ const LibraryCard = ({
 
   return (
     <Card 
-      className={`card-hover overflow-hidden ${
+      className={`card-hover overflow-hidden andalusian-card ${
         isHovered ? "shadow-md" : "shadow-sm"
       }`}
       onMouseEnter={() => setIsHovered(true)}
@@ -47,7 +47,7 @@ const LibraryCard = ({
       <CardHeader className="pb-2 relative text-right">
         <CardActions id={id} onEdit={onEdit} onDelete={onDelete} position="left" />
         <CardIcon />
-        <CardTitle className="text-xl font-cairo">{name}</CardTitle>
+        <CardTitle className="text-xl font-cairo andalusian-title">{name}</CardTitle>
         <CardDescription className="line-clamp-2 text-right">{description}</CardDescription>
       </CardHeader>
       
@@ -55,9 +55,9 @@ const LibraryCard = ({
         <CardStats bookCount={bookCount} volumeCount={volumeCount} />
       </CardContent>
       
-      <CardFooter>
+      <CardFooter className="border-t border-andalusian-border">
         <Link to={`/library/${id}`} className="w-full">
-          <Button variant="outline" className="w-full font-cairo">
+          <Button variant="secondary" className="w-full font-cairo andalusian-button">
             عرض المكتبة
           </Button>
         </Link>

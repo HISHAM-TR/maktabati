@@ -1,0 +1,179 @@
+:root {
+  /* Colors - تصميم أندلسي */
+  --primary: #9c6b4e; /* بني أندلسي أكثر حيوية */
+  --secondary: #f3d04e; /* ذهبي أندلسي مشرق */
+  --accent: #4a8fc5; /* أزرق أندلسي أكثر إشراقاً */
+  --background: #f9f6f0; /* خلفية دافئة */
+  --foreground: #1d1f2c;
+  --muted: #94a3b8;
+  --border: #e0c28a; /* ذهبي فاتح للحدود أكثر دفئاً */
+  
+  /* Typography */
+  --font-arabic: 'Amiri', 'Noto Naskh Arabic', serif;
+  --font-base: 1rem;
+  --heading-1: 2.5rem;
+  
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(61, 126, 174, 0.1);
+  --shadow-md: 0 4px 12px rgba(61, 126, 174, 0.15);
+  --shadow-lg: 0 8px 20px rgba(61, 126, 174, 0.2);
+  
+  /* Transitions */
+  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Borders */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.5rem;
+}
+
+.dark {
+  --primary: #b68468; /* بني أندلسي أفتح للوضع المظلم */
+  --secondary: #f7dc6f; /* ذهبي أندلسي أفتح للوضع المظلم */
+  --accent: #5fa0d8; /* أزرق أندلسي أفتح للوضع المظلم */
+  --background: #1d1f2c;
+  --foreground: #f8fafc;
+  --muted: #64748b;
+  --border: #c9b078; /* ذهبي داكن للحدود في الوضع المظلم */
+}
+
+/* تأثيرات الحركة - Animation Effects */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Islamic decorative elements - عناصر زخرفية إسلامية */
+.islamic-border {
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
+  position: relative;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+}
+
+.islamic-border::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--secondary);
+  border-radius: calc(var(--radius-md) + 4px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.islamic-border::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/islamic-pattern-light.svg');
+  background-size: 200px;
+  background-repeat: repeat;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark .islamic-border::after {
+  background-image: url('/islamic-pattern.svg');
+  opacity: 0.05;
+}
+
+/* Andalusian decorative header - رأس زخرفي أندلسي */
+.andalusian-header {
+  position: relative;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.andalusian-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  border-radius: 3px;
+}
+
+/* Andalusian card - بطاقة أندلسية */
+.andalusian-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.andalusian-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+
+.andalusian-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Andalusian button - زر أندلسي */
+.andalusian-button {
+  background: linear-gradient(135deg, var(--primary), var(--accent) 180%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 2px 10px rgba(74, 143, 197, 0.2);
+}
+
+.andalusian-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+  z-index: -1;
+}
+
+.andalusian-button:hover::before {
+  left: 100%;
+}
+
+.andalusian-button:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}

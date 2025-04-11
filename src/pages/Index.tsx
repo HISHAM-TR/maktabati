@@ -31,7 +31,7 @@ const Index = () => {
       {/* الصفحة الرئيسية */}
       <main className="flex-1">
         {/* قسم الترحيب */}
-        <section className="relative py-20 overflow-hidden bg-[url('/andalusian-library.svg')] bg-repeat bg-opacity-10 dark:bg-[url('/andalusian-library-dark.svg')]">
+        <section className="relative py-20 overflow-hidden bg-andalusian-library home-hero-section">
           <div className="container mx-auto px-4 relative z-10">
             <motion.div 
               initial={{ opacity: 0 }}
@@ -110,7 +110,7 @@ const Index = () => {
         
         {/* قسم المميزات */}
         <section className="py-16 bg-[#e8dfc1]/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/andalusian-library.svg')] bg-repeat opacity-5 dark:bg-[url('/andalusian-library-dark.svg')]"></div>
+          <div className="absolute inset-0 bg-andalusian-library opacity-5"></div>
           <div className="container mx-auto px-4 relative z-10">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -302,7 +302,7 @@ const Index = () => {
         
         {/* قسم الاتصال */}
         <section className="py-16 bg-[#e8dfc1]/70 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/andalusian-library.svg')] bg-repeat opacity-10 dark:bg-[url('/andalusian-library-dark.svg')]"></div>
+          <div className="absolute inset-0 bg-andalusian-library opacity-10"></div>
           <div className="absolute top-0 left-0 w-full h-20 bg-[url('/islamic-arch.svg')] bg-repeat-x bg-top opacity-20"></div>
           <div className="absolute bottom-0 left-0 w-full h-20 bg-[url('/islamic-arch.svg')] bg-repeat-x bg-bottom opacity-20 transform rotate-180"></div>
           
