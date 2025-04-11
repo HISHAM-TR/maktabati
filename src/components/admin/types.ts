@@ -8,6 +8,7 @@ export interface User {
   lastLogin: string;
   libraryCount: number;
   role?: "owner" | "admin" | "moderator" | "user";
+  phone?: string; // ✅ أضف هذا السطر لحل المشكلة
 }
 
 export interface Library {
