@@ -2,87 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('./styles/andalusian-theme.css');
-
-@layer base {
-  html {
-    font-family: var(--font-arabic), system-ui, sans-serif;
-    background-color: var(--background);
-    color: var(--foreground);
-  }
-  
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--spacing-md);
-    box-shadow: var(--shadow-md);
-  }
-}
-
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&display=swap');
 
 @layer base {
   :root {
-    --background: 40 30% 96%;
-    --foreground: 30 25% 18%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 30 25% 18%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 25% 18%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 210 70% 46%; /* أزرق أندلسي */
-    --primary-foreground: 40 30% 96%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 45 84% 55%; /* ذهبي أندلسي */
-    --secondary-foreground: 30 25% 18%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 40 30% 92%;
-    --muted-foreground: 30 15% 40%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 45 70% 50%; /* ذهبي أندلسي دافئ */
-    --accent-foreground: 30 25% 18%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 40 30% 96%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 39 50% 67%; /* ذهبي فاتح للحدود */
-    --input: 40 30% 92%;
-    --ring: 210 70% 46%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 84% 70%;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 20 15% 10%;
-    --foreground: 40 30% 96%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
     
-    --card: 20 15% 12%;
-    --card-foreground: 40 30% 96%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
     
-    --popover: 20 15% 12%;
-    --popover-foreground: 40 30% 96%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
     
-    --primary: 210 60% 53%; /* أزرق أندلسي أفتح للوضع المظلم */
-    --primary-foreground: 40 30% 96%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 98%;
     
-    --secondary: 45 80% 70%; /* ذهبي أندلسي أفتح للوضع المظلم */
-    --secondary-foreground: 20 15% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
     
-    --muted: 20 15% 18%;
-    --muted-foreground: 40 20% 80%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
     
-    --accent: 20 30% 53%; /* بني أندلسي أفتح للوضع المظلم */
-    --accent-foreground: 40 30% 96%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
     
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 40 30% 96%;
+    --destructive-foreground: 0 0% 98%;
     
-    --border: 39 40% 40%; /* ذهبي داكن للحدود في الوضع المظلم */
-    --input: 20 15% 18%;
-    --ring: 210 60% 53%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 
   * {
@@ -164,226 +146,6 @@
 
   .btn-secondary {
     @apply bg-secondary text-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2;
-  }
-  
-  /* تجاوز نمط الزر outline عندما يستخدم مع فئة andalusian-button */
-  .andalusian-button.outline,
-  button[class*="outline"].andalusian-button {
-    background-color: var(--secondary);
-    color: var(--secondary-foreground);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .btn-danger {
-    @apply bg-destructive text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-destructive/90 focus:outline-none focus:ring-2 focus:ring-destructive/50 focus:ring-offset-2;
-  }
-
-  .hamburger {
-    cursor: pointer;
-  }
-
-  .hamburger input {
-    @apply hidden;
-  }
-
-  .hamburger svg {
-    height: 1.5rem;
-    width: 1.5rem;
-    transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .hamburger input:checked + svg {
-    transform: rotate(-45deg);
-  }
-
-  .line {
-    fill: none;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 3;
-    transition: stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
-                stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .line-top-bottom {
-    stroke-dasharray: 12 63;
-  }
-
-  .line-top-bottom.checked,
-  .hamburger input:checked + svg .line-top-bottom {
-    stroke-dasharray: 20 300;
-    stroke-dashoffset: -32.42;
-  }
-
-  .hamburger-menu {
-    display: inline-block;
-  }
-
-  /* Cairo font utility classes for different weights */
-  .cairo-light {
-    font-family: "Cairo", sans-serif !important;
-    font-weight: 300;
-  }
-  
-  .cairo-regular {
-    font-family: "Cairo", sans-serif !important;
-    font-weight: 400;
-  }
-  
-  .cairo-medium {
-    font-family: "Cairo", sans-serif !important;
-    font-weight: 500;
-  }
-  
-  .cairo-semibold {
-    font-family: "Cairo", sans-serif !important;
-    font-weight: 600;
-  }
-  
-  .cairo-bold {
-    font-family: "Cairo", sans-serif !important;
-    font-weight: 700;
-  }
-  
-  .cairo-black {
-    font-family: "Cairo", sans-serif !important;
-    font-weight: 900;
-  }
-}
-
-    --accent: 45 70% 50%; /* ذهبي أندلسي دافئ */
-    --accent-foreground: 30 25% 18%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 40 30% 96%;
-
-    --border: 39 50% 67%; /* ذهبي فاتح للحدود */
-    --input: 40 30% 92%;
-    --ring: 210 70% 46%;
-
-    --radius: 0.75rem;
-  
-
-  .dark {
-    --background: 20 15% 10%;
-    --foreground: 40 30% 96%;
-    
-    --card: 20 15% 12%;
-    --card-foreground: 40 30% 96%;
-    
-    --popover: 20 15% 12%;
-    --popover-foreground: 40 30% 96%;
-    
-    --primary: 210 60% 53%; /* أزرق أندلسي أفتح للوضع المظلم */
-    --primary-foreground: 40 30% 96%;
-    
-    --secondary: 45 80% 70%; /* ذهبي أندلسي أفتح للوضع المظلم */
-    --secondary-foreground: 20 15% 10%;
-    
-    --muted: 20 15% 18%;
-    --muted-foreground: 40 20% 80%;
-    
-    --accent: 45 60% 55%; /* ذهبي أندلسي دافئ للوضع المظلم */
-    --accent-foreground: 40 30% 96%;
-    
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 40 30% 96%;
-    
-    --border: 39 40% 40%; /* ذهبي داكن للحدود في الوضع المظلم */
-    --input: 20 15% 18%;
-    --ring: 210 60% 53%;
-  }
-
-  * {
-    @apply border-border selection:bg-primary/10 selection:text-primary;
-    font-family: "Cairo", sans-serif !important;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-variation-settings: "slnt" 0;
-  }
-  
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: "Cairo", sans-serif !important;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-variation-settings: "slnt" 0;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
-    direction: rtl;
-  }
-
-  html {
-    @apply scroll-smooth;
-    font-family: "Cairo", sans-serif !important;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-variation-settings: "slnt" 0;
-  }
-
-  [dir="rtl"] {
-    text-align: right;
-    font-family: "Cairo", sans-serif !important;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-variation-settings: "slnt" 0;
-  }
-
-
-@layer utilities {
-  .glass {
-    @apply backdrop-blur-md bg-white/80 border border-white/20 shadow-lg;
-  }
-  
-  .dark .glass {
-    @apply backdrop-blur-md bg-slate-900/80 border border-white/10 shadow-lg;
-  }
-  
-  .glass-dark {
-    @apply backdrop-blur-md bg-black/10 border border-white/10;
-  }
-  
-  .scrollbar-hidden {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hidden::-webkit-scrollbar {
-    display: none;
-  }
-
-  .page-container {
-    @apply container mx-auto px-4 py-8 animate-fade-in;
-  }
-
-  .section-title {
-    @apply text-2xl font-semibold mb-6 text-foreground/90;
-  }
-
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-md hover:translate-y-[-2px];
-  }
-
-  .form-input {
-    @apply w-full px-4 py-2 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-primary/50;
-  }
-
-  .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2;
-  }
-
-  .btn-secondary {
-    @apply bg-secondary text-foreground px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2;
-  }
-  
-  /* تجاوز نمط الزر outline عندما يستخدم مع فئة andalusian-button */
-  .andalusian-button.outline,
-  button[class*="outline"].andalusian-button {
-    background-color: var(--secondary);
-    color: var(--secondary-foreground);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
   }
 
   .btn-danger {
