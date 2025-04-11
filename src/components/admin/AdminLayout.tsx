@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAdmin } from "@/contexts/AdminContext";
+// Remove unused imports
 
 // تستورد مكونات علامات التبويب المختلفة
 import DashboardTab from "@/components/admin/DashboardTab";
@@ -16,10 +17,11 @@ import TicketsTab from "@/components/admin/TicketsTab";
 import RolesTab from "@/components/admin/RolesTab";
 import SocialMediaTab from "@/components/admin/SocialMediaTab";
 import StatisticsTab from "@/components/admin/StatisticsTab";
+import { UserRole } from "@/components/admin/RoleTypes";
+import { User } from "@/components/admin/types";
 
 // استيراد Hooks الخاصة بالتطبيق
 import { useMaintenance, useApp, useTickets } from "@/App";
-import { UserRole } from "@/components/admin/RoleTypes";
 
 interface AdminLayoutProps {
   children?: React.ReactNode;
@@ -54,16 +56,30 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { socialLinks, updateSocialLinks } = useApp();
   const { updateTicketStatus, replyToTicket } = useTickets();
 
+  // التحقق من وجود المستخدم النشط قبل محاولة عرض البيانات
+  React.useEffect(() => {
+    // يمكننا هنا استدعاء دالة createDefaultOwner إذا لزم الأمر
+    try {
+      const setupDatabase = async () => {
+        const { setupDatabase: setupDatabaseFunc } = await import("@/lib/supabase-utils");
+        await setupDatabaseFunc();
+      };
+      setupDatabase();
+    } catch (error) {
+      console.error("Error setting up database:", error);
+    }
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen bg-[#f8f4e8] dark:bg-[#1a1814]" dir="rtl">
       <Header />
 
-      <main className="flex-1 pt-24 pb-16">
+      <main className="flex-1 pt-24 pb-16 bg-andalusian-library">
         <div className="container mx-auto px-4 text-right">
-          <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
+          <h1 className="text-3xl font-bold mb-8 andalusian-title">لوحة المشرف</h1>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
-            <TabsList className="grid w-full grid-cols-8 mb-8">
+          <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl" className="andalusian-admin-panel">
+            <TabsList className="grid w-full grid-cols-8 mb-8 border-b border-andalusian-border">
               <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
               <TabsTrigger value="users">المستخدمون</TabsTrigger>
               <TabsTrigger value="roles">الأدوار والصلاحيات</TabsTrigger>
@@ -75,7 +91,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </TabsList>
 
             <TabsContent value="dashboard">
-              <DashboardTab users={users} libraries={libraries} />
+              <DashboardTab 
+                users={users || []}
+                libraries={libraries || []}
+              />
             </TabsContent>
 
             <TabsContent value="users">
@@ -93,7 +112,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <RolesTab
                 users={users}
                 updateUserRole={updateUserRole}
-                currentUserRole="owner"
+                currentUserRole={"owner" as UserRole}
               />
             </TabsContent>
 

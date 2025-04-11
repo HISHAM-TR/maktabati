@@ -1,0 +1,355 @@
+/* أنماط التصميم الأندلسي للمكتبة */
+
+:root {
+  /* ألوان التصميم الأندلسي */
+  --andalusian-primary: #9c6b4e;      /* بني أندلسي أكثر حيوية */
+  --andalusian-secondary: #f3d04e;    /* ذهبي أندلسي مشرق */
+  --andalusian-accent: #4a8fc5;       /* أزرق أندلسي أكثر إشراقاً */
+  --andalusian-dark: #1d1f2c;         /* أزرق داكن */
+  --andalusian-light: #f9f6f0;        /* أبيض فاتح مائل للبيج دافئ */
+  --andalusian-border: #e0c28a;       /* ذهبي فاتح للحدود أكثر دفئاً */
+  --andalusian-pattern: rgba(74, 143, 197, 0.08); /* نمط خلفية شفاف أكثر وضوحاً */
+  
+  /* ظلال */
+  --andalusian-shadow-sm: 0 2px 8px rgba(74, 143, 197, 0.15);
+  --andalusian-shadow-md: 0 4px 12px rgba(74, 143, 197, 0.2);
+  --andalusian-shadow-lg: 0 8px 20px rgba(74, 143, 197, 0.25);
+  
+  /* زوايا */
+  --andalusian-radius-sm: 0.375rem;
+  --andalusian-radius-md: 0.75rem;
+  --andalusian-radius-lg: 1.5rem;
+  
+  /* ألوان حالة التذاكر */
+  --ticket-open: #f3d04e;             /* ذهبي للتذاكر المفتوحة */
+  --ticket-in-progress: #4a8fc5;      /* أزرق للتذاكر قيد التنفيذ */
+  --ticket-closed: #9c6b4e;           /* بني للتذاكر المغلقة */
+  
+  /* ألوان الأولوية */
+  --priority-high: #e05252;           /* أحمر للأولوية العالية */
+  --priority-medium: #f3d04e;         /* ذهبي للأولوية المتوسطة */
+  --priority-low: #6baa75;            /* أخضر للأولوية المنخفضة */
+}
+
+/* نمط الوضع المظلم */
+.dark {
+  --andalusian-primary: #b68468;      /* بني أندلسي أفتح وأكثر حيوية */
+  --andalusian-secondary: #f7dc6f;    /* ذهبي أندلسي أفتح وأكثر إشراقاً */
+  --andalusian-accent: #5fa0d8;       /* أزرق أندلسي أفتح وأكثر إشراقاً */
+  --andalusian-border: #c9b078;       /* ذهبي داكن للحدود أكثر حيوية */
+  --andalusian-pattern: rgba(95, 160, 216, 0.08); /* نمط خلفية شفاف للوضع المظلم */
+  --andalusian-dark: #1a1814;         /* خلفية داكنة للوضع المظلم */
+  --andalusian-light: #f0ebe0;        /* لون فاتح للوضع المظلم */
+  
+  /* ألوان حالة التذاكر للوضع المظلم */
+  --ticket-open: #f7dc6f;             /* ذهبي للتذاكر المفتوحة */
+  --ticket-in-progress: #5fa0d8;      /* أزرق للتذاكر قيد التنفيذ */
+  --ticket-closed: #b68468;           /* بني للتذاكر المغلقة */
+  
+  /* ألوان الأولوية للوضع المظلم */
+  --priority-high: #e87070;           /* أحمر للأولوية العالية */
+  --priority-medium: #f7dc6f;         /* ذهبي للأولوية المتوسطة */
+  --priority-low: #7dbd86;            /* أخضر للأولوية المنخفضة */
+}
+
+/* أنماط البطاقات */
+.andalusian-card {
+  background-color: var(--card);
+  border: 1px solid var(--andalusian-border);
+  border-radius: var(--andalusian-radius-md);
+  box-shadow: var(--andalusian-shadow-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.andalusian-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--andalusian-primary), var(--andalusian-secondary));
+}
+
+.andalusian-card:hover {
+  box-shadow: var(--andalusian-shadow-md);
+  transform: translateY(-2px);
+}
+
+/* أنماط الحدود المزخرفة */
+.andalusian-border {
+  position: relative;
+  border: 1px solid var(--andalusian-border);
+  border-radius: var(--andalusian-radius-md);
+  padding: 1.5rem;
+}
+
+.andalusian-border::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid var(--andalusian-secondary);
+  border-radius: calc(var(--andalusian-radius-md) + 4px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.andalusian-border::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/islamic-pattern-light.svg');
+  background-size: 200px;
+  background-repeat: repeat;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark .andalusian-border::after {
+  background-image: url('/islamic-pattern.svg');
+  opacity: 0.05;
+}
+
+/* أنماط العناوين */
+.andalusian-title {
+  position: relative;
+  font-weight: 700;
+  color: var(--foreground);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.andalusian-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--andalusian-secondary), var(--andalusian-primary));
+  border-radius: 3px;
+}
+
+/* أنماط الأزرار */
+.andalusian-button {
+  background: linear-gradient(135deg, var(--andalusian-primary), var(--andalusian-accent) 180%);
+  color: white;
+  border: none;
+  border-radius: var(--andalusian-radius-sm);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 0 2px 10px rgba(74, 143, 197, 0.2);
+}
+
+/* تجاوز نمط الزر outline عندما يستخدم مع andalusian-button */
+[variant="outline"].andalusian-button,
+button[variant="outline"].andalusian-button,
+.andalusian-button[variant="outline"] {
+  background: var(--andalusian-secondary);
+  color: var(--andalusian-dark);
+  border: 1px solid var(--andalusian-border);
+}
+
+.andalusian-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+  z-index: -1;
+}
+
+.andalusian-button:hover::before {
+  left: 100%;
+}
+
+.andalusian-button:hover {
+  box-shadow: 0 4px 12px rgba(61, 126, 174, 0.3);
+  transform: translateY(-1px);
+}
+
+/* أنماط الفوتر */
+.andalusian-footer {
+  background-color: var(--background);
+  border-top: 1px solid var(--andalusian-border);
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.andalusian-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--andalusian-primary), var(--andalusian-secondary), var(--andalusian-primary));
+  background-size: 200% 100%;
+  animation: gradient-flow 8s ease infinite;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* أنماط لوحة المشرفين */
+.andalusian-admin-panel {
+  background-color: var(--background);
+  border-radius: var(--andalusian-radius-lg);
+  box-shadow: var(--andalusian-shadow-md);
+  border: 1px solid var(--andalusian-border);
+  overflow: hidden;
+}
+
+.andalusian-admin-header {
+  background: linear-gradient(135deg, var(--andalusian-primary), var(--andalusian-dark));
+  color: white;
+  padding: 1rem 1.5rem;
+  position: relative;
+}
+
+.andalusian-admin-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--andalusian-secondary), transparent);
+}
+
+/* أنماط البروفايل */
+.andalusian-profile {
+  position: relative;
+  background-color: var(--card);
+  border-radius: var(--andalusian-radius-md);
+  border: 1px solid var(--andalusian-border);
+  overflow: hidden;
+}
+
+.andalusian-profile-header {
+  background: linear-gradient(135deg, var(--andalusian-primary), var(--andalusian-dark));
+  height: 100px;
+  position: relative;
+}
+
+.andalusian-profile-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background-image: url('/islamic-border.svg');
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  opacity: 0.2;
+}
+
+.andalusian-profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--card);
+  background-color: var(--andalusian-primary);
+  position: absolute;
+  top: 50px;
+  right: 30px;
+  overflow: hidden;
+  box-shadow: var(--andalusian-shadow-sm);
+}
+
+/* أنماط الجداول */
+.andalusian-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--andalusian-border);
+  border-radius: var(--andalusian-radius-md);
+  overflow: hidden;
+}
+
+.andalusian-table th {
+  background-color: var(--andalusian-primary);
+  color: white;
+  font-weight: 600;
+  text-align: right;
+  padding: 0.75rem 1rem;
+}
+
+.andalusian-table tr:nth-child(even) {
+  background-color: var(--andalusian-pattern);
+}
+
+.andalusian-table td {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* أنماط التبويبات */
+.andalusian-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--andalusian-border);
+  margin-bottom: 1.5rem;
+}
+
+.andalusian-tab {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.andalusian-tab.active {
+  color: var(--andalusian-primary);
+  font-weight: 600;
+}
+
+.andalusian-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--andalusian-primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* أنماط الشارات */
+.andalusian-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: var(--andalusian-primary);
+  color: white;
+}
+
+.andalusian-badge-secondary {
+  background-color: var(--andalusian-secondary);
+  color: var(--andalusian-dark);
+}
+
+.andalusian-badge-accent {
+  background-color: var(--andalusian-accent);
+  color: white;
+}

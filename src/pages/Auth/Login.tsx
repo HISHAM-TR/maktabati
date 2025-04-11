@@ -33,6 +33,7 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // التحقق من تسجيل الدخول عند تحميل الصفحة
   useEffect(() => {
@@ -49,16 +50,7 @@ const Login = () => {
     
     checkAuth();
     
-    // Try to create the default owner account
-    const setupDefaultOwner = async () => {
-      try {
-        await createDefaultOwner();
-      } catch (error) {
-        console.error("Error creating default owner:", error);
-      }
-    };
-    
-    setupDefaultOwner();
+
   }, [navigate]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -74,23 +66,35 @@ const Login = () => {
     setError(null);
 
     try {
-      // Show a tip for the default admin account
-      if (values.email.toLowerCase() !== "admin@admin.com") {
-        toast.info("يمكنك استخدام حساب المدير الافتراضي: admin@admin.com / 123456");
+      // Set default owner email and owner role for the specified email
+      if (values.email.toLowerCase() === "abouelfida2@gmail.com") {
+        localStorage.setItem('defaultOwnerEmail', values.email);
+        localStorage.setItem('userRole', 'owner');
+        // تعيين المستخدم كمصادق عليه تلقائيًا
+        localStorage.setItem('emailVerified', 'true');
       }
       
       // Try to sign in with Supabase
       await signIn(values.email, values.password);
       
-      // Update login state 
+      // Enable local storage login
       await login(values.email, values.password);
       
       toast.success("تم تسجيل الدخول بنجاح");
       navigate("/dashboard");
     } catch (error: any) {
-      const errorMessage = error.message || "فشل تسجيل الدخول";
+      let errorMessage = error.message || "فشل تسجيل الدخول";
+      
+      // Handle network errors specifically
+      if (errorMessage.includes('Failed to fetch')) {
+        errorMessage = "تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.";
+      }
+      
       setError(errorMessage);
       toast.error("فشل تسجيل الدخول: " + errorMessage);
+      
+      // Log the full error for debugging
+      console.error("Login error details:", error);
     } finally {
       setLoading(false);
     }
@@ -147,24 +151,42 @@ const Login = () => {
                       <FormItem>
                         <div className="flex items-center justify-between">
                           <FormLabel>كلمة المرور</FormLabel>
-                          <Button
-                            variant="link"
-                            className="p-0 h-auto text-sm"
-                            type="button"
-                            onClick={() => setIsForgotPasswordOpen(true)}
-                          >
-                            نسيت كلمة المرور؟
-                          </Button>
+                          <div className="flex flex-col items-end gap-1">
+                            <Button
+                              variant="link"
+                              className="p-0 h-auto text-sm"
+                              type="button"
+                              onClick={() => setIsForgotPasswordOpen(true)}
+                            >
+                              نسيت كلمة المرور؟
+                            </Button>
+                            <Button
+                              variant="link"
+                              className="p-0 h-auto text-sm"
+                              asChild
+                            >
+                              <Link to="/demo-account">استخدام حساب تجريبي</Link>
+                            </Button>
+                          </div>
                         </div>
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
                               placeholder="أدخل كلمة المرور"
-                              type="password"
-                              className="pl-3 pr-10"
+                              type={showPassword ? "text" : "password"}
+                              className="pl-10 pr-10"
                               {...field}
                             />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute left-0 top-0 h-full px-3"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? "إخفاء" : "إظهار"}
+                            </Button>
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -189,15 +211,7 @@ const Login = () => {
                 </form>
               </Form>
               
-              <div className="mt-4 p-4 bg-blue-50 rounded-md">
-                <p className="text-sm text-blue-700">
-                  للدخول كمشرف، استخدم الحساب التالي:
-                  <br />
-                  البريد الإلكتروني: <strong>admin@admin.com</strong>
-                  <br />
-                  كلمة المرور: <strong>123456</strong>
-                </p>
-              </div>
+
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">

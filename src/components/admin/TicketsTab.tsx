@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MessageSquare, AlertCircle, Filter, CheckCircle, Clock } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,13 @@ interface TicketsTabProps {
 }
 
 const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabProps) => {
+  const navigate = useNavigate();
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>(tickets);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
+  // تم إزالة حالة النافذة المنبثقة لأننا سنستخدم صفحة منفصلة لعرض التفاصيل
 
   const applyFilters = () => {
     let filtered = [...tickets];
@@ -33,6 +35,10 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
     
     if (priorityFilter !== "all") {
       filtered = filtered.filter(ticket => ticket.priority === priorityFilter);
+    }
+    
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(ticket => ticket.type === typeFilter);
     }
     
     if (searchQuery.trim()) {
@@ -57,15 +63,19 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
     setPriorityFilter(value);
     setTimeout(applyFilters, 0);
   };
+  
+  const handleTypeFilterChange = (value: string) => {
+    setTypeFilter(value);
+    setTimeout(applyFilters, 0);
+  };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setTimeout(applyFilters, 0);
   };
 
-  const openViewTicketDialog = (ticket: Ticket) => {
-    setActiveTicket(ticket);
-    setIsViewDialogOpen(true);
+  const navigateToTicketDetails = (ticket: Ticket) => {
+    navigate(`/tickets/${ticket.id}`);
   };
 
   const getStatusBadge = (status: string) => {
@@ -144,6 +154,27 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
               </Select>
             </div>
           </div>
+          
+          <div className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            <div className="w-40">
+              <Select
+                value={typeFilter}
+                onValueChange={handleTypeFilterChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="النوع" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع الأنواع</SelectItem>
+                  <SelectItem value="technical">فنية</SelectItem>
+                  <SelectItem value="account">حساب</SelectItem>
+                  <SelectItem value="payment">دفع</SelectItem>
+                  <SelectItem value="other">أخرى</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -158,6 +189,7 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
                 <TableHead className="text-right">تاريخ الإنشاء</TableHead>
                 <TableHead className="text-right">الحالة</TableHead>
                 <TableHead className="text-right">الأولوية</TableHead>
+                <TableHead className="text-right">النوع</TableHead>
                 <TableHead className="text-right">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
@@ -190,11 +222,18 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
                       {getPriorityBadge(ticket.priority)}
                     </TableCell>
                     <TableCell className="text-right">
+                      <Badge variant="outline">
+                        {ticket.type === "technical" ? "فنية" :
+                         ticket.type === "account" ? "حساب" :
+                         ticket.type === "payment" ? "دفع" : "أخرى"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
                       <div className="flex space-x-reverse space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => openViewTicketDialog(ticket)}
+                          onClick={() => navigateToTicketDetails(ticket)}
                         >
                           عرض وإجابة
                         </Button>
@@ -223,15 +262,7 @@ const TicketsTab = ({ tickets, updateTicketStatus, replyToTicket }: TicketsTabPr
         </CardContent>
       </Card>
 
-      {activeTicket && (
-        <ViewTicketDialog
-          isOpen={isViewDialogOpen}
-          setIsOpen={setIsViewDialogOpen}
-          ticket={activeTicket}
-          updateTicketStatus={updateTicketStatus}
-          replyToTicket={replyToTicket}
-        />
-      )}
+      {/* تم إزالة ViewTicketDialog واستبداله بصفحة منفصلة */}
     </div>
   );
 };

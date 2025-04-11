@@ -35,6 +35,9 @@ const defaultFormData: BookFormData = {
   volumes: 1,
   status: "available",
   borrowDate: null,
+  isRare: false,
+  isReference: false,
+  needsRepair: false,
 };
 
 const BookDialogs = forwardRef<
@@ -70,7 +73,7 @@ const BookDialogs = forwardRef<
   };
 
   // Use either the prop value or local state value
-  const actualIsAddDialogOpen = setIsAddDialogOpen ? isAddDialogOpen : localIsAddDialogOpen;
+  const actualIsAddDialogOpen = setIsAddDialogOpen !== undefined ? isAddDialogOpen : localIsAddDialogOpen;
 
   const resetFormData = () => {
     setFormData(defaultFormData);
@@ -96,12 +99,17 @@ const BookDialogs = forwardRef<
   };
 
   const handleEditBook = () => {
-    if (!activeBook) return;
+    if (!activeBook) {
+      console.log("لا يوجد كتاب نشط للتعديل");
+      return;
+    }
     if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
       toast.error("العنوان والمؤلف والتصنيف مطلوبين");
       return;
     }
 
+    console.log("تعديل الكتاب:", activeBook.id, formData);
+    
     const updatedBooks = books.map((book) =>
       book.id === activeBook.id
         ? { ...book, ...formData }
@@ -122,6 +130,7 @@ const BookDialogs = forwardRef<
   };
 
   const handleEditDialogOpen = (book: BookType) => {
+    console.log("فتح حوار تعديل الكتاب:", book.id);
     setActiveBook(book);
     setFormData({
       title: book.title,
@@ -131,6 +140,9 @@ const BookDialogs = forwardRef<
       volumes: (book as any).volumes || 1,
       status: book.status || "available",
       borrowDate: book.borrowDate || null,
+      isRare: (book as any).isRare || false,
+      isReference: (book as any).isReference || false,
+      needsRepair: (book as any).needsRepair || false,
     });
     setIsEditDialogOpen(true);
   };
@@ -183,7 +195,10 @@ const BookDialogs = forwardRef<
       </Dialog>
 
       {/* Edit Book Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
+        console.log("تغيير حالة حوار التعديل:", open);
+        setIsEditDialogOpen(open);
+      }}>
         <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-2xl">تعديل كتاب</DialogTitle>
@@ -201,7 +216,10 @@ const BookDialogs = forwardRef<
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
-            <Button onClick={handleEditBook} className="text-lg py-6 px-8">حفظ التغييرات</Button>
+            <Button onClick={() => {
+              console.log("تم النقر على زر حفظ التغييرات");
+              handleEditBook();
+            }} className="text-lg py-6 px-8">حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -241,6 +259,27 @@ const BookDialogs = forwardRef<
                     <Calendar className="h-5 w-5 text-blue-500" />
                     <span className="font-medium text-lg">تاريخ الإعارة:</span>
                     <span className="text-lg">{format(new Date(activeBook.borrowDate), "yyyy-MM-dd")}</span>
+                  </div>
+                )}
+                
+                {(activeBook as any).isRare && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <BookIcon className="h-5 w-5 text-amber-500" />
+                    <span className="font-medium text-lg">كتاب نادر</span>
+                  </div>
+                )}
+                
+                {(activeBook as any).isReference && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <BookIcon className="h-5 w-5 text-indigo-500" />
+                    <span className="font-medium text-lg">مرجع (غير قابل للإعارة)</span>
+                  </div>
+                )}
+                
+                {(activeBook as any).needsRepair && (
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <AlertCircle className="h-5 w-5 text-orange-500" />
+                    <span className="font-medium text-lg">يحتاج إلى صيانة</span>
                   </div>
                 )}
                 

@@ -102,11 +102,16 @@ const Dashboard = () => {
 
   // تعديل المكتبة
   const handleEditLibrary = () => {
-    if (!activeLibrary) return;
+    if (!activeLibrary) {
+      console.log("لا توجد مكتبة نشطة للتعديل");
+      return;
+    }
     if (!formData.name.trim()) {
       toast.error("اسم المكتبة مطلوب");
       return;
     }
+
+    console.log("تعديل المكتبة:", activeLibrary.id, formData);
 
     const updatedLibraries = libraries.map((lib) =>
       lib.id === activeLibrary.id
@@ -131,6 +136,7 @@ const Dashboard = () => {
 
   // فتح حوار التعديل
   const openEditDialog = (id: string) => {
+    console.log("فتح حوار التعديل للمكتبة:", id);
     const libraryToEdit = libraries.find((lib) => lib.id === id);
     if (libraryToEdit) {
       setActiveLibrary(libraryToEdit);
@@ -139,6 +145,8 @@ const Dashboard = () => {
         description: libraryToEdit.description,
       });
       setIsEditDialogOpen(true);
+    } else {
+      console.log("لم يتم العثور على المكتبة:", id);
     }
   };
 
@@ -149,7 +157,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen" dir="rtl">
+    <div className="flex flex-col min-h-screen bg-[#f8f4e8] dark:bg-[#1a1814]" dir="rtl">
       <Header />
 
       <main className="flex-1 pt-24 pb-16">

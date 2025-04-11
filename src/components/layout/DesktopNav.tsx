@@ -1,6 +1,7 @@
 
 import { NavLink } from "react-router-dom";
 import { User } from "@/App";
+import { MessageSquare } from "lucide-react";
 
 interface DesktopNavProps {
   user: User | null;
@@ -20,24 +21,36 @@ const DesktopNav = ({ user }: DesktopNavProps) => {
         </NavLink>
         
         {user && (
-          <NavLink 
-            to="/dashboard" 
-            className={({ isActive }) => 
-              `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
-            }
-          >
-            لوحة التحكم
-          </NavLink>
+          <>
+            <NavLink 
+              to="/dashboard" 
+              className={({ isActive }) => 
+                `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
+              }
+            >
+              لوحة التحكم
+            </NavLink>
+
+            <NavLink 
+              to="/tickets" 
+              className={({ isActive }) => 
+                `transition-colors hover:text-primary flex items-center gap-1 ${isActive ? "text-primary" : "text-foreground"}`
+              }
+            >
+              <MessageSquare className="h-4 w-4" />
+              تذاكر الدعم
+            </NavLink>
+          </>
         )}
         
-        {user?.role === "admin" && (
+        {user && (user.role === "admin" || user.role === "owner" || user.role === "moderator") && (
           <NavLink 
             to="/admin" 
             className={({ isActive }) => 
               `transition-colors hover:text-primary ${isActive ? "text-primary" : "text-foreground"}`
             }
           >
-            المشرف
+            لوحة المشرفين
           </NavLink>
         )}
       </div>

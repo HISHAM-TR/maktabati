@@ -1,8 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
-import { BookStatus } from "@/types/LibraryTypes";
-import { LibraryType, BookType } from "@/types/LibraryTypes";
 import { UserRole } from "@/components/admin/RoleTypes";
 import { toast } from "sonner";
+import { LibraryType, BookType } from "@/types/LibraryTypes";
 
 export type User = {
   id: string;
@@ -18,121 +16,133 @@ export type User = {
 
 // Authentication functions
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-
-  if (error) {
-    console.error("Login error:", error);
-    throw error;
+  // التحقق من البريد الإلكتروني الخاص بالمشرف
+  if (email.toLowerCase() === "abouelfida2@gmail.com" && password === "123456789") {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    let adminUser = users.find((u: any) => u.email.toLowerCase() === "abouelfida2@gmail.com");
+    
+    // إذا لم يكن المستخدم موجودًا، قم بإنشائه
+    if (!adminUser) {
+      adminUser = {
+        id: `owner-${Date.now()}`,
+        email: "abouelfida2@gmail.com",
+        password: "123456789",
+        name: "مالك النظام",
+        role: "owner" as UserRole,
+        lastLogin: new Date().toISOString()
+      };
+      
+      users.push(adminUser);
+    } else {
+      // تحديث بيانات المستخدم الموجود
+      adminUser.role = "owner";
+      adminUser.lastLogin = new Date().toISOString();
+    }
+    
+    // تحديث قائمة المستخدمين
+    const updatedUsers = users.map((u: any) => 
+      u.email.toLowerCase() === "abouelfida2@gmail.com" ? adminUser : u
+    );
+    
+    if (!updatedUsers.some(u => u.email.toLowerCase() === "abouelfida2@gmail.com")) {
+      updatedUsers.push(adminUser);
+    }
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    localStorage.setItem('currentUser', JSON.stringify(adminUser));
+    
+    return adminUser;
   }
-
-  return data;
+  
+  // المصادقة العادية للمستخدمين الآخرين
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const user = users.find((u: any) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+  
+  if (!user) {
+    throw new Error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+  }
+  
+  // تحديث آخر تسجيل دخول
+  user.lastLogin = new Date().toISOString();
+  localStorage.setItem('currentUser', JSON.stringify(user));
+  
+  // تحديث المستخدم في قائمة المستخدمين
+  const updatedUsers = users.map((u: any) => 
+    u.id === user.id ? { ...u, lastLogin: user.lastLogin } : u
+  );
+  localStorage.setItem('users', JSON.stringify(updatedUsers));
+  
+  return user;
 };
 
 export const signUp = async (email: string, password: string, metadata?: Record<string, any>) => {
-  const { data, error } = await supabase.auth.signUp({
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  
+  if (users.some((u: any) => u.email.toLowerCase() === email.toLowerCase())) {
+    throw new Error("هذا البريد الإلكتروني مسجل بالفعل");
+  }
+  
+  const newUser = {
+    id: Date.now().toString(),
     email,
     password,
-    options: {
-      data: metadata,
-    },
-  });
-
-  if (error) {
-    console.error("Signup error:", error);
-    throw error;
-  }
-
-  return data;
+    ...metadata,
+    role: 'user' as UserRole,
+    lastLogin: new Date().toISOString()
+  };
+  
+  users.push(newUser);
+  localStorage.setItem('users', JSON.stringify(users));
+  localStorage.setItem('currentUser', JSON.stringify(newUser));
+  
+  return { user: newUser };
 };
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    console.error("Signout error:", error);
-    throw error;
-  }
+  localStorage.removeItem('currentUser');
 };
 
 export const resetPassword = async (email: string) => {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/reset-password",
-  });
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const userExists = users.some((u: any) => u.email.toLowerCase() === email.toLowerCase());
   
-  if (error) {
-    console.error("Reset password error:", error);
-    throw error;
+  if (!userExists) {
+    throw new Error("البريد الإلكتروني غير مسجل في النظام");
   }
+  
+  // في بيئة حقيقية، هنا سيتم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور
+  // لكن في بيئة التخزين المحلي، نحاكي فقط نجاح العملية
+  console.log(`تم إرسال رابط إعادة تعيين كلمة المرور إلى: ${email}`);
+  return { success: true };
 };
 
 // User management functions
 export const updateLastLogin = async (userId: string) => {
   try {
-    await supabase
-      .from("profiles")
-      .update({ last_login: new Date().toISOString() })
-      .eq("id", userId);
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((user: any) => {
+      if (user.id === userId) {
+        return { ...user, lastLogin: new Date().toISOString() };
+      }
+      return user;
+    });
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    return true;
   } catch (error) {
     console.error("Error updating last login:", error);
+    return false;
   }
 };
 
 // Fetch current user with profile and role
 export const fetchCurrentUser = async (): Promise<User | null> => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return null;
-
-    const authUser = session.user;
-    if (!authUser) return null;
-
-    // Fetch user profile
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", authUser.id)
-      .single();
-
-    if (profileError) {
-      console.error("Error fetching profile:", profileError);
-      return null;
-    }
-
-    // Fetch user role
-    const { data: roleData, error: roleError } = await supabase
-      .from("user_roles")
-      .select("*")
-      .eq("user_id", authUser.id)
-      .single();
-
-    if (roleError) {
-      console.error("Error fetching user role:", roleError);
-      return null;
-    }
-
-    // Check role type and assign default if needed
-    let userRole: UserRole;
-    if (roleData.role === "owner") userRole = "owner";
-    else if (roleData.role === "admin") userRole = "admin";
-    else if (roleData.role === "moderator") userRole = "moderator";
-    else userRole = "user";
-
-    // Create user with profile info and role
-    const user: User = {
-      id: authUser.id,
-      email: authUser.email || "",
-      name: profileData.name || authUser.email?.split('@')[0] || "",
-      role: userRole,
-      country: "",
-      phoneNumber: "",
-      profileImage: profileData.avatar_url || "",
-      lastLogin: profileData.last_login ? new Date(profileData.last_login).toLocaleDateString() : undefined,
-      libraryCount: 0 // Will be updated later if needed
-    };
-
-    return user;
+    const userData = localStorage.getItem('currentUser');
+    if (!userData) return null;
+    
+    const user = JSON.parse(userData);
+    return user as User;
   } catch (error) {
     console.error("Error fetching current user:", error);
     return null;
@@ -147,28 +157,25 @@ export const createUserWithRole = async (
   role: UserRole
 ) => {
   try {
-    // Create user in Auth
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    if (users.some((u: any) => u.email.toLowerCase() === email.toLowerCase())) {
+      throw new Error("هذا البريد الإلكتروني مسجل بالفعل");
+    }
+    
+    const newUser = {
+      id: Date.now().toString(),
       email,
       password,
-      email_confirm: true,
-      user_metadata: { name },
-    });
-
-    if (authError) throw authError;
-    if (!authData.user) throw new Error("Failed to create user");
-
-    // Update role if not the default "user"
-    if (role !== "user") {
-      const { error: roleError } = await supabase
-        .from("user_roles")
-        .update({ role })
-        .eq("user_id", authData.user.id);
-
-      if (roleError) throw roleError;
-    }
-
-    return authData.user;
+      name,
+      role,
+      lastLogin: null
+    };
+    
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    return newUser;
   } catch (error) {
     console.error("Error creating user with role:", error);
     throw error;
@@ -177,12 +184,23 @@ export const createUserWithRole = async (
 
 export const updateUserRole = async (userId: string, newRole: UserRole) => {
   try {
-    const { error } = await supabase
-      .from("user_roles")
-      .update({ role: newRole })
-      .eq("user_id", userId);
-
-    if (error) throw error;
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((user: any) => {
+      if (user.id === userId) {
+        return { ...user, role: newRole };
+      }
+      return user;
+    });
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    // تحديث المستخدم الحالي إذا كان هو نفسه
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (currentUser && currentUser.id === userId) {
+      currentUser.role = newRole;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+    
     return true;
   } catch (error) {
     console.error("Error updating user role:", error);
@@ -190,14 +208,32 @@ export const updateUserRole = async (userId: string, newRole: UserRole) => {
   }
 };
 
-export const updateUserProfile = async (userId: string, name: string) => {
+export const updateUserProfile = async (userId: string, data: { name: string, country?: string, phone?: string }) => {
   try {
-    const { error } = await supabase
-      .from("profiles")
-      .update({ name })
-      .eq("id", userId);
-
-    if (error) throw error;
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map((user: any) => {
+      if (user.id === userId) {
+        return { 
+          ...user, 
+          name: data.name, 
+          ...(data.country ? { country: data.country } : {}),
+          ...(data.phone ? { phoneNumber: data.phone } : {})
+        };
+      }
+      return user;
+    });
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    // تحديث المستخدم الحالي إذا كان هو نفسه
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (currentUser && currentUser.id === userId) {
+      currentUser.name = data.name;
+      if (data.country) currentUser.country = data.country;
+      if (data.phone) currentUser.phone = data.phone;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    }
+    
     return true;
   } catch (error) {
     console.error("Error updating user profile:", error);
@@ -208,32 +244,18 @@ export const updateUserProfile = async (userId: string, name: string) => {
 // Library management
 export const fetchUserLibraries = async (userId: string) => {
   try {
-    const { data, error } = await supabase
-      .from("libraries")
-      .select(`
-        *,
-        books (count)
-      `)
-      .eq("owner_id", userId);
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
+    const userLibraries = Object.values(libraries)
+      .filter((lib: any) => lib.owner_id === userId)
+      .map((lib: any) => ({
+        ...lib,
+        books: lib.books || []
+      }));
     
-    // Transform to LibraryType format
-    const libraries = data.map(library => ({
-      id: library.id,
-      name: library.name,
-      description: library.description || "",
-      owner_id: library.owner_id,
-      is_public: library.is_public || false,
-      created_at: library.created_at,
-      updated_at: library.updated_at,
-      books: []
-    } as LibraryType));
-    
-    return libraries;
+    return userLibraries as LibraryType[];
   } catch (error) {
     console.error("Error fetching libraries:", error);
-    throw error;
+    return [];
   }
 };
 
@@ -244,29 +266,24 @@ export const createLibrary = async (
   owner_id: string
 ) => {
   try {
-    const { data, error } = await supabase
-      .from("libraries")
-      .insert([
-        { name, description, is_public, owner_id }
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
+    const now = new Date().toISOString();
     
-    // Transform to LibraryType
-    const library: LibraryType = {
-      id: data.id,
-      name: data.name,
-      description: data.description || "",
-      owner_id: data.owner_id,
-      is_public: data.is_public || false,
-      created_at: data.created_at,
-      updated_at: data.updated_at,
+    const newLibrary: LibraryType = {
+      id: `lib-${Date.now()}`,
+      name,
+      description,
+      is_public,
+      owner_id,
+      created_at: now,
+      updated_at: now,
       books: []
     };
     
-    return library;
+    libraries[newLibrary.id] = newLibrary;
+    localStorage.setItem('libraries', JSON.stringify(libraries));
+    
+    return newLibrary;
   } catch (error) {
     console.error("Error creating library:", error);
     throw error;
@@ -280,29 +297,25 @@ export const updateLibrary = async (
   is_public: boolean
 ) => {
   try {
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("libraries")
-      .update({ name, description, is_public, updated_at: now })
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
     
-    // Transform to LibraryType
-    const library: LibraryType = {
-      id: data.id,
-      name: data.name,
-      description: data.description || "",
-      owner_id: data.owner_id,
-      is_public: data.is_public || false,
-      created_at: data.created_at,
-      updated_at: data.updated_at,
-      books: []
+    if (!libraries[id]) {
+      throw new Error("المكتبة غير موجودة");
+    }
+    
+    const now = new Date().toISOString();
+    const updatedLibrary = {
+      ...libraries[id],
+      name,
+      description,
+      is_public,
+      updated_at: now
     };
     
-    return library;
+    libraries[id] = updatedLibrary;
+    localStorage.setItem('libraries', JSON.stringify(libraries));
+    
+    return updatedLibrary;
   } catch (error) {
     console.error("Error updating library:", error);
     throw error;
@@ -311,12 +324,15 @@ export const updateLibrary = async (
 
 export const deleteLibrary = async (id: string) => {
   try {
-    const { error } = await supabase
-      .from("libraries")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
+    
+    if (!libraries[id]) {
+      throw new Error("المكتبة غير موجودة");
+    }
+    
+    delete libraries[id];
+    localStorage.setItem('libraries', JSON.stringify(libraries));
+    
     return true;
   } catch (error) {
     console.error("Error deleting library:", error);
@@ -327,82 +343,55 @@ export const deleteLibrary = async (id: string) => {
 // Books management
 export const fetchLibraryBooks = async (libraryId: string) => {
   try {
-    const { data, error } = await supabase
-      .from("books")
-      .select("*")
-      .eq("library_id", libraryId);
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
     
-    // Transform to BookType
-    const books = data.map(book => ({
-      id: book.id,
-      title: book.title,
-      author: book.author || "",
-      description: book.description || "",
-      cover_url: book.cover_url || "",
-      category: book.category || "general",
-      isbn: book.isbn || "",
-      publication_year: book.publication_year || undefined,
-      publisher: book.publisher || "",
-      pages: book.pages || undefined,
-      language: book.language || "",
-      status: book.status || "available",
-      library_id: book.library_id,
-      volumes: 1  // Default value, add to database if needed
-    } as BookType));
+    if (!libraries[libraryId]) {
+      return [];
+    }
     
-    return books;
+    return libraries[libraryId].books || [];
   } catch (error) {
     console.error("Error fetching books:", error);
-    throw error;
+    return [];
   }
 };
 
 export const createBook = async (libraryId: string, bookData: Partial<BookType>) => {
   try {
-    const { data, error } = await supabase
-      .from("books")
-      .insert([
-        { 
-          library_id: libraryId,
-          title: bookData.title,
-          author: bookData.author,
-          description: bookData.description,
-          cover_url: bookData.cover_url,
-          category: bookData.category || "general",
-          isbn: bookData.isbn,
-          publication_year: bookData.publication_year,
-          publisher: bookData.publisher,
-          pages: bookData.pages,
-          language: bookData.language,
-          status: bookData.status || "available"
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
     
-    // Transform to BookType
-    const book: BookType = {
-      id: data.id,
-      title: data.title,
-      author: data.author || "",
-      description: data.description || "",
-      cover_url: data.cover_url || "",
-      category: data.category || "general",
-      isbn: data.isbn || "",
-      publication_year: data.publication_year || undefined,
-      publisher: data.publisher || "",
-      pages: data.pages || undefined,
-      language: data.language || "",
-      status: data.status as "available" | "borrowed" | "lost" | "damaged",
-      library_id: data.library_id,
-      volumes: 1  // Default value
+    if (!libraries[libraryId]) {
+      throw new Error("المكتبة غير موجودة");
+    }
+    
+    const now = new Date().toISOString();
+    const newBook: BookType = {
+      id: `book-${Date.now()}`,
+      title: bookData.title || "",
+      author: bookData.author || "",
+      description: bookData.description || "",
+      cover_url: bookData.cover_url || "",
+      category: bookData.category || "general",
+      isbn: bookData.isbn || "",
+      publication_year: bookData.publication_year,
+      publisher: bookData.publisher || "",
+      pages: bookData.pages,
+      language: bookData.language || "",
+      status: bookData.status || "available",
+      library_id: libraryId,
+      volumes: bookData.volumes || 1,
+      created_at: now,
+      updated_at: now
     };
     
-    return book;
+    if (!libraries[libraryId].books) {
+      libraries[libraryId].books = [];
+    }
+    
+    libraries[libraryId].books.push(newBook);
+    localStorage.setItem('libraries', JSON.stringify(libraries));
+    
+    return newBook;
   } catch (error) {
     console.error("Error creating book:", error);
     throw error;
@@ -411,48 +400,36 @@ export const createBook = async (libraryId: string, bookData: Partial<BookType>)
 
 export const updateBook = async (id: string, bookData: Partial<BookType>) => {
   try {
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("books")
-      .update({ 
-        title: bookData.title,
-        author: bookData.author,
-        description: bookData.description,
-        cover_url: bookData.cover_url,
-        category: bookData.category || "general",
-        isbn: bookData.isbn,
-        publication_year: bookData.publication_year,
-        publisher: bookData.publisher,
-        pages: bookData.pages,
-        language: bookData.language,
-        status: bookData.status,
-        updated_at: now 
-      })
-      .eq("id", id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
+    let bookFound = false;
+    let updatedBook: BookType | null = null;
     
-    // Transform to BookType
-    const book: BookType = {
-      id: data.id,
-      title: data.title,
-      author: data.author || "",
-      description: data.description || "",
-      cover_url: data.cover_url || "",
-      category: data.category || "general",
-      isbn: data.isbn || "",
-      publication_year: data.publication_year || undefined,
-      publisher: data.publisher || "",
-      pages: data.pages || undefined,
-      language: data.language || "",
-      status: data.status as "available" | "borrowed" | "lost" | "damaged",
-      library_id: data.library_id,
-      volumes: 1  // Default value
-    };
+    // البحث عن الكتاب في جميع المكتبات
+    for (const libId in libraries) {
+      if (libraries[libId].books) {
+        const bookIndex = libraries[libId].books.findIndex((book: BookType) => book.id === id);
+        
+        if (bookIndex !== -1) {
+          const now = new Date().toISOString();
+          updatedBook = {
+            ...libraries[libId].books[bookIndex],
+            ...bookData,
+            updated_at: now
+          };
+          
+          libraries[libId].books[bookIndex] = updatedBook;
+          bookFound = true;
+          break;
+        }
+      }
+    }
     
-    return book;
+    if (!bookFound) {
+      throw new Error("الكتاب غير موجود");
+    }
+    
+    localStorage.setItem('libraries', JSON.stringify(libraries));
+    return updatedBook as BookType;
   } catch (error) {
     console.error("Error updating book:", error);
     throw error;
@@ -461,12 +438,27 @@ export const updateBook = async (id: string, bookData: Partial<BookType>) => {
 
 export const deleteBook = async (id: string) => {
   try {
-    const { error } = await supabase
-      .from("books")
-      .delete()
-      .eq("id", id);
-
-    if (error) throw error;
+    const libraries = JSON.parse(localStorage.getItem('libraries') || '{}');
+    let bookFound = false;
+    
+    // البحث عن الكتاب في جميع المكتبات
+    for (const libId in libraries) {
+      if (libraries[libId].books) {
+        const bookIndex = libraries[libId].books.findIndex((book: BookType) => book.id === id);
+        
+        if (bookIndex !== -1) {
+          libraries[libId].books.splice(bookIndex, 1);
+          bookFound = true;
+          break;
+        }
+      }
+    }
+    
+    if (!bookFound) {
+      throw new Error("الكتاب غير موجود");
+    }
+    
+    localStorage.setItem('libraries', JSON.stringify(libraries));
     return true;
   } catch (error) {
     console.error("Error deleting book:", error);
@@ -477,22 +469,13 @@ export const deleteBook = async (id: string) => {
 // Site settings
 export const fetchSiteSettings = async () => {
   try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("*")
-      .limit(1)
-      .single();
-
-    if (error && error.code !== "PGRST116") { // PGRST116 is "no rows returned"
-      throw error;
-    }
-
-    // If no settings exist, create default settings
-    if (!data) {
+    const settings = localStorage.getItem('siteSettings');
+    
+    if (!settings) {
       return createDefaultSiteSettings();
     }
-
-    return data;
+    
+    return JSON.parse(settings);
   } catch (error) {
     console.error("Error fetching site settings:", error);
     return createDefaultSiteSettings();
@@ -501,19 +484,16 @@ export const fetchSiteSettings = async () => {
 
 export const createDefaultSiteSettings = async () => {
   try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .insert([
-        { 
-          maintenance_enabled: false,
-          maintenance_message: "الموقع قيد الصيانة حالياً، يرجى المحاولة لاحقاً"
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const defaultSettings = { 
+      id: "settings-1",
+      maintenance_enabled: false,
+      maintenance_message: "الموقع قيد الصيانة حالياً، يرجى المحاولة لاحقاً",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem('siteSettings', JSON.stringify(defaultSettings));
+    return defaultSettings;
   } catch (error) {
     console.error("Error creating default site settings:", error);
     throw error;
@@ -522,17 +502,15 @@ export const createDefaultSiteSettings = async () => {
 
 export const updateSiteSettings = async (settings: { maintenance_enabled: boolean, maintenance_message: string }) => {
   try {
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("site_settings")
-      .update({ 
-        maintenance_enabled: settings.maintenance_enabled, 
-        maintenance_message: settings.maintenance_message,
-        updated_at: now
-      })
-      .eq("id", (await fetchSiteSettings()).id);
-
-    if (error) throw error;
+    const currentSettings = await fetchSiteSettings();
+    const updatedSettings = {
+      ...currentSettings,
+      maintenance_enabled: settings.maintenance_enabled,
+      maintenance_message: settings.maintenance_message,
+      updated_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem('siteSettings', JSON.stringify(updatedSettings));
     return true;
   } catch (error) {
     console.error("Error updating site settings:", error);
@@ -543,22 +521,25 @@ export const updateSiteSettings = async (settings: { maintenance_enabled: boolea
 // Tickets system
 export const createTicket = async (userId: string, subject: string, description: string, priority = "medium") => {
   try {
-    const { data, error } = await supabase
-      .from("tickets")
-      .insert([
-        { 
-          user_id: userId, 
-          subject, 
-          description, 
-          priority,
-          status: "open" 
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+    const now = new Date().toISOString();
+    
+    const newTicket = {
+      id: `ticket-${Date.now()}`,
+      user_id: userId,
+      subject,
+      description,
+      priority,
+      status: "open",
+      created_at: now,
+      updated_at: now,
+      responses: []
+    };
+    
+    tickets.push(newTicket);
+    localStorage.setItem('tickets', JSON.stringify(tickets));
+    
+    return newTicket;
   } catch (error) {
     console.error("Error creating ticket:", error);
     throw error;
@@ -567,23 +548,16 @@ export const createTicket = async (userId: string, subject: string, description:
 
 export const fetchUserTickets = async () => {
   try {
-    const { data, error } = await supabase
-      .from('tickets')
-      .select(`
-        *,
-        profiles(name)
-      `);
-
-    if (error) {
-      console.error('Error fetching tickets:', error);
-      return [];
-    }
-
-    // Fix the type error by checking if profiles is present and not an error
-    return data.map(ticket => ({
-      ...ticket,
-      userName: typeof ticket.profiles === 'object' && ticket.profiles ? ticket.profiles.name : 'Unknown',
-    }));
+    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    
+    return tickets.map((ticket: any) => {
+      const user = users.find((u: any) => u.id === ticket.user_id);
+      return {
+        ...ticket,
+        userName: user ? user.name : 'Unknown'
+      };
+    });
   } catch (error) {
     console.error('Error fetching tickets:', error);
     return [];
@@ -592,32 +566,18 @@ export const fetchUserTickets = async () => {
 
 export const fetchAllTickets = async () => {
   try {
-    const { data, error } = await supabase
-      .from("tickets")
-      .select(`
-        *,
-        profiles(name, id),
-        ticket_responses (count)
-      `)
-      .order("created_at", { ascending: false });
-
-    if (error) throw error;
-
-    // Transform the data to match expected format and handle potential type issues
-    const tickets = data.map(ticket => ({
-      id: ticket.id,
-      subject: ticket.subject,
-      description: ticket.description,
-      status: ticket.status,
-      priority: ticket.priority,
-      user_id: ticket.user_id,
-      userName: typeof ticket.profiles === 'object' && ticket.profiles ? ticket.profiles.name : "Unknown",
-      responses: ticket.ticket_responses || [],
-      created_at: new Date(ticket.created_at).toISOString().split('T')[0],
-      updated_at: new Date(ticket.updated_at).toISOString().split('T')[0]
-    }));
+    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
     
-    return tickets;
+    return tickets.map((ticket: any) => {
+      const user = users.find((u: any) => u.id === ticket.user_id);
+      return {
+        ...ticket,
+        userName: user ? user.name : "Unknown",
+        created_at: new Date(ticket.created_at).toISOString().split('T')[0],
+        updated_at: new Date(ticket.updated_at).toISOString().split('T')[0]
+      };
+    }).sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   } catch (error) {
     console.error("Error fetching all tickets:", error);
     throw error;
@@ -626,13 +586,17 @@ export const fetchAllTickets = async () => {
 
 export const updateTicketStatus = async (ticketId: string, status: "open" | "in-progress" | "closed") => {
   try {
+    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
     const now = new Date().toISOString();
-    const { error } = await supabase
-      .from("tickets")
-      .update({ status, updated_at: now })
-      .eq("id", ticketId);
-
-    if (error) throw error;
+    
+    const updatedTickets = tickets.map((ticket: any) => {
+      if (ticket.id === ticketId) {
+        return { ...ticket, status, updated_at: now };
+      }
+      return ticket;
+    });
+    
+    localStorage.setItem('tickets', JSON.stringify(updatedTickets));
     return true;
   } catch (error) {
     console.error("Error updating ticket status:", error);
@@ -642,28 +606,34 @@ export const updateTicketStatus = async (ticketId: string, status: "open" | "in-
 
 export const replyToTicket = async (ticketId: string, userId: string, message: string, isAdmin = false) => {
   try {
-    const { data, error } = await supabase
-      .from("ticket_responses")
-      .insert([
-        { 
-          ticket_id: ticketId, 
-          user_id: userId, 
-          message, 
-          is_admin: isAdmin 
-        }
-      ])
-      .select();
-
-    if (error) throw error;
-    
-    // Also update the ticket's updated_at
+    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
     const now = new Date().toISOString();
-    await supabase
-      .from("tickets")
-      .update({ updated_at: now })
-      .eq("id", ticketId);
-      
-    return data[0];
+    
+    const user = users.find((u: any) => u.id === userId);
+    const response = {
+      id: `response-${Date.now()}`,
+      ticket_id: ticketId,
+      user_id: userId,
+      message,
+      is_admin: isAdmin,
+      created_at: now,
+      user_name: user ? user.name : (isAdmin ? "مدير النظام" : "مستخدم غير معروف")
+    };
+    
+    const updatedTickets = tickets.map((ticket: any) => {
+      if (ticket.id === ticketId) {
+        return { 
+          ...ticket, 
+          updated_at: now,
+          responses: [...(ticket.responses || []), response]
+        };
+      }
+      return ticket;
+    });
+    
+    localStorage.setItem('tickets', JSON.stringify(updatedTickets));
+    return response;
   } catch (error) {
     console.error("Error replying to ticket:", error);
     throw error;
@@ -672,17 +642,14 @@ export const replyToTicket = async (ticketId: string, userId: string, message: s
 
 export const fetchTicketResponses = async (ticketId: string) => {
   try {
-    const { data, error } = await supabase
-      .from("ticket_responses")
-      .select(`
-        *,
-        profiles (name)
-      `)
-      .eq("ticket_id", ticketId)
-      .order("created_at", { ascending: true });
-
-    if (error) throw error;
-    return data;
+    const tickets = JSON.parse(localStorage.getItem('tickets') || '[]');
+    const ticket = tickets.find((t: any) => t.id === ticketId);
+    
+    if (!ticket) {
+      return [];
+    }
+    
+    return ticket.responses || [];
   } catch (error) {
     console.error("Error fetching ticket responses:", error);
     throw error;
@@ -692,32 +659,17 @@ export const fetchTicketResponses = async (ticketId: string) => {
 // Social media links
 export const fetchSocialLinks = async () => {
   try {
-    const { data, error } = await supabase
-      .from("social_links")
-      .select("*");
-
-    if (error) throw error;
-    return data;
+    const links = localStorage.getItem('socialLinks');
+    return links ? JSON.parse(links) : [];
   } catch (error) {
     console.error("Error fetching social links:", error);
-    throw error;
+    return [];
   }
 };
 
 export const updateSocialLinks = async (links: { platform: string, url: string, icon: string }[]) => {
   try {
-    // First, delete all existing links
-    await supabase
-      .from("social_links")
-      .delete()
-      .neq("id", "00000000-0000-0000-0000-000000000000"); // This is just to make sure we have a valid filter
-    
-    // Then, insert the new links
-    const { data, error } = await supabase
-      .from("social_links")
-      .insert(links);
-
-    if (error) throw error;
+    localStorage.setItem('socialLinks', JSON.stringify(links));
     return true;
   } catch (error) {
     console.error("Error updating social links:", error);
@@ -728,23 +680,48 @@ export const updateSocialLinks = async (links: { platform: string, url: string, 
 // Create default owner
 export const createDefaultOwner = async () => {
   try {
-    const { data, error } = await supabase.functions.invoke('create-owner-account', {
-      body: {}
-    });
-
-    if (error) {
-      console.error("Error invoking create-owner-account function:", error);
-      throw new Error(error.message || 'Failed to create owner account');
-    }
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const defaultOwnerEmail = "abouelfida2@gmail.com";
+    const ownerExists = users.some((user: any) => user.email === defaultOwnerEmail);
     
-    if (data.exists) {
+    if (ownerExists) {
       console.log("Owner account already exists");
-    } else {
-      toast.success("تم إنشاء حساب المالك بنجاح");
-      console.log("Owner created with email: admin@admin.com and password: 123456");
+      // تحديث صلاحيات المستخدم الموجود إلى مالك النظام
+      const updatedUsers = users.map((user: any) => {
+        if (user.email === defaultOwnerEmail) {
+          return { ...user, role: "owner" as UserRole, password: "123456789" };
+        }
+        return user;
+      });
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      
+      // إذا كان المستخدم الحالي هو نفسه، قم بتحديث بياناته
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      if (currentUser && currentUser.email === defaultOwnerEmail) {
+        currentUser.role = "owner";
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      }
+      
+      return { exists: true };
     }
     
-    return data;
+    // إنشاء حساب المالك الافتراضي
+    const defaultOwner = {
+      id: `owner-${Date.now()}`,
+      email: defaultOwnerEmail,
+      password: "123456789",
+      name: "مالك النظام",
+      role: "owner" as UserRole,
+      lastLogin: new Date().toISOString()
+    };
+    
+    users.push(defaultOwner);
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    toast.success("تم إنشاء حساب المالك بنجاح");
+    console.log("Owner created with email: abouelfida2@gmail.com and password: 123456789");
+    
+    return { exists: false, owner: defaultOwner };
   } catch (error: any) {
     console.error("Error creating default owner:", error);
     toast.error("فشل إنشاء حساب المالك: " + error.message);
@@ -752,26 +729,50 @@ export const createDefaultOwner = async () => {
   }
 };
 
-export const createOwnerAccount = async (email: string, password: string, name: string) => {
+// Function to setup the database initially
+export const setupDatabase = async () => {
   try {
-    // Use the edge function to create the owner account
-    const { data, error } = await supabase.functions.invoke('create-owner', {
-      body: { email, password, name },
-    });
-
-    if (error) {
-      console.error("Error creating owner account:", error);
-      throw new Error(error.message || "Failed to create owner account");
+    // إنشاء المستخدمين الافتراضيين إذا لم يكونوا موجودين
+    if (!localStorage.getItem('users')) {
+      localStorage.setItem('users', JSON.stringify([]));
     }
-
-    if (!data || !data.success) {
-      throw new Error(data?.error || "Failed to create owner account");
+    
+    // إنشاء المكتبات الافتراضية إذا لم تكن موجودة
+    if (!localStorage.getItem('libraries')) {
+      localStorage.setItem('libraries', JSON.stringify({}));
     }
-
-    toast.success("تم إنشاء حساب المالك بنجاح");
-    return data;
-  } catch (error: any) {
-    console.error("Error creating owner account:", error);
+    
+    // إنشاء التذاكر الافتراضية إذا لم تكن موجودة
+    if (!localStorage.getItem('tickets')) {
+      localStorage.setItem('tickets', JSON.stringify([]));
+    }
+    
+    // إنشاء إعدادات الموقع الافتراضية إذا لم تكن موجودة
+    if (!localStorage.getItem('siteSettings')) {
+      await createDefaultSiteSettings();
+    }
+    
+    // إنشاء روابط التواصل الاجتماعي الافتراضية إذا لم تكن موجودة
+    if (!localStorage.getItem('socialLinks')) {
+      localStorage.setItem('socialLinks', JSON.stringify([]));
+    }
+    
+    // إنشاء حساب المالك الافتراضي
+    const ownerData = await createDefaultOwner();
+    
+    return {
+      success: true,
+      tables: {
+        users: true,
+        libraries: true,
+        tickets: true,
+        siteSettings: true,
+        socialLinks: true
+      },
+      owner: ownerData
+    };
+  } catch (error) {
+    console.error("Error setting up database:", error);
     throw error;
   }
 };

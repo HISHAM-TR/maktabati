@@ -42,13 +42,13 @@ const LibraryDialogs = ({
 }: LibraryDialogsProps) => {
   return (
     <>
-      {/* حوار إنشاء مكتبة */}
+      {/* حوار إنشاء تصنيف */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="font-cairo">
           <DialogHeader>
-            <DialogTitle className="text-xl tracking-wide">إنشاء مكتبة جديدة</DialogTitle>
+            <DialogTitle className="text-xl tracking-wide">إنشاء تصنيف جديد</DialogTitle>
             <DialogDescription className="text-base">
-              قم بإنشاء مكتبة جديدة لتنظيم كتبك.
+              قم بإنشاء تصنيف جديد لتنظيم كتبك.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -63,7 +63,7 @@ const LibraryDialogs = ({
                   setFormData({ ...formData, name: e.target.value })
                 }
                 className="col-span-3 text-right py-5 text-base"
-                placeholder="أدخل اسم المكتبة"
+                placeholder="أدخل اسم التصنيف"
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -77,7 +77,7 @@ const LibraryDialogs = ({
                   setFormData({ ...formData, description: e.target.value })
                 }
                 className="col-span-3 text-right py-3 text-base"
-                placeholder="وصف المكتبة الخاصة بك"
+                placeholder="وصف التصنيف الخاص بك"
                 rows={4}
               />
             </div>
@@ -90,7 +90,7 @@ const LibraryDialogs = ({
             >
               إلغاء
             </Button>
-            <Button onClick={handleCreateLibrary} className="text-base py-5 px-6">إنشاء مكتبة</Button>
+            <Button onClick={handleCreateLibrary} className="text-base py-5 px-6">إنشاء تصنيف</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
