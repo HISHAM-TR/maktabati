@@ -50,7 +50,6 @@ const LibraryDialogs = ({
             <DialogDescription className="text-base">
               قم بإنشاء تصنيف جديد لتنظيم كتبك.
             </DialogDescription>
-              قم بإنشاء تصنيف جديد لتنظيم كتبك.
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
