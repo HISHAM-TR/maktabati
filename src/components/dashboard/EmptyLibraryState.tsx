@@ -9,11 +9,11 @@ interface EmptyLibraryStateProps {
 
 const EmptyLibraryState = ({ hasLibraries, onCreateClick }: EmptyLibraryStateProps) => {
   return (
-    <div className="text-center py-16">
+    <div className="text-center py-16 andalusian-border">
       <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
         <Library className="h-8 w-8 text-primary" />
       </div>
-      <h3 className="text-xl font-semibold mb-2">لم يتم العثور على تصنيفات</h3>
+      <h3 className="text-xl font-semibold mb-2 andalusian-title">لم يتم العثور على تصنيفات</h3>
       <p className="text-muted-foreground mb-6 text-lg">
         {hasLibraries
           ? "جرب مصطلح بحث مختلف."
@@ -21,7 +21,7 @@ const EmptyLibraryState = ({ hasLibraries, onCreateClick }: EmptyLibraryStatePro
       </p>
       <Button
         onClick={onCreateClick}
-        className="text-base py-5 px-6"
+        className="text-base py-5 px-6 andalusian-button"
       >
         <Plus className="h-5 w-5 ml-2" />
         إنشاء تصنيف
