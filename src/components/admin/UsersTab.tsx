@@ -8,68 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import SearchBar from "@/components/ui/SearchBar";
 import { User as UserType } from "@/components/admin/types";
 
-const switchStyles = `
-  .switch {
-    font-size: 17px;
-    position: relative;
-    display: inline-block;
-    width: 3.5em;
-    height: 1.5em;
-  }
-  
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 1rem 0rem 1rem;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 1.5em;
-    width: 1.4em;
-    left: 0em;
-    bottom: 0em;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 1rem 0rem 1rem;
-    border: 3px solid white;
-  }
-
-  .ch:checked + .slider {
-    background-color: #72eb67;
-  }
-
-  .ch:focus + .slider {
-    box-shadow: 0 0 1px #2196f3;
-  }
-
-  .ch:checked + .slider:before {
-    transform: translateX(2.2em);
-    background-color: green;
-    box-shadow: 0px 0px 40px 5px #72eb67;
-    border: 3px solid white;
-  }
-
-  .ch:checked + .slider::after {
-    content: "|";
-    color: white;
-    position: absolute;
-    right: 0.3rem;
-    top: -3.3px;
-    transform: rotate(45deg);
-  }
-`;
-
 interface UsersTabProps {
   users: UserType[];
   filteredUsers: UserType[];
@@ -88,7 +26,6 @@ const UsersTab = ({
 }: UsersTabProps) => {
   return (
     <div className="animate-fade-in">
-      <style>{switchStyles}</style>
       <div className="flex justify-between items-center mb-6">
         <Button 
           onClick={() => setIsCreateUserDialogOpen(true)}
@@ -171,15 +108,29 @@ const UsersTab = ({
                       >
                         تعديل
                       </Button>
-                      <label className="switch">
-                        <input 
-                          className="ch" 
-                          type="checkbox" 
-                          checked={user.status === "active"}
-                          onChange={() => toggleUserStatus(user.id, user.status)}
-                        />
-                        <span className="slider" />
-                      </label>
+                      <Button
+                        variant={
+                          user.status === "active"
+                            ? "destructive"
+                            : "default"
+                        }
+                        size="sm"
+                        onClick={() =>
+                          toggleUserStatus(user.id, user.status)
+                        }
+                      >
+                        {user.status === "active" ? (
+                          <>
+                            <X className="h-4 w-4 ml-1" />
+                            تعطيل
+                          </>
+                        ) : (
+                          <>
+                            <Check className="h-4 w-4 ml-1" />
+                            تفعيل
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

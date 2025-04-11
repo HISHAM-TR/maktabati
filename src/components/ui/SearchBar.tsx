@@ -21,12 +21,6 @@ const SearchBar = ({
     onSearch(query);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    onSearch(value);
-  };
-
   return (
     <form 
       onSubmit={handleSubmit}
@@ -42,9 +36,9 @@ const SearchBar = ({
         <Input
           type="text"
           value={query}
-          onChange={handleChange}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder={placeholder}
-          className="pr-10 pl-12 py-2 w-full bg-white dark:bg-slate-900 text-right dark:text-white"
+          className="pr-10 pl-12 py-2 w-full bg-white text-right"
           dir="rtl"
         />
         <button

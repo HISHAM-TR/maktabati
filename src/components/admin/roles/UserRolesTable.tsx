@@ -1,6 +1,6 @@
 
 import React from "react";
-import { User, CheckCircle, Trash } from "lucide-react";
+import { User, CheckCircle } from "lucide-react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ interface UserRolesTableProps {
   currentUserRole: UserRole;
 }
 
-const UserRolesTable = ({ filteredUsers, updateUserRole, currentUserRole, deleteUser }: UserRolesTableProps & { deleteUser: (userId: string) => void }) => {
+const UserRolesTable = ({ filteredUsers, updateUserRole, currentUserRole }: UserRolesTableProps) => {
   // Sort roles by permission level
   const sortRoles = (roles: UserRole[]): UserRole[] => {
     const roleOrder: Record<UserRole, number> = {
@@ -80,7 +80,6 @@ const UserRolesTable = ({ filteredUsers, updateUserRole, currentUserRole, delete
                           {USER_ROLES[role]}
                         </Button>
                       ))}
-
                     </div>
                   ) : (
                     <span className="text-muted-foreground text-sm">

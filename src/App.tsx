@@ -1,4 +1,5 @@
-import React, { useState, createContext, useContext, useEffect, Suspense } from "react";
+
+import React, { useState, createContext, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,16 +16,13 @@ import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
-import Tickets from "./pages/Tickets";
-import TicketDetails from "./pages/TicketDetails";
 import Maintenance from "./pages/Maintenance";
-import DemoAccount from "./pages/Auth/DemoAccount";
 import { MaintenanceSettings } from "./components/admin/types";
 import { SocialMedia } from "./components/admin/SocialMediaTab";
 import { Ticket } from "./components/tickets/TicketTypes";
 import { LibraryType, BookType } from "./types/LibraryTypes";
 import { UserRole } from "./components/admin/RoleTypes";
-import { fetchCurrentUser, signOut } from "./lib/local-auth-utils";
+import { fetchCurrentUser, signOut } from "./lib/supabase-utils";
 
 export type User = {
   id: string;
@@ -258,18 +256,6 @@ const App = () => {
     localStorage.setItem("tickets", JSON.stringify(tickets));
   }, [tickets]);
 
-  useEffect(() => {
-    const setupDb = async () => {
-      try {
-        // No need for database setup with local storage
-      } catch (error) {
-        console.error("Failed to setup database:", error);
-      }
-    };
-    
-    setupDb();
-  }, []);
-
   const addLibrary = (library: LibraryType) => {
     setLibraries(prevLibraries => {
       const updatedLibraries = { ...prevLibraries, [library.id]: library };
@@ -337,15 +323,13 @@ const App = () => {
       prevTickets.map(ticket => {
         if (ticket.id === ticketId) {
           const now = new Date().toISOString().split('T')[0];
-          // تحديد ما إذا كان الرد من المستخدم أو من فريق الدعم
-          const isUserReply = user && user.id === ticket.userId;
           const newResponse = {
             id: `response-${Date.now()}`,
             ticketId,
             message,
-            userId: isUserReply ? user!.id : "admin",
-            userName: isUserReply ? user!.name : "فريق الدعم",
-            isAdmin: !isUserReply,
+            userId: "admin",
+            userName: "فريق الدعم",
+            isAdmin: true,
             createdAt: now
           };
           
@@ -362,7 +346,7 @@ const App = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      // Login is now handled by local storage
+      // Actual login is handled by supabase-utils 
       // Get the authenticated user after successful login
       const currentUser = await fetchCurrentUser();
       if (currentUser) {
@@ -406,7 +390,7 @@ const App = () => {
 
   const resetPassword = async (email: string) => {
     console.log("إعادة تعيين كلمة المرور لـ:", email);
-    // Implementation will be handled by local storage
+    // Implementation will be handled by Supabase
     await new Promise(resolve => setTimeout(resolve, 1000));
     return;
   };
@@ -462,7 +446,6 @@ const App = () => {
                     <Routes>
                       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
                       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
-                      <Route path="/demo-account" element={user ? <Navigate to="/dashboard" /> : <Suspense fallback={<div className="flex justify-center items-center h-screen">جاري التحميل...</div>}><DemoAccount /></Suspense>} />
                       <Route path="/maintenance" element={<Maintenance message={maintenanceSettings.message} />} />
                       <Route path="/terms" element={<Terms />} />
                       <Route path="/privacy" element={<Privacy />} />
@@ -476,8 +459,6 @@ const App = () => {
                       
                       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
                       <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-                      <Route path="/tickets" element={<RequireAuth><Tickets /></RequireAuth>} />
-                      <Route path="/tickets/:ticketId" element={<RequireAuth><Suspense fallback={<div className="flex justify-center items-center h-screen">جاري التحميل...</div>}><TicketDetails /></Suspense></RequireAuth>} />
                       <Route path="/library/:id" element={<RequireAuth><Library /></RequireAuth>} />
                       <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
                       

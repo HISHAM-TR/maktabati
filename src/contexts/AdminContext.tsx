@@ -376,18 +376,11 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setFilteredUsers(updatedUsers);
   };
 
-  const deleteUser = (userId: string) => {
-    const updatedUsers = users.filter(user => user.id !== userId);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    setUsers(updatedUsers);
-    setFilteredUsers(updatedUsers);
-  };
-
   const updateUserRole = (userId: string, newRole: UserRole) => {
     const updatedUsers = users.map((user) =>
       user.id === userId ? { ...user, role: newRole } : user
     );
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+
     setUsers(updatedUsers);
     setFilteredUsers(updatedUsers);
   };

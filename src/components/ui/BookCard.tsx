@@ -20,9 +20,6 @@ export type BookType = {
   description?: string;
   status?: "available" | "borrowed" | "lost" | "damaged";
   borrowDate?: Date;
-  isRare?: boolean;
-  isReference?: boolean;
-  needsRepair?: boolean;
 };
 
 interface BookCardProps {
@@ -49,7 +46,7 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden border border-andalusian-border h-full flex flex-col andalusian-card" dir="rtl">
+    <Card className="overflow-hidden border border-muted h-full flex flex-col" dir="rtl">
       <CardContent className="pt-6 px-6 flex-grow">
         <div className="flex justify-between items-start">
           <div className="h-12 w-12 rounded-full flex items-center justify-center bg-primary/10 mb-4">
@@ -61,16 +58,13 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
                 <HamburgerMenu />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="andalusian-dropdown">
+            <DropdownMenuContent align="start">
               <DropdownMenuItem onClick={() => onView(book)}>
                 <Eye className="h-4 w-4 ml-2" />
                 عرض التفاصيل
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {
-                console.log("تم النقر على زر التعديل للكتاب:", book.id);
-                onEdit(book);
-              }} className="text-[var(--andalusian-primary)] hover:text-[var(--andalusian-secondary)] focus:text-[var(--andalusian-secondary)]">
-                <Pencil className="h-4 w-4 ml-2 text-[var(--andalusian-primary)]" />
+              <DropdownMenuItem onClick={() => onEdit(book)}>
+                <Pencil className="h-4 w-4 ml-2" />
                 تعديل
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -83,20 +77,17 @@ const BookCard = ({ book, onView, onEdit, onDelete }: BookCardProps) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <h3 className="text-xl font-bold mb-1 line-clamp-1 text-right andalusian-title">{book.title}</h3>
+        <h3 className="text-xl font-bold mb-1 line-clamp-1 text-right">{book.title}</h3>
         <p className="text-muted-foreground mb-2 line-clamp-1 text-right">{book.author}</p>
-        <div className="flex flex-wrap space-x-reverse space-x-2 mb-3 justify-end gap-y-2">
-          <Badge variant="outline" className="border-andalusian-border">{book.category}</Badge>
+        <div className="flex space-x-reverse space-x-2 mb-3 justify-end">
+          <Badge variant="outline">{book.category}</Badge>
           {getStatusBadge()}
-          {book.isRare && <Badge className="bg-amber-500 hover:bg-amber-600">نادر</Badge>}
-          {book.isReference && <Badge className="bg-indigo-500 hover:bg-indigo-600">مرجع</Badge>}
-          {book.needsRepair && <Badge className="bg-orange-500 hover:bg-orange-600">صيانة</Badge>}
         </div>
         <p className="text-muted-foreground text-sm line-clamp-3 text-right">
           {book.description || "لا يوجد وصف متاح"}
         </p>
       </CardContent>
-      <CardFooter className="border-t border-andalusian-border px-6 py-3 bg-muted/30">
+      <CardFooter className="border-t px-6 py-3 bg-muted/30">
         {book.status === "borrowed" && book.borrowDate ? (
           <div className="text-sm text-muted-foreground text-right w-full">
             تاريخ الإعارة: {format(new Date(book.borrowDate), "yyyy-MM-dd")}

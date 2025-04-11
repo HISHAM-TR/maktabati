@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Shield, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Shield, User, Mail, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,6 @@ const CreateOwnerForm = () => {
     email: "abouelfida2@gmail.com",
     password: "Hichem1989*",
   });
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -132,24 +131,14 @@ const CreateOwnerForm = () => {
               <Input
                 id="password"
                 name="password"
-                type={showPassword ? "text" : "password"}
+                type="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="أدخل كلمة المرور"
                 required
-                className="pr-10 pl-10"
+                className="pr-10"
                 disabled={loading}
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute left-0 top-0 h-full px-3"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
-              >
-                {showPassword ? "إخفاء" : "إظهار"}
-              </Button>
             </div>
           </div>
 

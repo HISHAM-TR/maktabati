@@ -5,7 +5,6 @@ export interface Ticket {
   description: string;
   status: "open" | "in-progress" | "closed";
   priority: "low" | "medium" | "high";
-  type: "technical" | "account" | "payment" | "other"; // 👈 أضف هذا السطر
   userId: string;
   userName: string;
   userEmail: string;

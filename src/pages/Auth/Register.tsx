@@ -5,9 +5,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Mail, Lock, User, UserPlus, Phone, MapPin, Eye, EyeOff, Check, X } from "lucide-react";
+import { Mail, Lock, User, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -16,9 +15,6 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { signUp, fetchCurrentUser } from "@/lib/supabase-utils";
 import { useAuth } from "@/App";
-import CountrySelect from "@/components/ui/CountrySelect";
-import PhoneInput from "@/components/ui/PhoneInput";
-import "@/components/ui/phone-input.css";
 
 const formSchema = z.object({
   name: z
@@ -33,13 +29,7 @@ const formSchema = z.object({
     .min(6, { message: "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل" }),
   confirmPassword: z
     .string()
-    .min(6, { message: "تأكيد كلمة المرور مطلوب" }),
-  phoneNumber: z
-    .string()
-    .optional(),
-  country: z
-    .string()
-    .min(2, { message: "يرجى اختيار الدولة" })
+    .min(6, { message: "تأكيد كلمة المرور مطلوب" })
 });
 
 const Register = () => {
@@ -47,16 +37,6 @@ const Register = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [passwordChecks, setPasswordChecks] = useState({
-    hasLowerCase: false,
-    hasUpperCase: false,
-    hasNumber: false,
-    hasSymbol: false
-  });
 
   // التحقق من تسجيل الدخول عند تحميل الصفحة
   useEffect(() => {
@@ -85,53 +65,18 @@ const Register = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      phoneNumber: "",
-      country: "SA",
     },
   });
-
-  // دالة لتقييم قوة كلمة المرور
-  const evaluatePasswordStrength = (password: string) => {
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-    
-    const checks = { hasLowerCase, hasUpperCase, hasNumber, hasSymbol };
-    setPasswordChecks(checks);
-    
-    // حساب قوة كلمة المرور (0-100)
-    const strength = Object.values(checks).filter(Boolean).length * 25;
-    setPasswordStrength(strength);
-    
-    return strength;
-  };
-  
-  // معالج تغيير كلمة المرور
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    evaluatePasswordStrength(newPassword);
-    form.setValue("password", newPassword);
-  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setError(null);
 
     try {
-      const { user } = await signUp(values.email, values.password, { 
-        name: values.name,
-        country: values.country,
-        phoneNumber: values.phoneNumber
-      });
+      const { user } = await signUp(values.email, values.password, { name: values.name });
       
       if (user) {
-        // Temporarily disabled local storage registration
-        // await register(values.name, values.email, values.password, {
-        //   country: values.country,
-        //   phoneNumber: values.phoneNumber
-        // });
+        await register(values.name, values.email, values.password);
         toast.success("تم إنشاء الحساب بنجاح");
         navigate("/dashboard");
       } else {
@@ -222,45 +167,12 @@ const Register = () => {
                             <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
                               placeholder="أدخل كلمة المرور"
-                              type={showPassword ? "text" : "password"}
-                              className="pl-10 pr-10"
-                              value={password}
-                              onChange={handlePasswordChange}
-                              onBlur={field.onBlur}
-                              name={field.name}
+                              type="password"
+                              className="pl-3 pr-10"
+                              {...field}
                             />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute left-0 top-0 h-full px-3"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
                           </div>
                         </FormControl>
-                        <div className="mt-2">
-                          <Progress value={passwordStrength} className="h-2 mb-2" />
-                          <div className="text-xs flex flex-wrap gap-2 mt-1">
-                            <div className={`flex items-center gap-1 ${passwordChecks.hasLowerCase ? 'text-green-600' : 'text-gray-400'}`}>
-                              {passwordChecks.hasLowerCase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                              <span>حرف صغير</span>
-                            </div>
-                            <div className={`flex items-center gap-1 ${passwordChecks.hasUpperCase ? 'text-green-600' : 'text-gray-400'}`}>
-                              {passwordChecks.hasUpperCase ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                              <span>حرف كبير</span>
-                            </div>
-                            <div className={`flex items-center gap-1 ${passwordChecks.hasNumber ? 'text-green-600' : 'text-gray-400'}`}>
-                              {passwordChecks.hasNumber ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                              <span>رقم</span>
-                            </div>
-                            <div className={`flex items-center gap-1 ${passwordChecks.hasSymbol ? 'text-green-600' : 'text-gray-400'}`}>
-                              {passwordChecks.hasSymbol ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                              <span>رمز</span>
-                            </div>
-                          </div>
-                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -277,55 +189,15 @@ const Register = () => {
                             <Lock className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
                               placeholder="أعد إدخال كلمة المرور"
-                              type={showConfirmPassword ? "text" : "password"}
-                              className="pl-10 pr-10"
+                              type="password"
+                              className="pl-3 pr-10"
                               {...field}
                             />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute left-0 top-0 h-full px-3"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            >
-                              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </Button>
                           </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>الدولة</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <MapPin className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <div className="pr-10">
-                              <CountrySelect
-                                value={field.value}
-                                onChange={field.onChange}
-                                placeholder="اختر الدولة"
-                              />
-                            </div>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <PhoneInput
-                    control={form.control}
-                    name="phoneNumber"
-                    label="رقم الهاتف"
-                    placeholder="أدخل رقم الهاتف"
-                    defaultCountry="SA"
                   />
 
                   <Button
