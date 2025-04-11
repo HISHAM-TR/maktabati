@@ -94,11 +94,11 @@ const ViewTicketDialog = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "open":
-        return "bg-[var(--ticket-open)] text-[#1d1f2c] shadow-[0_0_10px_rgba(243,208,78,0.3)]";
+        return "bg-secondary text-secondary-foreground";
       case "in-progress":
-        return "bg-[var(--ticket-in-progress)] text-white shadow-[0_0_10px_rgba(74,143,197,0.3)]";
+        return "bg-primary text-primary-foreground";
       case "closed":
-        return "bg-[var(--ticket-closed)] text-white shadow-[0_0_10px_rgba(156,107,78,0.3)]";
+        return "bg-muted text-muted-foreground";
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -107,24 +107,24 @@ const ViewTicketDialog = ({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "open":
-        return <AlertCircle className="h-5 w-5 animate-pulse" />;
+        return <AlertCircle className="h-4 w-4" />;
       case "in-progress":
-        return <RefreshCw className="h-5 w-5 animate-spin-slow" />;
+        return <RefreshCw className="h-4 w-4" />;
       case "closed":
-        return <CheckCircle className="h-5 w-5" />;
+        return <CheckCircle className="h-4 w-4" />;
       default:
-        return <MessageSquare className="h-5 w-5" />;
+        return <MessageSquare className="h-4 w-4" />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
-        return "bg-[var(--priority-high)/15] text-[var(--priority-high)] border-[var(--priority-high)/30] font-semibold";
+        return "bg-destructive/10 text-destructive border-destructive/20";
       case "medium":
-        return "bg-[var(--priority-medium)/15] text-[var(--priority-medium)] border-[var(--priority-medium)/30] font-semibold";
+        return "bg-warning/10 text-warning-foreground border-warning/20";
       case "low":
-        return "bg-[var(--priority-low)/15] text-[var(--priority-low)] border-[var(--priority-low)/30] font-semibold";
+        return "bg-muted text-muted-foreground border-muted/50";
       default:
         return "bg-muted text-muted-foreground border-muted/50";
     }

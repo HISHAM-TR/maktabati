@@ -99,17 +99,12 @@ const BookDialogs = forwardRef<
   };
 
   const handleEditBook = () => {
-    if (!activeBook) {
-      console.log("لا يوجد كتاب نشط للتعديل");
-      return;
-    }
+    if (!activeBook) return;
     if (!formData.title.trim() || !formData.author.trim() || !formData.category) {
       toast.error("العنوان والمؤلف والتصنيف مطلوبين");
       return;
     }
 
-    console.log("تعديل الكتاب:", activeBook.id, formData);
-    
     const updatedBooks = books.map((book) =>
       book.id === activeBook.id
         ? { ...book, ...formData }
@@ -130,7 +125,6 @@ const BookDialogs = forwardRef<
   };
 
   const handleEditDialogOpen = (book: BookType) => {
-    console.log("فتح حوار تعديل الكتاب:", book.id);
     setActiveBook(book);
     setFormData({
       title: book.title,
@@ -195,10 +189,7 @@ const BookDialogs = forwardRef<
       </Dialog>
 
       {/* Edit Book Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={(open) => {
-        console.log("تغيير حالة حوار التعديل:", open);
-        setIsEditDialogOpen(open);
-      }}>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="font-cairo">
           <DialogHeader>
             <DialogTitle className="text-2xl">تعديل كتاب</DialogTitle>
@@ -216,10 +207,7 @@ const BookDialogs = forwardRef<
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="text-lg py-6 px-8">
               إلغاء
             </Button>
-            <Button onClick={() => {
-              console.log("تم النقر على زر حفظ التغييرات");
-              handleEditBook();
-            }} className="text-lg py-6 px-8">حفظ التغييرات</Button>
+            <Button onClick={handleEditBook} className="text-lg py-6 px-8">حفظ التغييرات</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

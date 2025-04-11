@@ -208,16 +208,16 @@ export const updateUserRole = async (userId: string, newRole: UserRole) => {
   }
 };
 
-export const updateUserProfile = async (userId: string, data: { name: string, country?: string, phone?: string }) => {
+export const updateUserProfile = async (userId: string, name: string, country?: string, phoneNumber?: string) => {
   try {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const updatedUsers = users.map((user: any) => {
       if (user.id === userId) {
         return { 
           ...user, 
-          name: data.name, 
-          ...(data.country ? { country: data.country } : {}),
-          ...(data.phone ? { phoneNumber: data.phone } : {})
+          name, 
+          ...(country ? { country } : {}),
+          ...(phoneNumber ? { phoneNumber } : {})
         };
       }
       return user;
@@ -228,9 +228,9 @@ export const updateUserProfile = async (userId: string, data: { name: string, co
     // تحديث المستخدم الحالي إذا كان هو نفسه
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
     if (currentUser && currentUser.id === userId) {
-      currentUser.name = data.name;
-      if (data.country) currentUser.country = data.country;
-      if (data.phone) currentUser.phone = data.phone;
+      currentUser.name = name;
+      if (country) currentUser.country = country;
+      if (phoneNumber) currentUser.phoneNumber = phoneNumber;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
     }
     
