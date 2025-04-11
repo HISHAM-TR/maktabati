@@ -74,12 +74,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex flex-col min-h-screen bg-[#f8f4e8] dark:bg-[#1a1814]" dir="rtl">
       <Header />
 
-      <main className="flex-1 pt-24 pb-16 bg-andalusian-library">
+      <main className="flex-1 pt-24 pb-16 bg-[url('/andalusian-library.svg')] bg-repeat bg-opacity-10 dark:bg-[url('/andalusian-library-dark.svg')]">
         <div className="container mx-auto px-4 text-right">
-          <h1 className="text-3xl font-bold mb-8 andalusian-title">لوحة المشرف</h1>
+          <h1 className="text-3xl font-bold mb-8">لوحة المشرف</h1>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl" className="andalusian-admin-panel">
-            <TabsList className="grid w-full grid-cols-8 mb-8 border-b border-andalusian-border">
+          <Tabs value={activeTab} onValueChange={setActiveTab} dir="rtl">
+            <TabsList className="grid w-full grid-cols-8 mb-8">
               <TabsTrigger value="dashboard">لوحة المعلومات</TabsTrigger>
               <TabsTrigger value="users">المستخدمون</TabsTrigger>
               <TabsTrigger value="roles">الأدوار والصلاحيات</TabsTrigger>

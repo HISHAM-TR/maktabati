@@ -35,8 +35,8 @@ const CardActions = ({ id, onEdit, onDelete, position = "right" }: CardActionsPr
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align={position === "left" ? "start" : "end"}>
-          <DropdownMenuItem onClick={() => onEdit(id)} className="text-[var(--andalusian-primary)] hover:text-[var(--andalusian-secondary)] focus:text-[var(--andalusian-secondary)]">
-            <Edit className="h-4 w-4 ml-2 text-[var(--andalusian-primary)]" />
+          <DropdownMenuItem onClick={() => onEdit(id)}>
+            <Edit className="h-4 w-4 ml-2" />
             تعديل
           </DropdownMenuItem>
           <DropdownMenuItem
